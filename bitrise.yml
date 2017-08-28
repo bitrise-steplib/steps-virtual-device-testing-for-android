@@ -4,18 +4,14 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 app:
   envs:
   # define these in your .bitrise.secrets.yml
-  - ADDON_VDTESTING_API_URL: $ADDON_VDTESTING_API_URL
   - TEST_APK_PATH: $TEST_APK_PATH
-  - APK_PATH: $APK_PATH
-  - BITRISE_BUILD_SLUG: $BITRISE_BUILD_SLUG
-  - BITRISE_APP_SLUG: $BITRISE_APP_SLUG
   # if you want to share this step into a StepLib
   - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
 
 workflows:
   test:
     before_run:
-    #- go-tests
+    - go-tests
     steps:
     - path::./:
         title: Step Test
@@ -26,7 +22,6 @@ workflows:
           file if you would not specify another value.
         inputs:
           - api_base_url: $ADDON_VDTESTING_API_URL
-          - apk_path: $APK_PATH
           - test_apk_path: $TEST_APK_PATH
           - test_type: instrumentation
 
