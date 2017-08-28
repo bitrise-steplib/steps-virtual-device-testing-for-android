@@ -118,15 +118,18 @@ inputs:
   - test_timeout: 900
     opts:
       category: "Debug"
-      title: "Maximum time allowed for the tests to run"
+      title: "Test timeout"
+      summary: "Maximum time allowed for the tests to run"
   - directories_to_pull:
     opts:
       category: "Debug"
-      title: "Directories to pull, one path per line"
+      title: "Directories to pull"
+      summary: "Directories to pull, one path per line"
   - environment_variables:
     opts:
       category: "Debug"
-      title: |
+      title: Environment Variables
+      summary: |
         Environment Variables, one per line and separated by "="
   - download_test_results: false
     opts:

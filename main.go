@@ -258,7 +258,9 @@ func (configs ConfigsModel) print() {
 
 		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", deviceParams[0], deviceParams[1], deviceParams[3], deviceParams[2]))
 	}
-	w.Flush()
+	if err := w.Flush(); err != nil {
+		log.Errorf("Failed to flush writer, error: %s", err)
+	}
 	log.Printf("---")
 	log.Printf("- AppPackageID: %s", configs.AppPackageID)
 	log.Printf("- TestType: %s", configs.TestType)
@@ -681,7 +683,9 @@ func main() {
 
 					fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome))
 				}
-				w.Flush()
+				if err := w.Flush(); err != nil {
+					log.Errorf("Failed to flush writer, error: %s", err)
+				}
 			}
 			if !finished {
 				time.Sleep(5 * time.Second)
