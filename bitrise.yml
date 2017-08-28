@@ -7,6 +7,7 @@ app:
   - TEST_APK_PATH: $TEST_APK_PATH
   # if you want to share this step into a StepLib
   - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
+  - STEP_VERSION: "0.9.0"
 
 workflows:
   test:
@@ -109,12 +110,25 @@ workflows:
             set -ex
             stepman audit --step-yml ./step.yml
 
+  # ----------------------------------------------------------------
+  # --- workflows to create Release
+  create-release:
+    steps:
+    - script:
+        title:
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+            export CI=true
+            releaseman create --version $STEP_VERSION
+
   share-this-step:
     envs:
       # if you want to share this step into a StepLib
       - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
       - STEP_ID_IN_STEPLIB: virtual-device-testing-for-android
-      - STEP_GIT_VERION_TAG_TO_SHARE: '0.9.0'
+      - STEP_GIT_VERION_TAG_TO_SHARE: $STEP_VERSION
       - STEP_GIT_CLONE_URL: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android.git
     description: |-
       If this is the first time you try to share a Step you should
