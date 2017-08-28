@@ -1,0 +1,159 @@
+title: "[PRIVATE-BETA] Virtual Device Testing for Android"
+summary: Run Android UI tests on virtual devices
+description: |-
+  Run Android UI tests on virtual devices.
+website: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
+source_code_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
+support_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android/issues
+host_os_tags:
+  - ubuntu
+project_type_tags:
+  - android
+type_tags:
+  - test
+is_always_run: false
+is_skippable: false
+deps:
+  brew:
+  - name: go
+  apt_get:
+  - name: golang
+    bin_name: go
+toolkit:
+  go:
+    package_name: github.com/bitrise-steplib/steps-virtual-device-testing-for-android
+inputs:
+  - apk_path: "$BITRISE_APK_PATH"
+    opts:
+      title: "APK path"
+      summary: The path to the debug, unaligned APK.
+      description: |
+        The path to the unaligned debug APK.
+      is_required: true
+  - test_devices: "NexusLowRes,24,en,portrait"
+    opts:
+      title: "Test devices"
+      summary: |
+        One device configuration per line and the parameters are separated with "," in the order of: "deviceID, version, language, orientation". For example: `NexusLowRes,24,en,portrait`
+      description: |
+        One device configuration per line and the parameters are separated with "," in the order of: deviceID, version, language, orientation
+        For example:
+        `NexusLowRes,24,en,portrait`
+        `NexusLowRes,24,en,landscape`
+      is_required: true
+  - test_type: "instrumentation"
+    opts:
+      title: "Test type"
+      summary: The type of your test
+      description: |
+        The type of your test you want to run on the device.
+      is_required: true
+      value_options:
+        - instrumentation
+        - robo
+        - gameloop
+  - app_package_id:
+    opts:
+      title: "App package ID"
+      summary: The package ID of your apk
+      description: |
+        The package ID of your app
+  - test_apk_path: 
+    opts:
+      category: "Instrumentation Test"
+      title: "Test APK path"
+      summary: The path to the unaligned test debug APK.
+      description: |
+        The path to the unaligned test debug APK.
+  - inst_test_package_id:
+    opts:
+      category: "Instrumentation Test"
+      title: "Test package ID"
+      summary: The package ID of your test apk
+      description: |
+        The package ID of your test apk
+  - inst_test_runner_class:
+    opts:
+      category: "Instrumentation Test"
+      title: "Test runner class"
+      summary: The test runner that will run your test cases
+      description: |
+        The test runner that will run your test cases
+  - inst_test_targets:
+    opts:
+      category: "Instrumentation Test"
+      title: |
+        Test targets, seperated with the "," character.
+      summary: Test targets
+      description: |
+        Test targets
+  - robo_initial_activity: 
+    opts:
+      category: "Robo Test"
+      title: "Initial activity"
+  - robo_max_depth:
+    opts:
+      category: "Robo Test"
+      title: "Max depth"
+  - robo_max_steps:
+    opts:
+      category: "Robo Test"
+      title: "Max steps"
+  - robo_directives:
+    opts:
+      category: "Robo Test"
+      title: "Robo directives"
+      summary: |
+        One directive per line, the parameters are separated with "," character. For example: "ResourceName,InputText,ActionType"
+      description: |
+        Test targets
+  - loop_scenarios:
+    opts:
+      category: "Game Loop Test"
+      title: "Loop scenarios"
+  - loop_scenario_labels:
+    opts:
+      category: "Game Loop Test"
+      title: "Loop scenario labels"
+  - test_timeout: 900
+    opts:
+      category: "Debug"
+      title: "Maximum time allowed for the tests to run"
+  - directories_to_pull:
+    opts:
+      category: "Debug"
+      title: "Directories to pull, one path per line"
+  - environment_variables:
+    opts:
+      category: "Debug"
+      title: |
+        Environment Variables, one per line and separated by "="
+  - download_test_results: false
+    opts:
+      category: "Debug"
+      title: "Download test result files"
+      is_required: true
+      value_options:
+        - false
+        - true
+  - api_base_url: $ADDON_VDTESTING_API_URL
+    opts:
+      title: "Test API's base URL"
+      summary: The URL where test API is accessible.
+      description: |
+        The URL where test API is accessible.
+      is_required: true
+      is_dont_change_value: true
+  - api_token: $ADDON_VDTESTING_API_TOKEN
+    opts: 
+      title: "API Token"
+      summary: The token required to authenticate with the API.
+      description: |
+        The token required to authenticate with the API.
+      is_required: true
+      is_dont_change_value: true
+outputs:
+  - VDTESTING_TEST_RESULTS_PATH:
+    opts:
+      title: "The directory containing test assets"
+      description: "The directory containing test assets"
