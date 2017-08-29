@@ -1,6 +1,10 @@
-## Changelog (Current version: 0.9.2)
+## Changelog (Current version: 0.9.3)
 
 -----------------
+
+### 0.9.3 (2017 Aug 29)
+
+* [680e561] Prepare for 0.9.3
 
 ### 0.9.2 (2017 Aug 29)
 
