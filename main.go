@@ -739,10 +739,10 @@ func main() {
 			}
 
 			log.Donef("=> Assets downloaded")
-			if err := tools.ExportEnvironmentWithEnvman("VDTESTING_TEST_RESULTS_PATH", tempDir); err != nil {
-				log.Warnf("Failed to export environment (VDTESTING_TEST_RESULTS_PATH), error: %s", err)
+			if err := tools.ExportEnvironmentWithEnvman("VDTESTING_DOWNLOADED_FILES_DIR", tempDir); err != nil {
+				log.Warnf("Failed to export environment (VDTESTING_DOWNLOADED_FILES_DIR), error: %s", err)
 			} else {
-				log.Printf("The downloaded test assets path (%s) is exported to the VDTESTING_TEST_RESULTS_PATH environment variable.", tempDir)
+				log.Printf("The downloaded test assets path (%s) is exported to the VDTESTING_DOWNLOADED_FILES_DIR environment variable.", tempDir)
 			}
 		}
 	}
