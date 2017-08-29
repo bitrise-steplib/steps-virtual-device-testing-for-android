@@ -105,9 +105,9 @@ inputs:
     opts:
       title: "App package ID"
       summary: |
-        The Java package of the application under test (leave empty fo get it extracted from the APK manifest).
+        The Java package of the application under test (leave empty to get it extracted from the APK manifest).
       description: |
-        The Java package of the application under test (leave empty fo get it extracted from the APK manifest).
+        The Java package of the application under test (leave empty to get it extracted from the APK manifest).
   - test_apk_path: 
     opts:
       category: "Instrumentation Test"
@@ -138,8 +138,8 @@ inputs:
     opts:
       category: "Robo Test"
       title: "Initial activity"
-      summary: The initial activity used to start the app during a robo test.
-      description: The initial activity used to start the app during a robo test.
+      summary: The initial activity used to start the app during a robo test. (leave empty to get it extracted from the APK manifest)
+      description: The initial activity used to start the app during a robo test. (leave empty to get it extracted from the APK manifest)
   - robo_max_depth:
     opts:
       category: "Robo Test"
