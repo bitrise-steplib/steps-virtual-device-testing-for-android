@@ -145,17 +145,17 @@ inputs:
       category: "Robo Test"
       title: "Max depth"
       summary: |
-        The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(default: 50)
+        The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(leave empty to use the default value: `50`)
       description: |
-        The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(default: 50)
+        The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(leave empty to use the default value: `50`)
   - robo_max_steps:
     opts:
       category: "Robo Test"
       title: "Max steps"
       summary: |
-        The maximum number of steps/actions a robo test can execute(default: no limit).
+        The maximum number of steps/actions a robo test can execute(leave empty to use the default value: `no limit`).
       description: |
-        The maximum number of steps/actions a robo test can execute(default: no limit).
+        The maximum number of steps/actions a robo test can execute(leave empty to use the default value: `no limit`).
   - robo_directives:
     opts:
       category: "Robo Test"
