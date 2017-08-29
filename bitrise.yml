@@ -7,7 +7,7 @@ app:
   - TEST_APK_PATH: $TEST_APK_PATH
   # if you want to share this step into a StepLib
   - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
-  - STEP_VERSION: "0.9.4"
+  - STEP_VERSION: "0.9.5"
 
 workflows:
   test:
