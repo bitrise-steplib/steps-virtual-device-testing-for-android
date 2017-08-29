@@ -380,9 +380,12 @@ func main() {
 		if err != nil {
 			failf("Failed to upload file(%s) to (%s), error: %s", configs.ApkPath, responseModel.AppURL, err)
 		}
-		err = uploadFile(responseModel.TestAppURL, configs.TestApkPath)
-		if err != nil {
-			failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, responseModel.TestAppURL, err)
+
+		if configs.TestType == "instrumentation" {
+			err = uploadFile(responseModel.TestAppURL, configs.TestApkPath)
+			if err != nil {
+				failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, responseModel.TestAppURL, err)
+			}
 		}
 
 		log.Donef("=> APKs uploaded")
