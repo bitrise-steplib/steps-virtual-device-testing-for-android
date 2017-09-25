@@ -89,7 +89,7 @@ inputs:
         └─────────────┴──────────┴────────────────────┴─────────────┴────────────────┴
         ```
       is_required: true
-  - test_type: "instrumentation"
+  - test_type: "robo"
     opts:
       title: "Test type"
       summary: |
