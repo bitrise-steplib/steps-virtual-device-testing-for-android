@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.5)
+## Changelog (Current version: 0.9.6)
 
 -----------------
+
+### 0.9.6 (2017 Sep 25)
+
+* [3cef49b] Prepare for 0.9.6
+* [5b96062] change default test type to robo (#1)
 
 ### 0.9.5 (2017 Aug 29)
 
@@ -25,4 +30,4 @@
 
 -----------------
 
-Updated: 2017 Aug 29
+Updated: 2017 Sep 25
