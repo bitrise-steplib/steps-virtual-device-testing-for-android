@@ -1,6 +1,10 @@
-## Changelog (Current version: 0.9.6)
+## Changelog (Current version: 0.9.7)
 
 -----------------
+
+### 0.9.7 (2017 Sep 27)
+
+* [88d5bd8] Prepare for 0.9.7
 
 ### 0.9.6 (2017 Sep 25)
 
@@ -30,4 +34,4 @@
 
 -----------------
 
-Updated: 2017 Sep 25
+Updated: 2017 Sep 27
