@@ -1,4 +1,4 @@
-title: "[PRIVATE-BETA] Virtual Device Testing for Android"
+title: "[BETA] Virtual Device Testing for Android"
 summary: Run Android UI tests on virtual devices
 description: |-
   Run Android UI tests on virtual devices. Available test types are instrumentation, robo, gameloop.
