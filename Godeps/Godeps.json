@@ -8,27 +8,27 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/colorstring",
-			"Rev": "6eb582e08179a025ed2deb86ea6dffbd13ba1ff6"
+			"Rev": "4ea9c35054b7f8cce3940bf73b5dcd395e9c9226"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/command",
-			"Rev": "6eb582e08179a025ed2deb86ea6dffbd13ba1ff6"
+			"Rev": "4ea9c35054b7f8cce3940bf73b5dcd395e9c9226"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/errorutil",
-			"Rev": "6eb582e08179a025ed2deb86ea6dffbd13ba1ff6"
+			"Rev": "4ea9c35054b7f8cce3940bf73b5dcd395e9c9226"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/log",
-			"Rev": "6eb582e08179a025ed2deb86ea6dffbd13ba1ff6"
+			"Rev": "4ea9c35054b7f8cce3940bf73b5dcd395e9c9226"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/pathutil",
-			"Rev": "6eb582e08179a025ed2deb86ea6dffbd13ba1ff6"
+			"Rev": "4ea9c35054b7f8cce3940bf73b5dcd395e9c9226"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/sliceutil",
-			"Rev": "6eb582e08179a025ed2deb86ea6dffbd13ba1ff6"
+			"Rev": "4ea9c35054b7f8cce3940bf73b5dcd395e9c9226"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-steputils/input",
@@ -37,6 +37,34 @@
 		{
 			"ImportPath": "github.com/bitrise-tools/go-steputils/tools",
 			"Rev": "a848c9870ff7d745a8fb2a951e1c81fcb147b4ec"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "a04bdaca5b32abe1c069418fb7088ae607de5bd0"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context/ctxhttp",
+			"Rev": "a04bdaca5b32abe1c069418fb7088ae607de5bd0"
+		},
+		{
+			"ImportPath": "google.golang.org/api/gensupport",
+			"Rev": "8615d46d2e751d0db6d6ec7fbffee66185a42a07"
+		},
+		{
+			"ImportPath": "google.golang.org/api/googleapi",
+			"Rev": "8615d46d2e751d0db6d6ec7fbffee66185a42a07"
+		},
+		{
+			"ImportPath": "google.golang.org/api/googleapi/internal/uritemplates",
+			"Rev": "8615d46d2e751d0db6d6ec7fbffee66185a42a07"
+		},
+		{
+			"ImportPath": "google.golang.org/api/testing/v1",
+			"Rev": "8615d46d2e751d0db6d6ec7fbffee66185a42a07"
+		},
+		{
+			"ImportPath": "google.golang.org/api/toolresults/v1beta3",
+			"Rev": "8615d46d2e751d0db6d6ec7fbffee66185a42a07"
 		}
 	]
 }

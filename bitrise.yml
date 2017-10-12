@@ -5,6 +5,7 @@ app:
   envs:
   # define these in your .bitrise.secrets.yml
   - TEST_APK_PATH: $TEST_APK_PATH
+  - APK_PATH: $APK_PATH
   # if you want to share this step into a StepLib
   - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
   - STEP_VERSION: "0.9.7"
@@ -18,6 +19,7 @@ workflows:
         inputs:
           - api_base_url: $ADDON_VDTESTING_API_URL
           - test_apk_path: $TEST_APK_PATH
+          - apk_path: $APK_PATH
           - test_type: instrumentation
 
   go-tests:
