@@ -15,12 +15,16 @@ import (
 	"text/tabwriter"
 	"time"
 
+	testing "google.golang.org/api/testing/v1"
+	toolresults "google.golang.org/api/toolresults/v1beta3"
+
 	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
 	"github.com/bitrise-tools/go-steputils/input"
 	"github.com/bitrise-tools/go-steputils/tools"
+	//toolresults "google.golang.org/api/toolresults/v1beta3firstparty"
 )
 
 // ConfigsModel ...
@@ -59,136 +63,136 @@ type ConfigsModel struct {
 }
 
 // ListStepsResponse ...
-type ListStepsResponse struct {
-	Steps []*Step `json:"steps,omitempty"`
-}
+// type ListStepsResponse struct {
+// 	Steps []*Step `json:"steps,omitempty"`
+// }
 
-// Outcome ...
-type Outcome struct {
-	FailureDetail      *FailureDetail      `json:"failureDetail,omitempty"`
-	InconclusiveDetail *InconclusiveDetail `json:"inconclusiveDetail,omitempty"`
-	SkippedDetail      *SkippedDetail      `json:"skippedDetail,omitempty"`
-	SuccessDetail      *SuccessDetail      `json:"successDetail,omitempty"`
-	Summary            string              `json:"summary,omitempty"`
-}
+// // Outcome ...
+// type Outcome struct {
+// 	FailureDetail      *FailureDetail      `json:"failureDetail,omitempty"`
+// 	InconclusiveDetail *InconclusiveDetail `json:"inconclusiveDetail,omitempty"`
+// 	SkippedDetail      *SkippedDetail      `json:"skippedDetail,omitempty"`
+// 	SuccessDetail      *SuccessDetail      `json:"successDetail,omitempty"`
+// 	Summary            string              `json:"summary,omitempty"`
+// }
 
 // SuccessDetail ...
-type SuccessDetail struct {
-	OtherNativeCrash bool `json:"otherNativeCrash,omitempty"`
-}
+// type SuccessDetail struct {
+// 	OtherNativeCrash bool `json:"otherNativeCrash,omitempty"`
+// }
 
-// SkippedDetail ...
-type SkippedDetail struct {
-	IncompatibleAppVersion   bool `json:"incompatibleAppVersion,omitempty"`
-	IncompatibleArchitecture bool `json:"incompatibleArchitecture,omitempty"`
-	IncompatibleDevice       bool `json:"incompatibleDevice,omitempty"`
-}
+// // SkippedDetail ...
+// type SkippedDetail struct {
+// 	IncompatibleAppVersion   bool `json:"incompatibleAppVersion,omitempty"`
+// 	IncompatibleArchitecture bool `json:"incompatibleArchitecture,omitempty"`
+// 	IncompatibleDevice       bool `json:"incompatibleDevice,omitempty"`
+// }
 
-// FailureDetail ...
-type FailureDetail struct {
-	Crashed          bool `json:"crashed,omitempty"`
-	NotInstalled     bool `json:"notInstalled,omitempty"`
-	OtherNativeCrash bool `json:"otherNativeCrash,omitempty"`
-	TimedOut         bool `json:"timedOut,omitempty"`
-	UnableToCrawl    bool `json:"unableToCrawl,omitempty"`
-}
+// // FailureDetail ...
+// type FailureDetail struct {
+// 	Crashed          bool `json:"crashed,omitempty"`
+// 	NotInstalled     bool `json:"notInstalled,omitempty"`
+// 	OtherNativeCrash bool `json:"otherNativeCrash,omitempty"`
+// 	TimedOut         bool `json:"timedOut,omitempty"`
+// 	UnableToCrawl    bool `json:"unableToCrawl,omitempty"`
+// }
 
-// InconclusiveDetail ...
-type InconclusiveDetail struct {
-	AbortedByUser         bool `json:"abortedByUser,omitempty"`
-	InfrastructureFailure bool `json:"infrastructureFailure,omitempty"`
-}
+// // InconclusiveDetail ...
+// type InconclusiveDetail struct {
+// 	AbortedByUser         bool `json:"abortedByUser,omitempty"`
+// 	InfrastructureFailure bool `json:"infrastructureFailure,omitempty"`
+// }
 
-// Step ...
-type Step struct {
-	Outcome        *Outcome                   `json:"outcome,omitempty"`
-	State          string                     `json:"state,omitempty"`
-	DimensionValue []*StepDimensionValueEntry `json:"dimensionValue,omitempty"`
-}
+// // Step ...
+// type Step struct {
+// 	Outcome        *Outcome                   `json:"outcome,omitempty"`
+// 	State          string                     `json:"state,omitempty"`
+// 	DimensionValue []*StepDimensionValueEntry `json:"dimensionValue,omitempty"`
+// }
 
 // StepDimensionValueEntry ...
-type StepDimensionValueEntry struct {
-	Key   string `json:"key,omitempty"`
-	Value string `json:"value,omitempty"`
-}
+// type StepDimensionValueEntry struct {
+// 	Key   string `json:"key,omitempty"`
+// 	Value string `json:"value,omitempty"`
+// }
 
-// AndroidDevice ...
-type AndroidDevice struct {
-	AndroidModelID   string `json:"androidModelId,omitempty"`
-	AndroidVersionID string `json:"androidVersionId,omitempty"`
-	Locale           string `json:"locale,omitempty"`
-	Orientation      string `json:"orientation,omitempty"`
-}
+// // AndroidDevice ...
+// type AndroidDevice struct {
+// 	AndroidModelID   string `json:"androidModelId,omitempty"`
+// 	AndroidVersionID string `json:"androidVersionId,omitempty"`
+// 	Locale           string `json:"locale,omitempty"`
+// 	Orientation      string `json:"orientation,omitempty"`
+// }
 
-// AndroidDeviceList ...
-type AndroidDeviceList struct {
-	AndroidDevices []*AndroidDevice `json:"androidDevices,omitempty"`
-}
+// // AndroidDeviceList ...
+// type AndroidDeviceList struct {
+// 	AndroidDevices []*AndroidDevice `json:"androidDevices,omitempty"`
+// }
 
-// EnvironmentMatrix ...
-type EnvironmentMatrix struct {
-	AndroidDeviceList *AndroidDeviceList `json:"androidDeviceList,omitempty"`
-}
+// // EnvironmentMatrix ...
+// type EnvironmentMatrix struct {
+// 	AndroidDeviceList *AndroidDeviceList `json:"androidDeviceList,omitempty"`
+// }
 
-// TestMatrix ...
-type TestMatrix struct {
-	EnvironmentMatrix *EnvironmentMatrix `json:"environmentMatrix,omitempty"`
-	TestSpecification *TestSpecification `json:"testSpecification,omitempty"`
-}
+// // TestMatrix ...
+// type TestMatrix struct {
+// 	EnvironmentMatrix *EnvironmentMatrix `json:"environmentMatrix,omitempty"`
+// 	TestSpecification *TestSpecification `json:"testSpecification,omitempty"`
+// }
 
-// TestSpecification ...
-type TestSpecification struct {
-	AndroidInstrumentationTest *AndroidInstrumentationTest `json:"androidInstrumentationTest,omitempty"`
-	AndroidRoboTest            *AndroidRoboTest            `json:"androidRoboTest,omitempty"`
-	AndroidTestLoop            *AndroidTestLoop            `json:"androidTestLoop,omitempty"`
-	AutoGoogleLogin            bool                        `json:"autoGoogleLogin,omitempty"`
-	TestSetup                  *TestSetup                  `json:"testSetup,omitempty"`
-	TestTimeout                string                      `json:"testTimeout,omitempty"`
-}
+// // TestSpecification ...
+// type TestSpecification struct {
+// 	AndroidInstrumentationTest *AndroidInstrumentationTest `json:"androidInstrumentationTest,omitempty"`
+// 	AndroidRoboTest            *AndroidRoboTest            `json:"androidRoboTest,omitempty"`
+// 	AndroidTestLoop            *AndroidTestLoop            `json:"androidTestLoop,omitempty"`
+// 	AutoGoogleLogin            bool                        `json:"autoGoogleLogin,omitempty"`
+// 	TestSetup                  *TestSetup                  `json:"testSetup,omitempty"`
+// 	TestTimeout                string                      `json:"testTimeout,omitempty"`
+// }
 
-// AndroidInstrumentationTest ...
-type AndroidInstrumentationTest struct {
-	AppPackageID    string   `json:"appPackageId,omitempty"`
-	TestPackageID   string   `json:"testPackageId,omitempty"`
-	TestRunnerClass string   `json:"testRunnerClass,omitempty"`
-	TestTargets     []string `json:"testTargets,omitempty"`
-}
+// // AndroidInstrumentationTest ...
+// type AndroidInstrumentationTest struct {
+// 	AppPackageID    string   `json:"appPackageId,omitempty"`
+// 	TestPackageID   string   `json:"testPackageId,omitempty"`
+// 	TestRunnerClass string   `json:"testRunnerClass,omitempty"`
+// 	TestTargets     []string `json:"testTargets,omitempty"`
+// }
 
-// AndroidRoboTest ...
-type AndroidRoboTest struct {
-	AppInitialActivity string           `json:"appInitialActivity,omitempty"`
-	AppPackageID       string           `json:"appPackageId,omitempty"`
-	MaxDepth           int64            `json:"maxDepth,omitempty"`
-	MaxSteps           int64            `json:"maxSteps,omitempty"`
-	RoboDirectives     []*RoboDirective `json:"roboDirectives,omitempty"`
-}
+// // AndroidRoboTest ...
+// type AndroidRoboTest struct {
+// 	AppInitialActivity string           `json:"appInitialActivity,omitempty"`
+// 	AppPackageID       string           `json:"appPackageId,omitempty"`
+// 	MaxDepth           int64            `json:"maxDepth,omitempty"`
+// 	MaxSteps           int64            `json:"maxSteps,omitempty"`
+// 	RoboDirectives     []*RoboDirective `json:"roboDirectives,omitempty"`
+// }
 
-// RoboDirective ...
-type RoboDirective struct {
-	ActionType   string `json:"actionType,omitempty"`
-	InputText    string `json:"inputText,omitempty"`
-	ResourceName string `json:"resourceName,omitempty"`
-}
+// // RoboDirective ...
+// type RoboDirective struct {
+// 	ActionType   string `json:"actionType,omitempty"`
+// 	InputText    string `json:"inputText,omitempty"`
+// 	ResourceName string `json:"resourceName,omitempty"`
+// }
 
-// AndroidTestLoop ...
-type AndroidTestLoop struct {
-	AppPackageID   string   `json:"appPackageId,omitempty"`
-	ScenarioLabels []string `json:"scenarioLabels,omitempty"`
-	Scenarios      []int64  `json:"scenarios,omitempty"`
-}
+// // AndroidTestLoop ...
+// type AndroidTestLoop struct {
+// 	AppPackageID   string   `json:"appPackageId,omitempty"`
+// 	ScenarioLabels []string `json:"scenarioLabels,omitempty"`
+// 	Scenarios      []int64  `json:"scenarios,omitempty"`
+// }
 
-// TestSetup ...
-type TestSetup struct {
-	DirectoriesToPull    []string               `json:"directoriesToPull,omitempty"`
-	EnvironmentVariables []*EnvironmentVariable `json:"environmentVariables,omitempty"`
-	NetworkProfile       string                 `json:"networkProfile,omitempty"`
-}
+// // TestSetup ...
+// type TestSetup struct {
+// 	DirectoriesToPull    []string               `json:"directoriesToPull,omitempty"`
+// 	EnvironmentVariables []*EnvironmentVariable `json:"environmentVariables,omitempty"`
+// 	NetworkProfile       string                 `json:"networkProfile,omitempty"`
+// }
 
-// EnvironmentVariable ...
-type EnvironmentVariable struct {
-	Key   string `json:"key,omitempty"`
-	Value string `json:"value,omitempty"`
-}
+// // EnvironmentVariable ...
+// type EnvironmentVariable struct {
+// 	Key   string `json:"key,omitempty"`
+// 	Value string `json:"value,omitempty"`
+// }
 
 // UploadURLRequest ...
 type UploadURLRequest struct {
@@ -396,9 +400,9 @@ func main() {
 	{
 		url := configs.APIBaseURL + "/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
-		testModel := &TestMatrix{}
-		testModel.EnvironmentMatrix = &EnvironmentMatrix{AndroidDeviceList: &AndroidDeviceList{}}
-		testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices = []*AndroidDevice{}
+		testModel := &testing.TestMatrix{}
+		testModel.EnvironmentMatrix = &testing.EnvironmentMatrix{AndroidDeviceList: &testing.AndroidDeviceList{}}
+		testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices = []*testing.AndroidDevice{}
 
 		scanner := bufio.NewScanner(strings.NewReader(configs.TestDevices))
 		for scanner.Scan() {
@@ -413,9 +417,9 @@ func main() {
 				failf("Invalid test device configuration: %s", device)
 			}
 
-			newDevice := AndroidDevice{
-				AndroidModelID:   deviceParams[0],
-				AndroidVersionID: deviceParams[1],
+			newDevice := testing.AndroidDevice{
+				AndroidModelId:   deviceParams[0],
+				AndroidVersionId: deviceParams[1],
 				Locale:           deviceParams[2],
 				Orientation:      deviceParams[3],
 			}
@@ -437,7 +441,7 @@ func main() {
 
 		// parse environment variables
 		scanner = bufio.NewScanner(strings.NewReader(configs.DirectoriesToPull))
-		envs := []*EnvironmentVariable{}
+		envs := []*testing.EnvironmentVariable{}
 		for scanner.Scan() {
 			envStr := scanner.Text()
 
@@ -453,12 +457,12 @@ func main() {
 			envKey := envStrSplit[0]
 			envValue := strings.Join(envStrSplit[1:], "=")
 
-			envs = append(envs, &EnvironmentVariable{Key: envKey, Value: envValue})
+			envs = append(envs, &testing.EnvironmentVariable{Key: envKey, Value: envValue})
 		}
 
-		testModel.TestSpecification = &TestSpecification{
+		testModel.TestSpecification = &testing.TestSpecification{
 			TestTimeout: fmt.Sprintf("%ss", configs.TestTimeout),
-			TestSetup: &TestSetup{
+			TestSetup: &testing.TestSetup{
 				EnvironmentVariables: envs,
 				DirectoriesToPull:    directoriesToPull,
 			},
@@ -466,12 +470,12 @@ func main() {
 
 		switch configs.TestType {
 		case "instrumentation":
-			testModel.TestSpecification.AndroidInstrumentationTest = &AndroidInstrumentationTest{}
+			testModel.TestSpecification.AndroidInstrumentationTest = &testing.AndroidInstrumentationTest{}
 			if configs.AppPackageID != "" {
-				testModel.TestSpecification.AndroidInstrumentationTest.AppPackageID = configs.AppPackageID
+				testModel.TestSpecification.AndroidInstrumentationTest.AppPackageId = configs.AppPackageID
 			}
 			if configs.InstTestPackageID != "" {
-				testModel.TestSpecification.AndroidInstrumentationTest.TestPackageID = configs.InstTestPackageID
+				testModel.TestSpecification.AndroidInstrumentationTest.TestPackageId = configs.InstTestPackageID
 			}
 			if configs.InstTestRunnerClass != "" {
 				testModel.TestSpecification.AndroidInstrumentationTest.TestRunnerClass = configs.InstTestRunnerClass
@@ -481,9 +485,9 @@ func main() {
 				testModel.TestSpecification.AndroidInstrumentationTest.TestTargets = targets
 			}
 		case "robo":
-			testModel.TestSpecification.AndroidRoboTest = &AndroidRoboTest{}
+			testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
 			if configs.AppPackageID != "" {
-				testModel.TestSpecification.AndroidRoboTest.AppPackageID = configs.AppPackageID
+				testModel.TestSpecification.AndroidRoboTest.AppPackageId = configs.AppPackageID
 			}
 			if configs.RoboInitialActivity != "" {
 				testModel.TestSpecification.AndroidRoboTest.AppInitialActivity = configs.RoboInitialActivity
@@ -503,7 +507,7 @@ func main() {
 				testModel.TestSpecification.AndroidRoboTest.MaxSteps = int64(maxSteps)
 			}
 			if configs.RoboDirectives != "" {
-				roboDirectives := []*RoboDirective{}
+				roboDirectives := []*testing.RoboDirective{}
 				scanner := bufio.NewScanner(strings.NewReader(configs.RoboDirectives))
 				for scanner.Scan() {
 					directive := scanner.Text()
@@ -516,14 +520,14 @@ func main() {
 					if len(directiveParams) != 3 {
 						failf("Invalid directive configuration: %s", directive)
 					}
-					roboDirectives = append(roboDirectives, &RoboDirective{ResourceName: directiveParams[0], InputText: directiveParams[1], ActionType: directiveParams[2]})
+					roboDirectives = append(roboDirectives, &testing.RoboDirective{ResourceName: directiveParams[0], InputText: directiveParams[1], ActionType: directiveParams[2]})
 				}
 				testModel.TestSpecification.AndroidRoboTest.RoboDirectives = roboDirectives
 			}
 		case "gameloop":
-			testModel.TestSpecification.AndroidTestLoop = &AndroidTestLoop{}
+			testModel.TestSpecification.AndroidTestLoop = &testing.AndroidTestLoop{}
 			if configs.AppPackageID != "" {
-				testModel.TestSpecification.AndroidTestLoop.AppPackageID = configs.AppPackageID
+				testModel.TestSpecification.AndroidTestLoop.AppPackageId = configs.AppPackageID
 			}
 			if configs.LoopScenarios != "" {
 				loopScenarios := []int64{}
@@ -589,7 +593,7 @@ func main() {
 				failf("Failed to read response body, error: %s", err)
 			}
 
-			responseModel := &ListStepsResponse{}
+			responseModel := &toolresults.ListStepsResponse{}
 
 			err = json.Unmarshal(body, responseModel)
 			if err != nil {
