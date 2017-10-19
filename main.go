@@ -242,7 +242,7 @@ func main() {
 			if err != nil {
 				failf("Failed to read response body, error: %s", err)
 			}
-			failf("Failed to start test[%d], error: %s", resp.StatusCode, string(body))
+			failf("Failed to start test: %d, error: %s", resp.StatusCode, string(body))
 		}
 
 		body, err := ioutil.ReadAll(resp.Body)
@@ -449,7 +449,7 @@ func main() {
 			if err != nil {
 				failf("Failed to read response body, error: %s", err)
 			}
-			failf("Failed to start test[%d], error: %s", resp.StatusCode, string(body))
+			failf("Failed to start test: %d, error: %s", resp.StatusCode, string(body))
 		}
 
 		log.Donef("=> Test started")
