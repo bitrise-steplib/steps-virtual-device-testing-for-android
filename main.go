@@ -470,13 +470,20 @@ func main() {
 
 			client := &http.Client{}
 			resp, err := client.Do(req)
-			if err != nil {
-				failf("Failed to get http response, error: %s", err)
+			if resp.StatusCode != http.StatusOK || err != nil {
+				resp, err = client.Do(req)
+				if err != nil {
+					failf("Failed to get http response, error: %s", err)
+				}
 			}
 
 			body, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
 				failf("Failed to read response body, error: %s", err)
+			}
+
+			if resp.StatusCode != http.StatusOK {
+				failf("Failed to get test status, error: %s", string(body))
 			}
 
 			responseModel := &toolresults.ListStepsResponse{}

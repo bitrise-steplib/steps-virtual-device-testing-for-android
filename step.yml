@@ -108,7 +108,7 @@ inputs:
         The Java package of the application under test (leave empty to get it extracted from the APK manifest).
       description: |
         The Java package of the application under test (leave empty to get it extracted from the APK manifest).
-  - test_apk_path: 
+  - test_apk_path: "$BITRISE_TEST_APK_PATH"
     opts:
       category: "Instrumentation Test"
       title: "Test APK path"
