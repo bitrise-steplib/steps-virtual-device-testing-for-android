@@ -134,6 +134,18 @@ inputs:
       summary: Test targets
       description: |
         Test targets
+  - inst_use_orchestrator: false
+    opts:
+      category: "Instrumentation Test"
+      title: "Use Orchestrator"
+      summary: |
+        The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not.
+      description: |
+        The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not.
+      is_required: true
+      value_options:
+        - false
+        - true
   - robo_initial_activity: 
     opts:
       category: "Robo Test"

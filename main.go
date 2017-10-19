@@ -24,7 +24,6 @@ import (
 	"github.com/bitrise-io/go-utils/sliceutil"
 	"github.com/bitrise-tools/go-steputils/input"
 	"github.com/bitrise-tools/go-steputils/tools"
-	//toolresults "google.golang.org/api/toolresults/v1beta3firstparty"
 )
 
 // ConfigsModel ...
@@ -50,6 +49,7 @@ type ConfigsModel struct {
 	InstTestPackageID   string
 	InstTestRunnerClass string
 	InstTestTargets     string
+	UseOrchestrator     string
 
 	// robo
 	RoboInitialActivity string
@@ -61,138 +61,6 @@ type ConfigsModel struct {
 	LoopScenarios      string
 	LoopScenarioLabels string
 }
-
-// ListStepsResponse ...
-// type ListStepsResponse struct {
-// 	Steps []*Step `json:"steps,omitempty"`
-// }
-
-// // Outcome ...
-// type Outcome struct {
-// 	FailureDetail      *FailureDetail      `json:"failureDetail,omitempty"`
-// 	InconclusiveDetail *InconclusiveDetail `json:"inconclusiveDetail,omitempty"`
-// 	SkippedDetail      *SkippedDetail      `json:"skippedDetail,omitempty"`
-// 	SuccessDetail      *SuccessDetail      `json:"successDetail,omitempty"`
-// 	Summary            string              `json:"summary,omitempty"`
-// }
-
-// SuccessDetail ...
-// type SuccessDetail struct {
-// 	OtherNativeCrash bool `json:"otherNativeCrash,omitempty"`
-// }
-
-// // SkippedDetail ...
-// type SkippedDetail struct {
-// 	IncompatibleAppVersion   bool `json:"incompatibleAppVersion,omitempty"`
-// 	IncompatibleArchitecture bool `json:"incompatibleArchitecture,omitempty"`
-// 	IncompatibleDevice       bool `json:"incompatibleDevice,omitempty"`
-// }
-
-// // FailureDetail ...
-// type FailureDetail struct {
-// 	Crashed          bool `json:"crashed,omitempty"`
-// 	NotInstalled     bool `json:"notInstalled,omitempty"`
-// 	OtherNativeCrash bool `json:"otherNativeCrash,omitempty"`
-// 	TimedOut         bool `json:"timedOut,omitempty"`
-// 	UnableToCrawl    bool `json:"unableToCrawl,omitempty"`
-// }
-
-// // InconclusiveDetail ...
-// type InconclusiveDetail struct {
-// 	AbortedByUser         bool `json:"abortedByUser,omitempty"`
-// 	InfrastructureFailure bool `json:"infrastructureFailure,omitempty"`
-// }
-
-// // Step ...
-// type Step struct {
-// 	Outcome        *Outcome                   `json:"outcome,omitempty"`
-// 	State          string                     `json:"state,omitempty"`
-// 	DimensionValue []*StepDimensionValueEntry `json:"dimensionValue,omitempty"`
-// }
-
-// StepDimensionValueEntry ...
-// type StepDimensionValueEntry struct {
-// 	Key   string `json:"key,omitempty"`
-// 	Value string `json:"value,omitempty"`
-// }
-
-// // AndroidDevice ...
-// type AndroidDevice struct {
-// 	AndroidModelID   string `json:"androidModelId,omitempty"`
-// 	AndroidVersionID string `json:"androidVersionId,omitempty"`
-// 	Locale           string `json:"locale,omitempty"`
-// 	Orientation      string `json:"orientation,omitempty"`
-// }
-
-// // AndroidDeviceList ...
-// type AndroidDeviceList struct {
-// 	AndroidDevices []*AndroidDevice `json:"androidDevices,omitempty"`
-// }
-
-// // EnvironmentMatrix ...
-// type EnvironmentMatrix struct {
-// 	AndroidDeviceList *AndroidDeviceList `json:"androidDeviceList,omitempty"`
-// }
-
-// // TestMatrix ...
-// type TestMatrix struct {
-// 	EnvironmentMatrix *EnvironmentMatrix `json:"environmentMatrix,omitempty"`
-// 	TestSpecification *TestSpecification `json:"testSpecification,omitempty"`
-// }
-
-// // TestSpecification ...
-// type TestSpecification struct {
-// 	AndroidInstrumentationTest *AndroidInstrumentationTest `json:"androidInstrumentationTest,omitempty"`
-// 	AndroidRoboTest            *AndroidRoboTest            `json:"androidRoboTest,omitempty"`
-// 	AndroidTestLoop            *AndroidTestLoop            `json:"androidTestLoop,omitempty"`
-// 	AutoGoogleLogin            bool                        `json:"autoGoogleLogin,omitempty"`
-// 	TestSetup                  *TestSetup                  `json:"testSetup,omitempty"`
-// 	TestTimeout                string                      `json:"testTimeout,omitempty"`
-// }
-
-// // AndroidInstrumentationTest ...
-// type AndroidInstrumentationTest struct {
-// 	AppPackageID    string   `json:"appPackageId,omitempty"`
-// 	TestPackageID   string   `json:"testPackageId,omitempty"`
-// 	TestRunnerClass string   `json:"testRunnerClass,omitempty"`
-// 	TestTargets     []string `json:"testTargets,omitempty"`
-// }
-
-// // AndroidRoboTest ...
-// type AndroidRoboTest struct {
-// 	AppInitialActivity string           `json:"appInitialActivity,omitempty"`
-// 	AppPackageID       string           `json:"appPackageId,omitempty"`
-// 	MaxDepth           int64            `json:"maxDepth,omitempty"`
-// 	MaxSteps           int64            `json:"maxSteps,omitempty"`
-// 	RoboDirectives     []*RoboDirective `json:"roboDirectives,omitempty"`
-// }
-
-// // RoboDirective ...
-// type RoboDirective struct {
-// 	ActionType   string `json:"actionType,omitempty"`
-// 	InputText    string `json:"inputText,omitempty"`
-// 	ResourceName string `json:"resourceName,omitempty"`
-// }
-
-// // AndroidTestLoop ...
-// type AndroidTestLoop struct {
-// 	AppPackageID   string   `json:"appPackageId,omitempty"`
-// 	ScenarioLabels []string `json:"scenarioLabels,omitempty"`
-// 	Scenarios      []int64  `json:"scenarios,omitempty"`
-// }
-
-// // TestSetup ...
-// type TestSetup struct {
-// 	DirectoriesToPull    []string               `json:"directoriesToPull,omitempty"`
-// 	EnvironmentVariables []*EnvironmentVariable `json:"environmentVariables,omitempty"`
-// 	NetworkProfile       string                 `json:"networkProfile,omitempty"`
-// }
-
-// // EnvironmentVariable ...
-// type EnvironmentVariable struct {
-// 	Key   string `json:"key,omitempty"`
-// 	Value string `json:"value,omitempty"`
-// }
 
 // UploadURLRequest ...
 type UploadURLRequest struct {
@@ -223,6 +91,7 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		InstTestPackageID:   os.Getenv("inst_test_package_id"),
 		InstTestRunnerClass: os.Getenv("inst_test_runner_class"),
 		InstTestTargets:     os.Getenv("inst_test_targets"),
+		UseOrchestrator:     os.Getenv("inst_use_orchestrator"),
 
 		// robo
 		RoboInitialActivity: os.Getenv("robo_initial_activity"),
@@ -275,6 +144,7 @@ func (configs ConfigsModel) print() {
 		log.Printf("- InstTestPackageID: %s", configs.InstTestPackageID)
 		log.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
 		log.Printf("- InstTestTargets: %s", configs.InstTestTargets)
+		log.Printf("- UseOrchestrator: %s", configs.UseOrchestrator)
 	}
 
 	//robo
@@ -311,6 +181,9 @@ func (configs ConfigsModel) validate() error {
 	}
 	if err := input.ValidateWithOptions(configs.TestType, "instrumentation", "robo", "gameloop"); err != nil {
 		return fmt.Errorf("Issue with TestType: %s", err)
+	}
+	if err := input.ValidateWithOptions(configs.UseOrchestrator, "false", "true"); err != nil {
+		return fmt.Errorf("Issue with UseOrchestrator: %s", err)
 	}
 	if err := input.ValidateIfNotEmpty(configs.ApkPath); err != nil {
 		return fmt.Errorf("Issue with ApkPath: %s", err)
@@ -483,6 +356,11 @@ func main() {
 			if configs.InstTestTargets != "" {
 				targets := strings.Split(strings.TrimSpace(configs.InstTestTargets), ",")
 				testModel.TestSpecification.AndroidInstrumentationTest.TestTargets = targets
+			}
+			if configs.UseOrchestrator == "true" {
+				testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "USE_ORCHESTRATOR"
+			} else {
+				testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "DO_NOT_USE_ORCHESTRATOR"
 			}
 		case "robo":
 			testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}

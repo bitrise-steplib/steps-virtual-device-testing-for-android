@@ -21,6 +21,7 @@ workflows:
           - test_apk_path: $TEST_APK_PATH
           - apk_path: $APK_PATH
           - test_type: instrumentation
+          - inst_use_orchestrator: true
 
   go-tests:
     before_run:
