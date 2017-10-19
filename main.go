@@ -204,7 +204,7 @@ func (configs ConfigsModel) validate() error {
 }
 
 func failf(f string, v ...interface{}) {
-	log.Errorf(f, v)
+	log.Errorf(f, v...)
 	os.Exit(1)
 }
 
