@@ -238,7 +238,11 @@ func main() {
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			failf("Failed to get http response, status code: %d", resp.StatusCode)
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				failf("Failed to read response body, error: %s", err)
+			}
+			failf("Failed to start test[%d], error: %s", resp.StatusCode, string(body))
 		}
 
 		body, err := ioutil.ReadAll(resp.Body)
