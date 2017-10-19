@@ -63,7 +63,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -ex
-            go test ./...
+            go test $(go list ./... | grep -v /vendor/)
   _install-test-tools:
     steps:
     - script:
@@ -79,7 +79,7 @@ workflows:
 
   # ----------------------------------------------------------------
   # --- Utility workflows
-  godeps-update:
+  dep-update:
     title: Godeps update
     description: |
       Used for updating bitrise dependencies with godep
@@ -90,11 +90,11 @@ workflows:
         - content: |
             #!/bin/bash
             set -ex
-            go get -u -v github.com/tools/godep
-            rm -rf ./Godeps
-            rm -rf ./vendor
-            go get -t -d ./...
-            godep save ./...
+            go get -u -v github.com/bitrise-tools/gows
+            go get -u -v github.com/golang/dep/cmd/dep
+            gows clear
+            gows dep ensure -v
+            gows dep ensure -v -update
 
   # ----------------------------------------------------------------
   # --- workflows to Share this step into a Step Library

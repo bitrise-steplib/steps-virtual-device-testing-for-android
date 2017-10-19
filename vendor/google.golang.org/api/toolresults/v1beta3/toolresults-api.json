@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/brq_qwMPbELJi8YdbP43Yj8p7so\"",
+ "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/qTGcqTfP2AvSFxr0hOGEezA1IHs\"",
  "discoveryVersion": "v1",
  "id": "toolresults:v1beta3",
  "name": "toolresults",
  "canonicalName": "Tool Results",
  "version": "v1beta3",
- "revision": "20171006",
+ "revision": "20171017",
  "title": "Cloud Tool Results API",
  "description": "Reads and publishes results from Firebase Test Lab.",
  "ownerDomain": "google.com",
@@ -1203,11 +1203,15 @@
      "description": "Type of issue. Required.",
      "enum": [
       "anr",
+      "compatibleWithOrchestrator",
       "fatalException",
       "nativeCrash",
-      "unspecifiedType"
+      "unspecifiedType",
+      "unusedRoboDirective"
      ],
      "enumDescriptions": [
+      "",
+      "",
       "",
       "",
       "",

@@ -7,7 +7,7 @@
 //   import "google.golang.org/api/testing/v1"
 //   ...
 //   testingService, err := testing.New(oauthHttpClient)
-package testing
+package testing // import "google.golang.org/api/testing/v1"
 
 import (
 	"bytes"

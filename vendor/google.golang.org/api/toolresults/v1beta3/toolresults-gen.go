@@ -7,7 +7,7 @@
 //   import "google.golang.org/api/toolresults/v1beta3"
 //   ...
 //   toolresultsService, err := toolresults.New(oauthHttpClient)
-package toolresults
+package toolresults // import "google.golang.org/api/toolresults/v1beta3"
 
 import (
 	"bytes"
@@ -2523,9 +2523,11 @@ type TestIssue struct {
 	//
 	// Possible values:
 	//   "anr"
+	//   "compatibleWithOrchestrator"
 	//   "fatalException"
 	//   "nativeCrash"
 	//   "unspecifiedType"
+	//   "unusedRoboDirective"
 	Type string `json:"type,omitempty"`
 
 	// Warning: Warning message with additional details of the issue. Should
