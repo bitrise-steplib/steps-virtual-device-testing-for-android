@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.7)
+## Changelog (Current version: 0.9.8)
 
 -----------------
+
+### 0.9.8 (2017 Oct 20)
+
+* [d96edd0] Prepare for 0.9.8
+* [94d181a] API and logging update (#7)
 
 ### 0.9.7 (2017 Sep 27)
 
@@ -34,4 +39,4 @@
 
 -----------------
 
-Updated: 2017 Sep 27
+Updated: 2017 Oct 20
