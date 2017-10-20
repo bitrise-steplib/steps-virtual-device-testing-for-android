@@ -3,8 +3,6 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 app:
   envs:
-  # define these in your .bitrise.secrets.yml
-  - TEST_APK_PATH: $TEST_APK_PATH
   # if you want to share this step into a StepLib
   - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
   - STEP_VERSION: "0.9.7"
@@ -16,8 +14,6 @@ workflows:
     steps:
     - path::./:
         inputs:
-          - api_base_url: $ADDON_VDTESTING_API_URL
-          - test_apk_path: $TEST_APK_PATH
           - test_type: instrumentation
 
   go-tests:
@@ -60,7 +56,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -ex
-            go test ./...
+            go test $(go list ./... | grep -v /vendor/)
   _install-test-tools:
     steps:
     - script:
@@ -76,7 +72,7 @@ workflows:
 
   # ----------------------------------------------------------------
   # --- Utility workflows
-  godeps-update:
+  dep-update:
     title: Godeps update
     description: |
       Used for updating bitrise dependencies with godep
@@ -87,11 +83,11 @@ workflows:
         - content: |
             #!/bin/bash
             set -ex
-            go get -u -v github.com/tools/godep
-            rm -rf ./Godeps
-            rm -rf ./vendor
-            go get -t -d ./...
-            godep save ./...
+            go get -u -v github.com/bitrise-tools/gows
+            go get -u -v github.com/golang/dep/cmd/dep
+            gows clear
+            gows dep ensure -v
+            gows dep ensure -v -update
 
   # ----------------------------------------------------------------
   # --- workflows to Share this step into a Step Library
