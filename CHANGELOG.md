@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.8)
+## Changelog (Current version: 0.9.9)
 
 -----------------
+
+### 0.9.9 (2017 Dec 12)
+
+* [5e689d0] Prepare for 0.9.9
+* [6e219c2] replaced config variable (#8)
 
 ### 0.9.8 (2017 Oct 20)
 
@@ -39,4 +44,4 @@
 
 -----------------
 
-Updated: 2017 Oct 20
+Updated: 2017 Dec 12
