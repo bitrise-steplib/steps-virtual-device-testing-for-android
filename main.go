@@ -317,7 +317,7 @@ func main() {
 		}
 
 		// parse environment variables
-		scanner = bufio.NewScanner(strings.NewReader(configs.DirectoriesToPull))
+		scanner = bufio.NewScanner(strings.NewReader(configs.EnvironmentVariables))
 		envs := []*testing.EnvironmentVariable{}
 		for scanner.Scan() {
 			envStr := scanner.Text()
