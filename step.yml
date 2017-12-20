@@ -29,9 +29,9 @@ inputs:
     opts:
       title: "APK path"
       summary: |
-        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so wou won't need to change this input.
+        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
       description: |
-        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so wou won't need to change this input.
+        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
       is_required: true
   - test_devices: "NexusLowRes,24,en,portrait"
     opts:
@@ -98,9 +98,9 @@ inputs:
         The type of your test you want to run on the devices. Find more properties below in the selected test type's group.
       is_required: true
       value_options:
-        - instrumentation
-        - robo
-        - gameloop
+        - "instrumentation"
+        - "robo"
+        - "gameloop"
   - app_package_id:
     opts:
       title: "App package ID"
@@ -134,7 +134,7 @@ inputs:
       summary: Test targets
       description: |
         Test targets
-  - inst_use_orchestrator: false
+  - inst_use_orchestrator: "false"
     opts:
       category: "Instrumentation Test"
       title: "Use Orchestrator"
@@ -144,8 +144,8 @@ inputs:
         The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not.
       is_required: true
       value_options:
-        - false
-        - true
+        - "false"
+        - "true"
   - robo_initial_activity: 
     opts:
       category: "Robo Test"
@@ -245,7 +245,7 @@ inputs:
 
         ```
         coverage=true
-        coverageFile="/sdcard/tempDir/coverage.ec"
+        coverageFile=/sdcard/tempDir/coverage.ec
         ```
       description: |
         One variable per line, key and value seperated by `=`
@@ -254,9 +254,9 @@ inputs:
 
         ```
         coverage=true
-        coverageFile="/sdcard/tempDir/coverage.ec"
+        coverageFile=/sdcard/tempDir/coverage.ec
         ```
-  - download_test_results: false
+  - download_test_results: "false"
     opts:
       category: "Debug"
       title: "Download files"
@@ -266,8 +266,8 @@ inputs:
         Test result files like video or test cases results won't be downloaded. Use this input if you have set `directories_to_pull` input and you have files generated in the test.
       is_required: true
       value_options:
-        - false
-        - true
+        - "false"
+        - "true"
   - api_base_url: $ADDON_VDTESTING_API_URL
     opts:
       title: "Test API's base URL"
