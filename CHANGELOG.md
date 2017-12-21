@@ -1,6 +1,12 @@
-## Changelog (Current version: 0.9.9)
+## Changelog (Current version: 1.0.0)
 
 -----------------
+
+### 1.0.0 (2017 Dec 21)
+
+* [e7d95bd] Prepare for 1.0.0
+* [98cdbee] Merge pull request #10 from bitrise-steplib/step-yml-fix
+* [5232b95] update step infos
 
 ### 0.9.9 (2017 Dec 12)
 
@@ -44,4 +50,4 @@
 
 -----------------
 
-Updated: 2017 Dec 12
+Updated: 2017 Dec 21
