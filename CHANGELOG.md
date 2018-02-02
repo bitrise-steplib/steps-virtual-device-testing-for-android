@@ -1,6 +1,11 @@
-## Changelog (Current version: 1.0.0)
+## Changelog (Current version: 1.0.1)
 
 -----------------
+
+### 1.0.1 (2018 Feb 02)
+
+* [5b4c828] Prepare for 1.0.1
+* [14083ab] added warning of empty APIBaseURL, updated step input description (#14)
 
 ### 1.0.0 (2017 Dec 21)
 
@@ -50,4 +55,4 @@
 
 -----------------
 
-Updated: 2017 Dec 21
+Updated: 2018 Feb 02
