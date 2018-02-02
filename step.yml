@@ -131,9 +131,26 @@ inputs:
       category: "Instrumentation Test"
       title: |
         Test targets, seperated with the "," character.
-      summary: Test targets
+      summary: |
+        A list of one or more instrumentation test targets to be run (default: all targets). Each target must be fully qualified with the package name or class name, in one of these formats:
+
+        - `package package_name`
+        - `class package_name.class_name`
+        - `class package_name.class_name#method_name`
+
+        For example:
+
+        `class com.my.company.app.MyTargetClass,class com.my.company.app.MyOtherTargetClass`
       description: |
-        Test targets
+        A list of one or more instrumentation test targets to be run (default: all targets). Each target must be fully qualified with the package name or class name, in one of these formats:
+
+        - `package package_name`
+        - `class package_name.class_name`
+        - `class package_name.class_name#method_name`
+
+        For example:
+
+        `class com.my.company.app.MyTargetClass,class com.my.company.app.MyOtherTargetClass`
   - inst_use_orchestrator: "false"
     opts:
       category: "Instrumentation Test"
