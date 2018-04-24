@@ -278,9 +278,9 @@ inputs:
       category: "Debug"
       title: "Download files"
       summary: |
-        Test result files like video or test cases results won't be downloaded. Use this input if you have set `directories_to_pull` input and you have files generated in the test.
+        Downloading all the files generated in a test run. Use this input if you have set `directories_to_pull` input and you have files generated in the test.
       description: |
-        Test result files like video or test cases results won't be downloaded. Use this input if you have set `directories_to_pull` input and you have files generated in the test.
+        Downloading all the files generated in a test run. Use this input if you have set `directories_to_pull` input and you have files generated in the test.
       is_required: true
       value_options:
         - "false"
