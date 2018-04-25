@@ -242,6 +242,8 @@ inputs:
         /sdcard/tempDir1
         /data/tempDir2
         ```
+        
+        If `download_test_results` input is set to `false` then these files will be downloaded to the dashboard only. To have them downloaded set that input to `true` as well.
       description: |
         A list of paths that will be downloaded from the device's storage after the test is complete. 
         
@@ -251,6 +253,8 @@ inputs:
         /sdcard/tempDir1
         /data/tempDir2
         ```
+        
+        If `download_test_results` input is set to `false` then these files will be available on the dashboard only. To have them downloaded set that input to `true` as well.
   - environment_variables:
     opts:
       category: "Debug"
@@ -278,9 +282,9 @@ inputs:
       category: "Debug"
       title: "Download files"
       summary: |
-        Test result files like video or test cases results won't be downloaded. Use this input if you have set `directories_to_pull` input and you have files generated in the test.
+        If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded. 
       description: |
-        Test result files like video or test cases results won't be downloaded. Use this input if you have set `directories_to_pull` input and you have files generated in the test.
+        If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded.
       is_required: true
       value_options:
         - "false"
