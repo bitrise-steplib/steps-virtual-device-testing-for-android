@@ -278,9 +278,9 @@ inputs:
       category: "Debug"
       title: "Download files"
       summary: |
-        Downloading all the files generated in a test run. Use this input if you have set `directories_to_pull` input and you have files generated in the test.
+        If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded. 
       description: |
-        Downloading all the files generated in a test run. Use this input if you have set `directories_to_pull` input and you have files generated in the test.
+        If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded.
       is_required: true
       value_options:
         - "false"
