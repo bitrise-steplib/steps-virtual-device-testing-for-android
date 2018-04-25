@@ -242,6 +242,8 @@ inputs:
         /sdcard/tempDir1
         /data/tempDir2
         ```
+        
+        If `download_test_results` input is set to `false` then these files will be downloaded to the dashboard only. To have them downloaded set that input to `true` as well.
       description: |
         A list of paths that will be downloaded from the device's storage after the test is complete. 
         
@@ -251,6 +253,8 @@ inputs:
         /sdcard/tempDir1
         /data/tempDir2
         ```
+        
+        If `download_test_results` input is set to `false` then these files will be available on the dashboard only. To have them downloaded set that input to `true` as well.
   - environment_variables:
     opts:
       category: "Debug"
