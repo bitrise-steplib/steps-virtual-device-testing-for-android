@@ -1,6 +1,11 @@
-## Changelog (Current version: 1.0.1)
+## Changelog (Current version: 1.0.2)
 
 -----------------
+
+### 1.0.2 (2018 Apr 26)
+
+* [6260ef4] Prepare for 1.0.2
+* [fe2fa7b] updating download files input description and summary (#19)
 
 ### 1.0.1 (2018 Feb 02)
 
@@ -55,4 +60,4 @@
 
 -----------------
 
-Updated: 2018 Feb 02
+Updated: 2018 Apr 26
