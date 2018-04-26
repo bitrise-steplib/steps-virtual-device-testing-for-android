@@ -195,10 +195,10 @@ func (configs ConfigsModel) validate() error {
 	}
 	if configs.TestType == "instrumentation" {
 		if err := input.ValidateIfNotEmpty(configs.TestApkPath); err != nil {
-			return fmt.Errorf("Issue with TestApkPath: %s", err)
+			return fmt.Errorf("Issue with TestApkPath: %s. Is it possible that you used gradle-runner step and forgot to set `assembleDebugAndroidTest` task?", err)
 		}
 		if err := input.ValidateIfPathExists(configs.TestApkPath); err != nil {
-			return fmt.Errorf("Issue with TestApkPath: %s", err)
+			return fmt.Errorf("Issue with TestApkPath: %s. Is it possible that you used gradle-runner step and forgot to set `assembleDebugAndroidTest` task?", err)
 		}
 	}
 

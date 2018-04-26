@@ -195,9 +195,9 @@ inputs:
         For example, you could use the following parameter for custom login:
 
         ```
-        username_resource,username,text
-        password_resource,password,text
-        loginbtn_resource,,click
+        username_resource,username,ENTER_TEXT
+        password_resource,password,ENTER_TEXT
+        loginbtn_resource,,SINGLE_CLICK
         ```
 
         One directive per line, the parameters are separated with `,` character. For example: `ResourceName,InputText,ActionType`
@@ -207,9 +207,9 @@ inputs:
         For example, you could use the following parameter for custom login:
 
         ```
-        username_resource,username,text
-        password_resource,password,text
-        loginbtn_resource,,click
+        username_resource,username,ENTER_TEXT
+        password_resource,password,ENTER_TEXT
+        loginbtn_resource,,SINGLE_CLICK
         ```
 
         One directive per line, the parameters are separated with `,` character. For example: `ResourceName,InputText,ActionType`
