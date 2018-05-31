@@ -492,7 +492,7 @@ func main() {
 				failf("Failed to get test status, error: %s", string(body))
 			}
 
-			log.Printft("status code: %s", resp.StatusCode)
+			log.Printft("status code: %d", resp.StatusCode)
 
 			responseModel := &toolresults.ListStepsResponse{}
 
@@ -504,7 +504,7 @@ func main() {
 			finished = true
 			testsRunning := 0
 			for _, step := range responseModel.Steps {
-				log.Printft("%s state: %s %s", step.Name, step.State, step.Outcome)
+				log.Printft("%s state: %s %v", step.Name, step.State, *step.Outcome)
 				if step.State != "complete" {
 					finished = false
 					testsRunning++
@@ -517,7 +517,6 @@ func main() {
 				msg = fmt.Sprintf("- Validating")
 			} else {
 				msg = fmt.Sprintf("- (%d/%d) running", testsRunning, len(responseModel.Steps))
-				log.Printft("d: %v", responseModel.Steps)
 			}
 
 			if !sliceutil.IsStringInSlice(msg, printedLogs) {
@@ -536,6 +535,7 @@ func main() {
 				}
 
 				for _, step := range responseModel.Steps {
+					log.Printft("d: %v", *step.Outcome)
 					dimensions := map[string]string{}
 					for _, dimension := range step.DimensionValue {
 						dimensions[dimension.Key] = dimension.Value
