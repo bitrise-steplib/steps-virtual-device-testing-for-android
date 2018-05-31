@@ -463,6 +463,7 @@ func main() {
 		finished := false
 		printedLogs := []string{}
 		for !finished {
+			fmt.Println("Checking...")
 			url := configs.APIBaseURL + "/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
 			req, err := http.NewRequest("GET", url, nil)
@@ -488,6 +489,8 @@ func main() {
 				failf("Failed to get test status, error: %s", string(body))
 			}
 
+			fmt.Println("status code:", resp.StatusCode)
+
 			responseModel := &toolresults.ListStepsResponse{}
 
 			err = json.Unmarshal(body, responseModel)
@@ -498,6 +501,7 @@ func main() {
 			finished = true
 			testsRunning := 0
 			for _, step := range responseModel.Steps {
+				fmt.Println(step.Name, "state:", step.State, step.Outcome)
 				if step.State != "complete" {
 					finished = false
 					testsRunning++
