@@ -492,7 +492,7 @@ func main() {
 				failf("Failed to get test status, error: %s", string(body))
 			}
 
-			log.Printft("status code: %d", resp.StatusCode)
+			fmt.Println("status code:", resp.StatusCode)
 
 			responseModel := &toolresults.ListStepsResponse{}
 
@@ -504,7 +504,7 @@ func main() {
 			finished = true
 			testsRunning := 0
 			for _, step := range responseModel.Steps {
-				log.Printft("%s state: %s %v", step.Name, step.State, *step.Outcome)
+				fmt.Println("state:", step.Name, step.State, step.Outcome)
 				if step.State != "complete" {
 					finished = false
 					testsRunning++
@@ -535,7 +535,7 @@ func main() {
 				}
 
 				for _, step := range responseModel.Steps {
-					log.Printft("d: %v", *step.Outcome)
+					fmt.Println(step.Outcome)
 					dimensions := map[string]string{}
 					for _, dimension := range step.DimensionValue {
 						dimensions[dimension.Key] = dimension.Value
