@@ -129,7 +129,7 @@ func (configs ConfigsModel) print() {
 			continue
 		}
 
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", deviceParams[0], deviceParams[1], deviceParams[3], deviceParams[2]))
+		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", deviceParams[0], deviceParams[1], deviceParams[2], deviceParams[3]))
 	}
 	if err := w.Flush(); err != nil {
 		log.Errorf("Failed to flush writer, error: %s", err)
