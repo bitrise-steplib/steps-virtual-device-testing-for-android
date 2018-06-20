@@ -131,7 +131,7 @@ func (configs ConfigsModel) print() {
 			continue
 		}
 
-		if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", deviceParams[0], deviceParams[1], deviceParams[3], deviceParams[2])); err != nil {
+		if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", deviceParams[0], deviceParams[1], deviceParams[2], deviceParams[3])); err != nil {
 			failf("Failed to write in writer")
 		}
 	}
