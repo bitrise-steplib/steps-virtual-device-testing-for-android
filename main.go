@@ -114,7 +114,9 @@ func (configs ConfigsModel) print() {
 	log.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariables)
 	log.Printf("- TestDevices:\n---")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\t")
+	if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\t"); err != nil {
+		failf("Failed to write in tabwriter, error: %s", err)
+	}
 	scanner := bufio.NewScanner(strings.NewReader(configs.TestDevices))
 	for scanner.Scan() {
 		device := scanner.Text()
@@ -129,7 +131,9 @@ func (configs ConfigsModel) print() {
 			continue
 		}
 
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", deviceParams[0], deviceParams[1], deviceParams[3], deviceParams[2]))
+		if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", deviceParams[0], deviceParams[1], deviceParams[3], deviceParams[2])); err != nil {
+			failf("Failed to write in tabwriter, error: %s", err)
+		}
 	}
 	if err := w.Flush(); err != nil {
 		log.Errorf("Failed to flush writer, error: %s", err)
@@ -523,7 +527,9 @@ func main() {
 
 				log.Infof("Test results:")
 				w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-				fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\tOutcome\t")
+				if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\tOutcome\t"); err != nil {
+					failf("Failed to write in tabwriter, error: %s", err)
+				}
 
 				for _, step := range responseModel.Steps {
 					dimensions := map[string]string{}
@@ -583,7 +589,9 @@ func main() {
 						outcome = colorstring.Blue(outcome)
 					}
 
-					fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome))
+					if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
+						failf("Failed to write in tabwriter, error: %s", err)
+					}
 				}
 				if err := w.Flush(); err != nil {
 					log.Errorf("Failed to flush writer, error: %s", err)
