@@ -305,6 +305,7 @@ inputs:
         The token required to authenticate with the API.
       is_required: true
       is_dont_change_value: true
+      is_sensitive: true
 outputs:
   - VDTESTING_DOWNLOADED_FILES_DIR:
     opts:
