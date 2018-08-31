@@ -289,7 +289,7 @@ inputs:
       value_options:
         - "false"
         - "true"
-  - api_base_url: $ADDON_VDTESTING_API_URL
+  - api_base_url: "https://vdt.bitrise.io/test"
     opts:
       title: "Test API's base URL"
       summary: The URL where test API is accessible.
@@ -305,6 +305,7 @@ inputs:
         The token required to authenticate with the API.
       is_required: true
       is_dont_change_value: true
+      is_sensitive: true
 outputs:
   - VDTESTING_DOWNLOADED_FILES_DIR:
     opts:
