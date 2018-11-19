@@ -1,4 +1,4 @@
-// Copyright 2017 Google Inc. All Rights Reserved.
+// Copyright 2017 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 package internal
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -45,6 +45,13 @@ func TestTokenSource(t *testing.T) {
 	// Load a valid JSON file. No way to really test the contents; we just
 	// verify that there is no error.
 	ds = &DialSettings{CredentialsFile: "service-account.json"}
+	if _, err := Creds(ctx, ds); err != nil {
+		t.Errorf("got %v, wanted no error", err)
+	}
+
+	// Load valid JSON. No way to really test the contents; we just
+	// verify that there is no error.
+	ds = &DialSettings{CredentialsJSON: []byte(validServiceAccountJSON)}
 	if _, err := Creds(ctx, ds); err != nil {
 		t.Errorf("got %v, wanted no error", err)
 	}
@@ -85,46 +92,3 @@ const validServiceAccountJSON = `{
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
   "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dumba-504%40appspot.gserviceaccount.com"
 }`
-
-func TestRefreshTokenTokenSource(t *testing.T) {
-	tests := []struct {
-		name    string
-		data    []byte
-		wantOK  bool
-		wantErr bool
-	}{
-		{
-			name:    "empty",
-			data:    []byte{},
-			wantOK:  false,
-			wantErr: true, // not valid JSON
-		},
-		{
-			name:    "non refresh token JSON",
-			data:    []byte("{}"),
-			wantOK:  false,
-			wantErr: false,
-		},
-		{
-			name:    "service account JSON",
-			data:    []byte(validServiceAccountJSON),
-			wantOK:  false,
-			wantErr: false,
-		},
-		{
-			name:    "valid refresh token JSON",
-			data:    []byte(validRefeshTokenJSON),
-			wantOK:  true,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		_, ok, err := refreshTokenTokenSource(context.Background(), tt.data)
-		if (err != nil) != tt.wantErr {
-			t.Errorf("%v: refreshTokenTokenSource() err = %v, wantErr %v", tt.name, err, tt.wantErr)
-		}
-		if ok != tt.wantOK {
-			t.Errorf("%v: refreshTokenTokenSource() ok = %v, want %v", tt.name, ok, tt.wantOK)
-		}
-	}
-}

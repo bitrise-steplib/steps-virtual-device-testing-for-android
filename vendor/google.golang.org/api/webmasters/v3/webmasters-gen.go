@@ -11,18 +11,18 @@ package webmasters // import "google.golang.org/api/webmasters/v3"
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	context "golang.org/x/net/context"
-	ctxhttp "golang.org/x/net/context/ctxhttp"
-	gensupport "google.golang.org/api/gensupport"
-	googleapi "google.golang.org/api/googleapi"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	gensupport "google.golang.org/api/gensupport"
+	googleapi "google.golang.org/api/googleapi"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -38,7 +38,6 @@ var _ = googleapi.Version
 var _ = errors.New
 var _ = strings.Replace
 var _ = context.Canceled
-var _ = ctxhttp.Do
 
 const apiId = "webmasters:v3"
 const apiName = "webmasters"
@@ -164,21 +163,21 @@ type ApiDataRow struct {
 }
 
 func (s *ApiDataRow) MarshalJSON() ([]byte, error) {
-	type noMethod ApiDataRow
-	raw := noMethod(*s)
+	type NoMethod ApiDataRow
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 func (s *ApiDataRow) UnmarshalJSON(data []byte) error {
-	type noMethod ApiDataRow
+	type NoMethod ApiDataRow
 	var s1 struct {
 		Clicks      gensupport.JSONFloat64 `json:"clicks"`
 		Ctr         gensupport.JSONFloat64 `json:"ctr"`
 		Impressions gensupport.JSONFloat64 `json:"impressions"`
 		Position    gensupport.JSONFloat64 `json:"position"`
-		*noMethod
+		*NoMethod
 	}
-	s1.noMethod = (*noMethod)(s)
+	s1.NoMethod = (*NoMethod)(s)
 	if err := json.Unmarshal(data, &s1); err != nil {
 		return err
 	}
@@ -214,8 +213,8 @@ type ApiDimensionFilter struct {
 }
 
 func (s *ApiDimensionFilter) MarshalJSON() ([]byte, error) {
-	type noMethod ApiDimensionFilter
-	raw := noMethod(*s)
+	type NoMethod ApiDimensionFilter
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -242,8 +241,8 @@ type ApiDimensionFilterGroup struct {
 }
 
 func (s *ApiDimensionFilterGroup) MarshalJSON() ([]byte, error) {
-	type noMethod ApiDimensionFilterGroup
-	raw := noMethod(*s)
+	type NoMethod ApiDimensionFilterGroup
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -319,8 +318,8 @@ type SearchAnalyticsQueryRequest struct {
 }
 
 func (s *SearchAnalyticsQueryRequest) MarshalJSON() ([]byte, error) {
-	type noMethod SearchAnalyticsQueryRequest
-	raw := noMethod(*s)
+	type NoMethod SearchAnalyticsQueryRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -360,8 +359,8 @@ type SearchAnalyticsQueryResponse struct {
 }
 
 func (s *SearchAnalyticsQueryResponse) MarshalJSON() ([]byte, error) {
-	type noMethod SearchAnalyticsQueryResponse
-	raw := noMethod(*s)
+	type NoMethod SearchAnalyticsQueryResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -393,8 +392,8 @@ type SitemapsListResponse struct {
 }
 
 func (s *SitemapsListResponse) MarshalJSON() ([]byte, error) {
-	type noMethod SitemapsListResponse
-	raw := noMethod(*s)
+	type NoMethod SitemapsListResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -427,8 +426,8 @@ type SitesListResponse struct {
 }
 
 func (s *SitesListResponse) MarshalJSON() ([]byte, error) {
-	type noMethod SitesListResponse
-	raw := noMethod(*s)
+	type NoMethod SitesListResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -459,8 +458,8 @@ type UrlCrawlErrorCount struct {
 }
 
 func (s *UrlCrawlErrorCount) MarshalJSON() ([]byte, error) {
-	type noMethod UrlCrawlErrorCount
-	raw := noMethod(*s)
+	type NoMethod UrlCrawlErrorCount
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -495,8 +494,8 @@ type UrlCrawlErrorCountsPerType struct {
 }
 
 func (s *UrlCrawlErrorCountsPerType) MarshalJSON() ([]byte, error) {
-	type noMethod UrlCrawlErrorCountsPerType
-	raw := noMethod(*s)
+	type NoMethod UrlCrawlErrorCountsPerType
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -529,8 +528,8 @@ type UrlCrawlErrorsCountsQueryResponse struct {
 }
 
 func (s *UrlCrawlErrorsCountsQueryResponse) MarshalJSON() ([]byte, error) {
-	type noMethod UrlCrawlErrorsCountsQueryResponse
-	raw := noMethod(*s)
+	type NoMethod UrlCrawlErrorsCountsQueryResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -577,8 +576,8 @@ type UrlCrawlErrorsSample struct {
 }
 
 func (s *UrlCrawlErrorsSample) MarshalJSON() ([]byte, error) {
-	type noMethod UrlCrawlErrorsSample
-	raw := noMethod(*s)
+	type NoMethod UrlCrawlErrorsSample
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -611,8 +610,8 @@ type UrlCrawlErrorsSamplesListResponse struct {
 }
 
 func (s *UrlCrawlErrorsSamplesListResponse) MarshalJSON() ([]byte, error) {
-	type noMethod UrlCrawlErrorsSamplesListResponse
-	raw := noMethod(*s)
+	type NoMethod UrlCrawlErrorsSamplesListResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -644,8 +643,8 @@ type UrlSampleDetails struct {
 }
 
 func (s *UrlSampleDetails) MarshalJSON() ([]byte, error) {
-	type noMethod UrlSampleDetails
-	raw := noMethod(*s)
+	type NoMethod UrlSampleDetails
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -681,8 +680,8 @@ type WmxSite struct {
 }
 
 func (s *WmxSite) MarshalJSON() ([]byte, error) {
-	type noMethod WmxSite
-	raw := noMethod(*s)
+	type NoMethod WmxSite
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -743,8 +742,8 @@ type WmxSitemap struct {
 }
 
 func (s *WmxSitemap) MarshalJSON() ([]byte, error) {
-	type noMethod WmxSitemap
-	raw := noMethod(*s)
+	type NoMethod WmxSitemap
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -779,8 +778,8 @@ type WmxSitemapContent struct {
 }
 
 func (s *WmxSitemapContent) MarshalJSON() ([]byte, error) {
-	type noMethod WmxSitemapContent
-	raw := noMethod(*s)
+	type NoMethod WmxSitemapContent
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -848,9 +847,13 @@ func (c *SearchanalyticsQueryCall) doRequest(alt string) (*http.Response, error)
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}/searchAnalytics/query")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl": c.siteUrl,
@@ -891,7 +894,7 @@ func (c *SearchanalyticsQueryCall) Do(opts ...googleapi.CallOption) (*SearchAnal
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -977,9 +980,13 @@ func (c *SitemapsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}/sitemaps/{feedpath}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl":  c.siteUrl,
@@ -1096,9 +1103,13 @@ func (c *SitemapsGetCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}/sitemaps/{feedpath}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl":  c.siteUrl,
@@ -1140,7 +1151,7 @@ func (c *SitemapsGetCall) Do(opts ...googleapi.CallOption) (*WmxSitemap, error) 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1252,9 +1263,13 @@ func (c *SitemapsListCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}/sitemaps")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl": c.siteUrl,
@@ -1295,7 +1310,7 @@ func (c *SitemapsListCall) Do(opts ...googleapi.CallOption) (*SitemapsListRespon
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1383,9 +1398,13 @@ func (c *SitemapsSubmitCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}/sitemaps/{feedpath}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("PUT", urls, body)
+	req, err := http.NewRequest("PUT", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl":  c.siteUrl,
@@ -1486,9 +1505,13 @@ func (c *SitesAddCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("PUT", urls, body)
+	req, err := http.NewRequest("PUT", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl": c.siteUrl,
@@ -1582,9 +1605,13 @@ func (c *SitesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl": c.siteUrl,
@@ -1613,7 +1640,7 @@ func (c *SitesDeleteCall) Do(opts ...googleapi.CallOption) error {
 	//   ],
 	//   "parameters": {
 	//     "siteUrl": {
-	//       "description": "The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/",
+	//       "description": "The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/ Note: for property-sets, use the URI that starts with sc-set: which is used in Search Console URLs.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -1691,9 +1718,13 @@ func (c *SitesGetCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl": c.siteUrl,
@@ -1734,7 +1765,7 @@ func (c *SitesGetCall) Do(opts ...googleapi.CallOption) (*WmxSite, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1747,7 +1778,7 @@ func (c *SitesGetCall) Do(opts ...googleapi.CallOption) (*WmxSite, error) {
 	//   ],
 	//   "parameters": {
 	//     "siteUrl": {
-	//       "description": "The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/",
+	//       "description": "The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/ Note: for property-sets, use the URI that starts with sc-set: which is used in Search Console URLs.",
 	//       "location": "path",
 	//       "required": true,
 	//       "type": "string"
@@ -1827,9 +1858,13 @@ func (c *SitesListCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
@@ -1867,7 +1902,7 @@ func (c *SitesListCall) Do(opts ...googleapi.CallOption) (*SitesListResponse, er
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1991,9 +2026,13 @@ func (c *UrlcrawlerrorscountsQueryCall) doRequest(alt string) (*http.Response, e
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}/urlCrawlErrorsCounts/query")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl": c.siteUrl,
@@ -2035,7 +2074,7 @@ func (c *UrlcrawlerrorscountsQueryCall) Do(opts ...googleapi.CallOption) (*UrlCr
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2182,9 +2221,13 @@ func (c *UrlcrawlerrorssamplesGetCall) doRequest(alt string) (*http.Response, er
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}/urlCrawlErrorsSamples/{url}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl": c.siteUrl,
@@ -2226,7 +2269,7 @@ func (c *UrlcrawlerrorssamplesGetCall) Do(opts ...googleapi.CallOption) (*UrlCra
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2377,9 +2420,13 @@ func (c *UrlcrawlerrorssamplesListCall) doRequest(alt string) (*http.Response, e
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}/urlCrawlErrorsSamples")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl": c.siteUrl,
@@ -2421,7 +2468,7 @@ func (c *UrlcrawlerrorssamplesListCall) Do(opts ...googleapi.CallOption) (*UrlCr
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2553,9 +2600,13 @@ func (c *UrlcrawlerrorssamplesMarkAsFixedCall) doRequest(alt string) (*http.Resp
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "sites/{siteUrl}/urlCrawlErrorsSamples/{url}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"siteUrl": c.siteUrl,

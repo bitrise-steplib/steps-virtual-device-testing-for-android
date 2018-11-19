@@ -1,4 +1,4 @@
-// Package adexperiencereport provides access to the Google Ad Experience Report API.
+// Package adexperiencereport provides access to the Ad Experience Report API.
 //
 // See https://developers.google.com/ad-experience-report/
 //
@@ -11,18 +11,18 @@ package adexperiencereport // import "google.golang.org/api/adexperiencereport/v
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	context "golang.org/x/net/context"
-	ctxhttp "golang.org/x/net/context/ctxhttp"
-	gensupport "google.golang.org/api/gensupport"
-	googleapi "google.golang.org/api/googleapi"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	gensupport "google.golang.org/api/gensupport"
+	googleapi "google.golang.org/api/googleapi"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -38,7 +38,6 @@ var _ = googleapi.Version
 var _ = errors.New
 var _ = strings.Replace
 var _ = context.Canceled
-var _ = ctxhttp.Do
 
 const apiId = "adexperiencereport:v1"
 const apiName = "adexperiencereport"
@@ -131,6 +130,7 @@ type PlatformSummary struct {
 	//   "REGION_UNKNOWN" - Ad standard not yet defined for your region.
 	//   "REGION_A" - Region A.
 	//   "REGION_B" - Region B.
+	//   "REGION_C" - Region C.
 	Region []string `json:"region,omitempty"`
 
 	// ReportUrl: A link that leads to a full ad experience report.
@@ -158,8 +158,8 @@ type PlatformSummary struct {
 }
 
 func (s *PlatformSummary) MarshalJSON() ([]byte, error) {
-	type noMethod PlatformSummary
-	raw := noMethod(*s)
+	type NoMethod PlatformSummary
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -197,8 +197,8 @@ type SiteSummaryResponse struct {
 }
 
 func (s *SiteSummaryResponse) MarshalJSON() ([]byte, error) {
-	type noMethod SiteSummaryResponse
-	raw := noMethod(*s)
+	type NoMethod SiteSummaryResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -230,8 +230,8 @@ type ViolatingSitesResponse struct {
 }
 
 func (s *ViolatingSitesResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ViolatingSitesResponse
-	raw := noMethod(*s)
+	type NoMethod ViolatingSitesResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -299,9 +299,13 @@ func (c *SitesGetCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+name}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
@@ -342,7 +346,7 @@ func (c *SitesGetCall) Do(opts ...googleapi.CallOption) (*SiteSummaryResponse, e
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -437,9 +441,13 @@ func (c *ViolatingSitesListCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/violatingSites")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
@@ -477,7 +485,7 @@ func (c *ViolatingSitesListCall) Do(opts ...googleapi.CallOption) (*ViolatingSit
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil

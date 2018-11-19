@@ -1,4 +1,4 @@
-// Copyright 2016 Google Inc. All Rights Reserved.
+// Copyright 2016 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ package bytestream
 // https://github.com/googleapis/googleapis/blob/master/google/bytestream/bytestream.proto
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"time"
 
-	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	pb "google.golang.org/genproto/googleapis/bytestream"

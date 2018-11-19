@@ -1,4 +1,4 @@
-// Copyright 2015 Google Inc. All Rights Reserved.
+// Copyright 2015 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@
 package grpc
 
 import (
+	"context"
 	"errors"
+	"log"
 
-	"golang.org/x/net/context"
+	"go.opencensus.io/plugin/ocgrpc"
 	"google.golang.org/api/internal"
 	"google.golang.org/api/option"
 	"google.golang.org/grpc"
@@ -34,9 +36,23 @@ var appengineDialerHook func(context.Context) grpc.DialOption
 // Dial returns a GRPC connection for use communicating with a Google cloud
 // service, configured with the given ClientOptions.
 func Dial(ctx context.Context, opts ...option.ClientOption) (*grpc.ClientConn, error) {
+	return dial(ctx, false, opts)
+}
+
+// DialInsecure returns an insecure GRPC connection for use communicating
+// with fake or mock Google cloud service implementations, such as emulators.
+// The connection is configured with the given ClientOptions.
+func DialInsecure(ctx context.Context, opts ...option.ClientOption) (*grpc.ClientConn, error) {
+	return dial(ctx, true, opts)
+}
+
+func dial(ctx context.Context, insecure bool, opts []option.ClientOption) (*grpc.ClientConn, error) {
 	var o internal.DialSettings
 	for _, opt := range opts {
 		opt.Apply(&o)
+	}
+	if err := o.Validate(); err != nil {
+		return nil, err
 	}
 	if o.HTTPClient != nil {
 		return nil, errors.New("unsupported HTTP client specified")
@@ -44,18 +60,32 @@ func Dial(ctx context.Context, opts ...option.ClientOption) (*grpc.ClientConn, e
 	if o.GRPCConn != nil {
 		return o.GRPCConn, nil
 	}
-	creds, err := internal.Creds(ctx, &o)
-	if err != nil {
-		return nil, err
-	}
 	grpcOpts := []grpc.DialOption{
-		grpc.WithPerRPCCredentials(oauth.TokenSource{creds.TokenSource}),
-		grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, "")),
+		grpc.WithWaitForHandshake(),
+	}
+	if insecure {
+		grpcOpts = []grpc.DialOption{grpc.WithInsecure()}
+	} else if !o.NoAuth {
+		if o.APIKey != "" {
+			log.Print("API keys are not supported for gRPC APIs. Remove the WithAPIKey option from your client-creating call.")
+		}
+		creds, err := internal.Creds(ctx, &o)
+		if err != nil {
+			return nil, err
+		}
+		grpcOpts = []grpc.DialOption{
+			grpc.WithPerRPCCredentials(oauth.TokenSource{creds.TokenSource}),
+			grpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, "")),
+		}
 	}
 	if appengineDialerHook != nil {
 		// Use the Socket API on App Engine.
 		grpcOpts = append(grpcOpts, appengineDialerHook(ctx))
 	}
+	// Add tracing, but before the other options, so that clients can override the
+	// gRPC stats handler.
+	// This assumes that gRPC options are processed in order, left to right.
+	grpcOpts = addOCStatsHandler(grpcOpts)
 	grpcOpts = append(grpcOpts, o.GRPCDialOpts...)
 	if o.UserAgent != "" {
 		grpcOpts = append(grpcOpts, grpc.WithUserAgent(o.UserAgent))
@@ -63,24 +93,6 @@ func Dial(ctx context.Context, opts ...option.ClientOption) (*grpc.ClientConn, e
 	return grpc.DialContext(ctx, o.Endpoint, grpcOpts...)
 }
 
-// DialInsecure returns an insecure GRPC connection for use communicating
-// with fake or mock Google cloud service implementations, such as emulators.
-// The connection is configured with the given ClientOptions.
-func DialInsecure(ctx context.Context, opts ...option.ClientOption) (*grpc.ClientConn, error) {
-	var o internal.DialSettings
-	for _, opt := range opts {
-		opt.Apply(&o)
-	}
-	if o.HTTPClient != nil {
-		return nil, errors.New("unsupported HTTP client specified")
-	}
-	if o.GRPCConn != nil {
-		return o.GRPCConn, nil
-	}
-	grpcOpts := []grpc.DialOption{grpc.WithInsecure()}
-	grpcOpts = append(grpcOpts, o.GRPCDialOpts...)
-	if o.UserAgent != "" {
-		grpcOpts = append(grpcOpts, grpc.WithUserAgent(o.UserAgent))
-	}
-	return grpc.DialContext(ctx, o.Endpoint, grpcOpts...)
+func addOCStatsHandler(opts []grpc.DialOption) []grpc.DialOption {
+	return append(opts, grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
 }

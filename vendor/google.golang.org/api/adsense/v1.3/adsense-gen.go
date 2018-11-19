@@ -11,18 +11,18 @@ package adsense // import "google.golang.org/api/adsense/v1.3"
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	context "golang.org/x/net/context"
-	ctxhttp "golang.org/x/net/context/ctxhttp"
-	gensupport "google.golang.org/api/gensupport"
-	googleapi "google.golang.org/api/googleapi"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	gensupport "google.golang.org/api/gensupport"
+	googleapi "google.golang.org/api/googleapi"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -38,7 +38,6 @@ var _ = googleapi.Version
 var _ = errors.New
 var _ = strings.Replace
 var _ = context.Canceled
-var _ = ctxhttp.Do
 
 const apiId = "adsense:v1.3"
 const apiName = "adsense"
@@ -401,8 +400,8 @@ type Account struct {
 }
 
 func (s *Account) MarshalJSON() ([]byte, error) {
-	type noMethod Account
-	raw := noMethod(*s)
+	type NoMethod Account
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -443,8 +442,8 @@ type Accounts struct {
 }
 
 func (s *Accounts) MarshalJSON() ([]byte, error) {
-	type noMethod Accounts
-	raw := noMethod(*s)
+	type NoMethod Accounts
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -483,8 +482,8 @@ type AdClient struct {
 }
 
 func (s *AdClient) MarshalJSON() ([]byte, error) {
-	type noMethod AdClient
-	raw := noMethod(*s)
+	type NoMethod AdClient
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -525,8 +524,8 @@ type AdClients struct {
 }
 
 func (s *AdClients) MarshalJSON() ([]byte, error) {
-	type noMethod AdClients
-	raw := noMethod(*s)
+	type NoMethod AdClients
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -559,8 +558,8 @@ type AdCode struct {
 }
 
 func (s *AdCode) MarshalJSON() ([]byte, error) {
-	type noMethod AdCode
-	raw := noMethod(*s)
+	type NoMethod AdCode
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -598,8 +597,8 @@ type AdStyle struct {
 }
 
 func (s *AdStyle) MarshalJSON() ([]byte, error) {
-	type noMethod AdStyle
-	raw := noMethod(*s)
+	type NoMethod AdStyle
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -640,8 +639,8 @@ type AdStyleColors struct {
 }
 
 func (s *AdStyleColors) MarshalJSON() ([]byte, error) {
-	type noMethod AdStyleColors
-	raw := noMethod(*s)
+	type NoMethod AdStyleColors
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -671,8 +670,8 @@ type AdStyleFont struct {
 }
 
 func (s *AdStyleFont) MarshalJSON() ([]byte, error) {
-	type noMethod AdStyleFont
-	raw := noMethod(*s)
+	type NoMethod AdStyleFont
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -743,8 +742,8 @@ type AdUnit struct {
 }
 
 func (s *AdUnit) MarshalJSON() ([]byte, error) {
-	type noMethod AdUnit
-	raw := noMethod(*s)
+	type NoMethod AdUnit
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -779,8 +778,8 @@ type AdUnitContentAdsSettings struct {
 }
 
 func (s *AdUnitContentAdsSettings) MarshalJSON() ([]byte, error) {
-	type noMethod AdUnitContentAdsSettings
-	raw := noMethod(*s)
+	type NoMethod AdUnitContentAdsSettings
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -815,8 +814,8 @@ type AdUnitContentAdsSettingsBackupOption struct {
 }
 
 func (s *AdUnitContentAdsSettingsBackupOption) MarshalJSON() ([]byte, error) {
-	type noMethod AdUnitContentAdsSettingsBackupOption
-	raw := noMethod(*s)
+	type NoMethod AdUnitContentAdsSettingsBackupOption
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -855,8 +854,8 @@ type AdUnitFeedAdsSettings struct {
 }
 
 func (s *AdUnitFeedAdsSettings) MarshalJSON() ([]byte, error) {
-	type noMethod AdUnitFeedAdsSettings
-	raw := noMethod(*s)
+	type NoMethod AdUnitFeedAdsSettings
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -894,8 +893,8 @@ type AdUnitMobileContentAdsSettings struct {
 }
 
 func (s *AdUnitMobileContentAdsSettings) MarshalJSON() ([]byte, error) {
-	type noMethod AdUnitMobileContentAdsSettings
-	raw := noMethod(*s)
+	type NoMethod AdUnitMobileContentAdsSettings
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -936,8 +935,8 @@ type AdUnits struct {
 }
 
 func (s *AdUnits) MarshalJSON() ([]byte, error) {
-	type noMethod AdUnits
-	raw := noMethod(*s)
+	type NoMethod AdUnits
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -996,8 +995,8 @@ type AdsenseReportsGenerateResponse struct {
 }
 
 func (s *AdsenseReportsGenerateResponse) MarshalJSON() ([]byte, error) {
-	type noMethod AdsenseReportsGenerateResponse
-	raw := noMethod(*s)
+	type NoMethod AdsenseReportsGenerateResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1031,8 +1030,8 @@ type AdsenseReportsGenerateResponseHeaders struct {
 }
 
 func (s *AdsenseReportsGenerateResponseHeaders) MarshalJSON() ([]byte, error) {
-	type noMethod AdsenseReportsGenerateResponseHeaders
-	raw := noMethod(*s)
+	type NoMethod AdsenseReportsGenerateResponseHeaders
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1076,8 +1075,8 @@ type Alert struct {
 }
 
 func (s *Alert) MarshalJSON() ([]byte, error) {
-	type noMethod Alert
-	raw := noMethod(*s)
+	type NoMethod Alert
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1110,8 +1109,8 @@ type Alerts struct {
 }
 
 func (s *Alerts) MarshalJSON() ([]byte, error) {
-	type noMethod Alerts
-	raw := noMethod(*s)
+	type NoMethod Alerts
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1157,8 +1156,8 @@ type CustomChannel struct {
 }
 
 func (s *CustomChannel) MarshalJSON() ([]byte, error) {
-	type noMethod CustomChannel
-	raw := noMethod(*s)
+	type NoMethod CustomChannel
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1200,8 +1199,8 @@ type CustomChannelTargetingInfo struct {
 }
 
 func (s *CustomChannelTargetingInfo) MarshalJSON() ([]byte, error) {
-	type noMethod CustomChannelTargetingInfo
-	raw := noMethod(*s)
+	type NoMethod CustomChannelTargetingInfo
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1242,8 +1241,8 @@ type CustomChannels struct {
 }
 
 func (s *CustomChannels) MarshalJSON() ([]byte, error) {
-	type noMethod CustomChannels
-	raw := noMethod(*s)
+	type NoMethod CustomChannels
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1275,8 +1274,8 @@ type Metadata struct {
 }
 
 func (s *Metadata) MarshalJSON() ([]byte, error) {
-	type noMethod Metadata
-	raw := noMethod(*s)
+	type NoMethod Metadata
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1336,8 +1335,8 @@ type ReportingMetadataEntry struct {
 }
 
 func (s *ReportingMetadataEntry) MarshalJSON() ([]byte, error) {
-	type noMethod ReportingMetadataEntry
-	raw := noMethod(*s)
+	type NoMethod ReportingMetadataEntry
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1378,8 +1377,8 @@ type SavedAdStyle struct {
 }
 
 func (s *SavedAdStyle) MarshalJSON() ([]byte, error) {
-	type noMethod SavedAdStyle
-	raw := noMethod(*s)
+	type NoMethod SavedAdStyle
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1420,8 +1419,8 @@ type SavedAdStyles struct {
 }
 
 func (s *SavedAdStyles) MarshalJSON() ([]byte, error) {
-	type noMethod SavedAdStyles
-	raw := noMethod(*s)
+	type NoMethod SavedAdStyles
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1453,8 +1452,8 @@ type SavedReport struct {
 }
 
 func (s *SavedReport) MarshalJSON() ([]byte, error) {
-	type noMethod SavedReport
-	raw := noMethod(*s)
+	type NoMethod SavedReport
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1495,8 +1494,8 @@ type SavedReports struct {
 }
 
 func (s *SavedReports) MarshalJSON() ([]byte, error) {
-	type noMethod SavedReports
-	raw := noMethod(*s)
+	type NoMethod SavedReports
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1531,8 +1530,8 @@ type UrlChannel struct {
 }
 
 func (s *UrlChannel) MarshalJSON() ([]byte, error) {
-	type noMethod UrlChannel
-	raw := noMethod(*s)
+	type NoMethod UrlChannel
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1573,8 +1572,8 @@ type UrlChannels struct {
 }
 
 func (s *UrlChannels) MarshalJSON() ([]byte, error) {
-	type noMethod UrlChannels
-	raw := noMethod(*s)
+	type NoMethod UrlChannels
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1692,7 +1691,7 @@ func (c *AccountsGetCall) Do(opts ...googleapi.CallOption) (*Account, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1846,7 +1845,7 @@ func (c *AccountsListCall) Do(opts ...googleapi.CallOption) (*Accounts, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2025,7 +2024,7 @@ func (c *AccountsAdclientsListCall) Do(opts ...googleapi.CallOption) (*AdClients
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2204,7 +2203,7 @@ func (c *AccountsAdunitsGetCall) Do(opts ...googleapi.CallOption) (*AdUnit, erro
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2362,7 +2361,7 @@ func (c *AccountsAdunitsGetAdCodeCall) Do(opts ...googleapi.CallOption) (*AdCode
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2541,7 +2540,7 @@ func (c *AccountsAdunitsListCall) Do(opts ...googleapi.CallOption) (*AdUnits, er
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2749,7 +2748,7 @@ func (c *AccountsAdunitsCustomchannelsListCall) Do(opts ...googleapi.CallOption)
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2944,7 +2943,7 @@ func (c *AccountsAlertsListCall) Do(opts ...googleapi.CallOption) (*Alerts, erro
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3094,7 +3093,7 @@ func (c *AccountsCustomchannelsGetCall) Do(opts ...googleapi.CallOption) (*Custo
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3267,7 +3266,7 @@ func (c *AccountsCustomchannelsListCall) Do(opts ...googleapi.CallOption) (*Cust
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3475,7 +3474,7 @@ func (c *AccountsCustomchannelsAdunitsListCall) Do(opts ...googleapi.CallOption)
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3755,7 +3754,7 @@ func (c *AccountsReportsGenerateCall) Do(opts ...googleapi.CallOption) (*Adsense
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3997,7 +3996,7 @@ func (c *AccountsReportsSavedGenerateCall) Do(opts ...googleapi.CallOption) (*Ad
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4180,7 +4179,7 @@ func (c *AccountsReportsSavedListCall) Do(opts ...googleapi.CallOption) (*SavedR
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4355,7 +4354,7 @@ func (c *AccountsSavedadstylesGetCall) Do(opts ...googleapi.CallOption) (*SavedA
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4517,7 +4516,7 @@ func (c *AccountsSavedadstylesListCall) Do(opts ...googleapi.CallOption) (*Saved
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4709,7 +4708,7 @@ func (c *AccountsUrlchannelsListCall) Do(opts ...googleapi.CallOption) (*UrlChan
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4899,7 +4898,7 @@ func (c *AdclientsListCall) Do(opts ...googleapi.CallOption) (*AdClients, error)
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5065,7 +5064,7 @@ func (c *AdunitsGetCall) Do(opts ...googleapi.CallOption) (*AdUnit, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5213,7 +5212,7 @@ func (c *AdunitsGetAdCodeCall) Do(opts ...googleapi.CallOption) (*AdCode, error)
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5382,7 +5381,7 @@ func (c *AdunitsListCall) Do(opts ...googleapi.CallOption) (*AdUnits, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5580,7 +5579,7 @@ func (c *AdunitsCustomchannelsListCall) Do(opts ...googleapi.CallOption) (*Custo
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5763,7 +5762,7 @@ func (c *AlertsListCall) Do(opts ...googleapi.CallOption) (*Alerts, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5900,7 +5899,7 @@ func (c *CustomchannelsGetCall) Do(opts ...googleapi.CallOption) (*CustomChannel
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -6063,7 +6062,7 @@ func (c *CustomchannelsListCall) Do(opts ...googleapi.CallOption) (*CustomChanne
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -6261,7 +6260,7 @@ func (c *CustomchannelsAdunitsListCall) Do(opts ...googleapi.CallOption) (*AdUni
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -6441,7 +6440,7 @@ func (c *MetadataDimensionsListCall) Do(opts ...googleapi.CallOption) (*Metadata
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -6564,7 +6563,7 @@ func (c *MetadataMetricsListCall) Do(opts ...googleapi.CallOption) (*Metadata, e
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -6782,7 +6781,7 @@ func (c *ReportsGenerateCall) Do(opts ...googleapi.CallOption) (*AdsenseReportsG
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7020,7 +7019,7 @@ func (c *ReportsSavedGenerateCall) Do(opts ...googleapi.CallOption) (*AdsenseRep
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7191,7 +7190,7 @@ func (c *ReportsSavedListCall) Do(opts ...googleapi.CallOption) (*SavedReports, 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7354,7 +7353,7 @@ func (c *SavedadstylesGetCall) Do(opts ...googleapi.CallOption) (*SavedAdStyle, 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7504,7 +7503,7 @@ func (c *SavedadstylesListCall) Do(opts ...googleapi.CallOption) (*SavedAdStyles
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7684,7 +7683,7 @@ func (c *UrlchannelsListCall) Do(opts ...googleapi.CallOption) (*UrlChannels, er
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil

@@ -1,4 +1,4 @@
-// Package cloudfunctions provides access to the Google Cloud Functions API.
+// Package cloudfunctions provides access to the Cloud Functions API.
 //
 // See https://cloud.google.com/functions
 //
@@ -11,18 +11,18 @@ package cloudfunctions // import "google.golang.org/api/cloudfunctions/v1beta2"
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	context "golang.org/x/net/context"
-	ctxhttp "golang.org/x/net/context/ctxhttp"
-	gensupport "google.golang.org/api/gensupport"
-	googleapi "google.golang.org/api/googleapi"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	gensupport "google.golang.org/api/gensupport"
+	googleapi "google.golang.org/api/googleapi"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -38,7 +38,6 @@ var _ = googleapi.Version
 var _ = errors.New
 var _ = strings.Replace
 var _ = context.Canceled
-var _ = ctxhttp.Do
 
 const apiId = "cloudfunctions:v1beta2"
 const apiName = "cloudfunctions"
@@ -143,8 +142,8 @@ type CallFunctionRequest struct {
 }
 
 func (s *CallFunctionRequest) MarshalJSON() ([]byte, error) {
-	type noMethod CallFunctionRequest
-	raw := noMethod(*s)
+	type NoMethod CallFunctionRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -186,8 +185,8 @@ type CallFunctionResponse struct {
 }
 
 func (s *CallFunctionResponse) MarshalJSON() ([]byte, error) {
-	type noMethod CallFunctionResponse
-	raw := noMethod(*s)
+	type NoMethod CallFunctionResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -213,6 +212,12 @@ type CloudFunction struct {
 	// in `source_location`.
 	EntryPoint string `json:"entryPoint,omitempty"`
 
+	// EnvironmentVariables: **Beta Feature**
+	//
+	// Environment variables that shall be available during function
+	// execution.
+	EnvironmentVariables map[string]string `json:"environmentVariables,omitempty"`
+
 	// EventTrigger: A source that fires events in response to a condition
 	// in another service.
 	EventTrigger *EventTrigger `json:"eventTrigger,omitempty"`
@@ -231,10 +236,50 @@ type CloudFunction struct {
 	// active operation.
 	LatestOperation string `json:"latestOperation,omitempty"`
 
+	// MaxInstances: The limit on the maximum number of function instances
+	// that may coexist at a
+	// given time. This feature is currently in alpha, available only
+	// for
+	// whitelisted users.
+	MaxInstances int64 `json:"maxInstances,omitempty"`
+
 	// Name: A user-defined name of the function. Function names must be
 	// unique
 	// globally and match pattern `projects/*/locations/*/functions/*`
 	Name string `json:"name,omitempty"`
+
+	// Network: The VPC Network that this cloud function can connect to. It
+	// can be
+	// either the fully-qualified URI, or the short name of the network
+	// resource.
+	// If the short network name is used, the network must belong to the
+	// same
+	// project. Otherwise, it must belong to a project within the
+	// same
+	// organization. The format of this field is
+	// either
+	// `projects/{project}/global/networks/{network}` or `{network}`,
+	// where
+	// {project} is a project id where the network is defined, and {network}
+	// is
+	// the short name of the network.
+	//
+	// This field is mutually exclusive with `vpc_connector` and will be
+	// replaced
+	// by it.
+	//
+	// See [the VPC
+	// documentation](https://cloud.google.com/compute/docs/vpc) for
+	// more information on connecting Cloud projects.
+	//
+	// This feature is currently in alpha, available only for whitelisted
+	// users.
+	Network string `json:"network,omitempty"`
+
+	// Runtime: The runtime in which the function is going to run. If empty,
+	// defaults to
+	// Node.js 6.
+	Runtime string `json:"runtime,omitempty"`
 
 	// ServiceAccount: Output only. The service account of the function.
 	ServiceAccount string `json:"serviceAccount,omitempty"`
@@ -305,6 +350,26 @@ type CloudFunction struct {
 	// results in a new version of a function being created.
 	VersionId int64 `json:"versionId,omitempty,string"`
 
+	// VpcConnector: The VPC Network Connector that this cloud function can
+	// connect to. It can
+	// be either the fully-qualified URI, or the short name of the
+	// network
+	// connector resource. The format of this field
+	// is
+	// `projects/*/locations/*/connectors/*`
+	//
+	// This field is mutually exclusive with `network` field and will
+	// eventually
+	// replace it.
+	//
+	// See [the VPC
+	// documentation](https://cloud.google.com/compute/docs/vpc) for
+	// more information on connecting Cloud projects.
+	//
+	// This feature is currently in alpha, available only for whitelisted
+	// users.
+	VpcConnector string `json:"vpcConnector,omitempty"`
+
 	// ServerResponse contains the HTTP response code and headers from the
 	// server.
 	googleapi.ServerResponse `json:"-"`
@@ -328,8 +393,8 @@ type CloudFunction struct {
 }
 
 func (s *CloudFunction) MarshalJSON() ([]byte, error) {
-	type noMethod CloudFunction
-	raw := noMethod(*s)
+	type NoMethod CloudFunction
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -344,13 +409,15 @@ type EventTrigger struct {
 	// `providers/*/eventTypes/*` e.g. Directly handle a Message published
 	// to
 	// Google Cloud Pub/Sub
-	// `providers/cloud.pubsub/eventTypes/topic.publish`
+	// `providers/cloud.pubsub/eventTypes/topic.publish`.
 	//
-	//      Handle an object changing in Google Cloud Storage
-	//      `providers/cloud.storage/eventTypes/object.change`
+	// Handle an object changing in Google Cloud
+	// Storage:
+	// `providers/cloud.storage/eventTypes/object.change`
 	//
-	//      Handle a write to the Firebase Realtime Database
-	//      `providers/google.firebase.database/eventTypes/ref.write`
+	// Handle a write to the Firebase Realtime
+	// Database:
+	// `providers/google.firebase.database/eventTypes/ref.write`
 	EventType string `json:"eventType,omitempty"`
 
 	// FailurePolicy: Specifies policy for failed executions.
@@ -373,7 +440,7 @@ type EventTrigger struct {
 	// will
 	// be used. For example, `storage.googleapis.com` is the default for
 	// all
-	// event types in the 'google.storage` namespace.
+	// event types in the `google.storage` namespace.
 	Service string `json:"service,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "EventType") to
@@ -394,8 +461,8 @@ type EventTrigger struct {
 }
 
 func (s *EventTrigger) MarshalJSON() ([]byte, error) {
-	type noMethod EventTrigger
-	raw := noMethod(*s)
+	type NoMethod EventTrigger
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -426,8 +493,8 @@ type FailurePolicy struct {
 }
 
 func (s *FailurePolicy) MarshalJSON() ([]byte, error) {
-	type noMethod FailurePolicy
-	raw := noMethod(*s)
+	type NoMethod FailurePolicy
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -454,8 +521,8 @@ type GenerateDownloadUrlRequest struct {
 }
 
 func (s *GenerateDownloadUrlRequest) MarshalJSON() ([]byte, error) {
-	type noMethod GenerateDownloadUrlRequest
-	raw := noMethod(*s)
+	type NoMethod GenerateDownloadUrlRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -489,8 +556,8 @@ type GenerateDownloadUrlResponse struct {
 }
 
 func (s *GenerateDownloadUrlResponse) MarshalJSON() ([]byte, error) {
-	type noMethod GenerateDownloadUrlResponse
-	raw := noMethod(*s)
+	type NoMethod GenerateDownloadUrlResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -529,8 +596,8 @@ type GenerateUploadUrlResponse struct {
 }
 
 func (s *GenerateUploadUrlResponse) MarshalJSON() ([]byte, error) {
-	type noMethod GenerateUploadUrlResponse
-	raw := noMethod(*s)
+	type NoMethod GenerateUploadUrlResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -558,8 +625,8 @@ type HTTPSTrigger struct {
 }
 
 func (s *HTTPSTrigger) MarshalJSON() ([]byte, error) {
-	type noMethod HTTPSTrigger
-	raw := noMethod(*s)
+	type NoMethod HTTPSTrigger
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -598,8 +665,8 @@ type ListFunctionsResponse struct {
 }
 
 func (s *ListFunctionsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListFunctionsResponse
-	raw := noMethod(*s)
+	type NoMethod ListFunctionsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -635,8 +702,8 @@ type ListLocationsResponse struct {
 }
 
 func (s *ListLocationsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListLocationsResponse
-	raw := noMethod(*s)
+	type NoMethod ListLocationsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -672,13 +739,18 @@ type ListOperationsResponse struct {
 }
 
 func (s *ListOperationsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListOperationsResponse
-	raw := noMethod(*s)
+	type NoMethod ListOperationsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 // Location: A resource that represents Google Cloud Platform location.
 type Location struct {
+	// DisplayName: The friendly name for this location, typically a nearby
+	// city name.
+	// For example, "Tokyo".
+	DisplayName string `json:"displayName,omitempty"`
+
 	// Labels: Cross-service attributes for the location. For example
 	//
 	//     {"cloud.googleapis.com/region": "us-east1"}
@@ -698,7 +770,7 @@ type Location struct {
 	// For example: "projects/example-project/locations/us-east1"
 	Name string `json:"name,omitempty"`
 
-	// ForceSendFields is a list of field names (e.g. "Labels") to
+	// ForceSendFields is a list of field names (e.g. "DisplayName") to
 	// unconditionally include in API requests. By default, fields with
 	// empty values are omitted from API requests. However, any non-pointer,
 	// non-interface field appearing in ForceSendFields will be sent to the
@@ -706,18 +778,18 @@ type Location struct {
 	// used to include empty fields in Patch requests.
 	ForceSendFields []string `json:"-"`
 
-	// NullFields is a list of field names (e.g. "Labels") to include in API
-	// requests with the JSON null value. By default, fields with empty
-	// values are omitted from API requests. However, any field with an
-	// empty value appearing in NullFields will be sent to the server as
+	// NullFields is a list of field names (e.g. "DisplayName") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
 	// null. It is an error if a field in this list has a non-empty value.
 	// This may be used to include null fields in Patch requests.
 	NullFields []string `json:"-"`
 }
 
 func (s *Location) MarshalJSON() ([]byte, error) {
-	type noMethod Location
-	raw := noMethod(*s)
+	type NoMethod Location
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -791,8 +863,58 @@ type Operation struct {
 }
 
 func (s *Operation) MarshalJSON() ([]byte, error) {
-	type noMethod Operation
-	raw := noMethod(*s)
+	type NoMethod Operation
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// OperationMetadataV1: Metadata describing an Operation
+type OperationMetadataV1 struct {
+	// Request: The original request that started the operation.
+	Request googleapi.RawMessage `json:"request,omitempty"`
+
+	// Target: Target of the operation - for
+	// example
+	// projects/project-1/locations/region-1/functions/function-1
+	Target string `json:"target,omitempty"`
+
+	// Type: Type of operation.
+	//
+	// Possible values:
+	//   "OPERATION_UNSPECIFIED" - Unknown operation type.
+	//   "CREATE_FUNCTION" - Triggered by CreateFunction call
+	//   "UPDATE_FUNCTION" - Triggered by UpdateFunction call
+	//   "DELETE_FUNCTION" - Triggered by DeleteFunction call.
+	Type string `json:"type,omitempty"`
+
+	// UpdateTime: The last update timestamp of the operation.
+	UpdateTime string `json:"updateTime,omitempty"`
+
+	// VersionId: Version id of the function created or updated by an API
+	// call.
+	// This field is only pupulated for Create and Update operations.
+	VersionId int64 `json:"versionId,omitempty,string"`
+
+	// ForceSendFields is a list of field names (e.g. "Request") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Request") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *OperationMetadataV1) MarshalJSON() ([]byte, error) {
+	type NoMethod OperationMetadataV1
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -814,6 +936,9 @@ type OperationMetadataV1Beta2 struct {
 	//   "UPDATE_FUNCTION" - Triggered by UpdateFunction call
 	//   "DELETE_FUNCTION" - Triggered by DeleteFunction call.
 	Type string `json:"type,omitempty"`
+
+	// UpdateTime: The last update timestamp of the operation.
+	UpdateTime string `json:"updateTime,omitempty"`
 
 	// VersionId: Version id of the function created or updated by an API
 	// call.
@@ -838,8 +963,8 @@ type OperationMetadataV1Beta2 struct {
 }
 
 func (s *OperationMetadataV1Beta2) MarshalJSON() ([]byte, error) {
-	type noMethod OperationMetadataV1Beta2
-	raw := noMethod(*s)
+	type NoMethod OperationMetadataV1Beta2
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -915,8 +1040,8 @@ type SourceRepository struct {
 }
 
 func (s *SourceRepository) MarshalJSON() ([]byte, error) {
-	type noMethod SourceRepository
-	raw := noMethod(*s)
+	type NoMethod SourceRepository
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1034,8 +1159,8 @@ type Status struct {
 }
 
 func (s *Status) MarshalJSON() ([]byte, error) {
-	type noMethod Status
-	raw := noMethod(*s)
+	type NoMethod Status
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1107,9 +1232,13 @@ func (c *OperationsGetCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+name}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
@@ -1150,7 +1279,7 @@ func (c *OperationsGetCall) Do(opts ...googleapi.CallOption) (*Operation, error)
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1288,9 +1417,13 @@ func (c *OperationsListCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/operations")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
@@ -1328,7 +1461,7 @@ func (c *OperationsListCall) Do(opts ...googleapi.CallOption) (*ListOperationsRe
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1479,9 +1612,13 @@ func (c *ProjectsLocationsListCall) doRequest(alt string) (*http.Response, error
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+name}/locations")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
@@ -1522,7 +1659,7 @@ func (c *ProjectsLocationsListCall) Do(opts ...googleapi.CallOption) (*ListLocat
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1650,9 +1787,13 @@ func (c *ProjectsLocationsFunctionsCallCall) doRequest(alt string) (*http.Respon
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+name}:call")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
@@ -1693,7 +1834,7 @@ func (c *ProjectsLocationsFunctionsCallCall) Do(opts ...googleapi.CallOption) (*
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1789,9 +1930,13 @@ func (c *ProjectsLocationsFunctionsCreateCall) doRequest(alt string) (*http.Resp
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+location}/functions")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"location": c.location,
@@ -1832,7 +1977,7 @@ func (c *ProjectsLocationsFunctionsCreateCall) Do(opts ...googleapi.CallOption) 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1921,9 +2066,13 @@ func (c *ProjectsLocationsFunctionsDeleteCall) doRequest(alt string) (*http.Resp
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+name}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
@@ -1964,7 +2113,7 @@ func (c *ProjectsLocationsFunctionsDeleteCall) Do(opts ...googleapi.CallOption) 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2060,9 +2209,13 @@ func (c *ProjectsLocationsFunctionsGenerateDownloadUrlCall) doRequest(alt string
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+name}:generateDownloadUrl")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
@@ -2103,7 +2256,7 @@ func (c *ProjectsLocationsFunctionsGenerateDownloadUrlCall) Do(opts ...googleapi
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2158,6 +2311,19 @@ type ProjectsLocationsFunctionsGenerateUploadUrlCall struct {
 // Once the function source code upload is complete, the used signed
 // URL should be provided in CreateFunction or UpdateFunction request
 // as a reference to the function source code.
+//
+// When uploading source code to the generated signed URL, please
+// follow
+// these restrictions:
+//
+// * Source file type should be a zip file.
+// * Source file size should not exceed 100MB limit.
+//
+// When making a HTTP PUT request, these two headers need to be
+// specified:
+//
+// * `content-type: application/zip`
+// * `x-goog-content-length-range: 0,104857600`
 func (r *ProjectsLocationsFunctionsService) GenerateUploadUrl(parent string, generateuploadurlrequest *GenerateUploadUrlRequest) *ProjectsLocationsFunctionsGenerateUploadUrlCall {
 	c := &ProjectsLocationsFunctionsGenerateUploadUrlCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.parent = parent
@@ -2203,9 +2369,13 @@ func (c *ProjectsLocationsFunctionsGenerateUploadUrlCall) doRequest(alt string) 
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+parent}/functions:generateUploadUrl")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"parent": c.parent,
@@ -2246,12 +2416,12 @@ func (c *ProjectsLocationsFunctionsGenerateUploadUrlCall) Do(opts ...googleapi.C
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
 	// {
-	//   "description": "Returns a signed URL for uploading a function source code.\nFor more information about the signed URL usage see:\nhttps://cloud.google.com/storage/docs/access-control/signed-urls\nOnce the function source code upload is complete, the used signed\nURL should be provided in CreateFunction or UpdateFunction request\nas a reference to the function source code.",
+	//   "description": "Returns a signed URL for uploading a function source code.\nFor more information about the signed URL usage see:\nhttps://cloud.google.com/storage/docs/access-control/signed-urls\nOnce the function source code upload is complete, the used signed\nURL should be provided in CreateFunction or UpdateFunction request\nas a reference to the function source code.\n\nWhen uploading source code to the generated signed URL, please follow\nthese restrictions:\n\n* Source file type should be a zip file.\n* Source file size should not exceed 100MB limit.\n\nWhen making a HTTP PUT request, these two headers need to be specified:\n\n* `content-type: application/zip`\n* `x-goog-content-length-range: 0,104857600`",
 	//   "flatPath": "v1beta2/projects/{projectsId}/locations/{locationsId}/functions:generateUploadUrl",
 	//   "httpMethod": "POST",
 	//   "id": "cloudfunctions.projects.locations.functions.generateUploadUrl",
@@ -2260,7 +2430,7 @@ func (c *ProjectsLocationsFunctionsGenerateUploadUrlCall) Do(opts ...googleapi.C
 	//   ],
 	//   "parameters": {
 	//     "parent": {
-	//       "description": "The project and location in which the Google Cloud Storage signed URL\nshould be generated, specified in the format `projects/*/locations/*",
+	//       "description": "The project and location in which the Google Cloud Storage signed URL\nshould be generated, specified in the format `projects/*/locations/*`.",
 	//       "location": "path",
 	//       "pattern": "^projects/[^/]+/locations/[^/]+$",
 	//       "required": true,
@@ -2346,9 +2516,13 @@ func (c *ProjectsLocationsFunctionsGetCall) doRequest(alt string) (*http.Respons
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+name}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
@@ -2389,7 +2563,7 @@ func (c *ProjectsLocationsFunctionsGetCall) Do(opts ...googleapi.CallOption) (*C
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2504,9 +2678,13 @@ func (c *ProjectsLocationsFunctionsListCall) doRequest(alt string) (*http.Respon
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+location}/functions")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"location": c.location,
@@ -2547,7 +2725,7 @@ func (c *ProjectsLocationsFunctionsListCall) Do(opts ...googleapi.CallOption) (*
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2668,9 +2846,13 @@ func (c *ProjectsLocationsFunctionsUpdateCall) doRequest(alt string) (*http.Resp
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta2/{+name}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("PUT", urls, body)
+	req, err := http.NewRequest("PUT", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"name": c.name,
@@ -2711,7 +2893,7 @@ func (c *ProjectsLocationsFunctionsUpdateCall) Do(opts ...googleapi.CallOption) 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil

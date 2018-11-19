@@ -11,18 +11,18 @@ package clouduseraccounts // import "google.golang.org/api/clouduseraccounts/vm_
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	context "golang.org/x/net/context"
-	ctxhttp "golang.org/x/net/context/ctxhttp"
-	gensupport "google.golang.org/api/gensupport"
-	googleapi "google.golang.org/api/googleapi"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	gensupport "google.golang.org/api/gensupport"
+	googleapi "google.golang.org/api/googleapi"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -38,7 +38,6 @@ var _ = googleapi.Version
 var _ = errors.New
 var _ = strings.Replace
 var _ = context.Canceled
-var _ = ctxhttp.Do
 
 const apiId = "clouduseraccounts:vm_beta"
 const apiName = "clouduseraccounts"
@@ -157,8 +156,8 @@ type AuthorizedKeysView struct {
 }
 
 func (s *AuthorizedKeysView) MarshalJSON() ([]byte, error) {
-	type noMethod AuthorizedKeysView
-	raw := noMethod(*s)
+	type NoMethod AuthorizedKeysView
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -214,8 +213,8 @@ type Group struct {
 }
 
 func (s *Group) MarshalJSON() ([]byte, error) {
-	type noMethod Group
-	raw := noMethod(*s)
+	type NoMethod Group
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -260,8 +259,8 @@ type GroupList struct {
 }
 
 func (s *GroupList) MarshalJSON() ([]byte, error) {
-	type noMethod GroupList
-	raw := noMethod(*s)
+	type NoMethod GroupList
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -287,8 +286,8 @@ type GroupsAddMemberRequest struct {
 }
 
 func (s *GroupsAddMemberRequest) MarshalJSON() ([]byte, error) {
-	type noMethod GroupsAddMemberRequest
-	raw := noMethod(*s)
+	type NoMethod GroupsAddMemberRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -314,8 +313,8 @@ type GroupsRemoveMemberRequest struct {
 }
 
 func (s *GroupsRemoveMemberRequest) MarshalJSON() ([]byte, error) {
-	type noMethod GroupsRemoveMemberRequest
-	raw := noMethod(*s)
+	type NoMethod GroupsRemoveMemberRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -353,8 +352,8 @@ type LinuxAccountViews struct {
 }
 
 func (s *LinuxAccountViews) MarshalJSON() ([]byte, error) {
-	type noMethod LinuxAccountViews
-	raw := noMethod(*s)
+	type NoMethod LinuxAccountViews
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -384,8 +383,8 @@ type LinuxGetAuthorizedKeysViewResponse struct {
 }
 
 func (s *LinuxGetAuthorizedKeysViewResponse) MarshalJSON() ([]byte, error) {
-	type noMethod LinuxGetAuthorizedKeysViewResponse
-	raw := noMethod(*s)
+	type NoMethod LinuxGetAuthorizedKeysViewResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -416,8 +415,8 @@ type LinuxGetLinuxAccountViewsResponse struct {
 }
 
 func (s *LinuxGetLinuxAccountViewsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod LinuxGetLinuxAccountViewsResponse
-	raw := noMethod(*s)
+	type NoMethod LinuxGetLinuxAccountViewsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -451,8 +450,8 @@ type LinuxGroupView struct {
 }
 
 func (s *LinuxGroupView) MarshalJSON() ([]byte, error) {
-	type noMethod LinuxGroupView
-	raw := noMethod(*s)
+	type NoMethod LinuxGroupView
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -496,8 +495,8 @@ type LinuxUserView struct {
 }
 
 func (s *LinuxUserView) MarshalJSON() ([]byte, error) {
-	type noMethod LinuxUserView
-	raw := noMethod(*s)
+	type NoMethod LinuxUserView
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -625,8 +624,8 @@ type Operation struct {
 }
 
 func (s *Operation) MarshalJSON() ([]byte, error) {
-	type noMethod Operation
-	raw := noMethod(*s)
+	type NoMethod Operation
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -655,8 +654,8 @@ type OperationError struct {
 }
 
 func (s *OperationError) MarshalJSON() ([]byte, error) {
-	type noMethod OperationError
-	raw := noMethod(*s)
+	type NoMethod OperationError
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -689,8 +688,8 @@ type OperationErrorErrors struct {
 }
 
 func (s *OperationErrorErrors) MarshalJSON() ([]byte, error) {
-	type noMethod OperationErrorErrors
-	raw := noMethod(*s)
+	type NoMethod OperationErrorErrors
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -744,8 +743,8 @@ type OperationWarnings struct {
 }
 
 func (s *OperationWarnings) MarshalJSON() ([]byte, error) {
-	type noMethod OperationWarnings
-	raw := noMethod(*s)
+	type NoMethod OperationWarnings
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -781,8 +780,8 @@ type OperationWarningsData struct {
 }
 
 func (s *OperationWarningsData) MarshalJSON() ([]byte, error) {
-	type noMethod OperationWarningsData
-	raw := noMethod(*s)
+	type NoMethod OperationWarningsData
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -832,8 +831,8 @@ type OperationList struct {
 }
 
 func (s *OperationList) MarshalJSON() ([]byte, error) {
-	type noMethod OperationList
-	raw := noMethod(*s)
+	type NoMethod OperationList
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -878,8 +877,8 @@ type PublicKey struct {
 }
 
 func (s *PublicKey) MarshalJSON() ([]byte, error) {
-	type noMethod PublicKey
-	raw := noMethod(*s)
+	type NoMethod PublicKey
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -944,8 +943,8 @@ type User struct {
 }
 
 func (s *User) MarshalJSON() ([]byte, error) {
-	type noMethod User
-	raw := noMethod(*s)
+	type NoMethod User
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -990,8 +989,8 @@ type UserList struct {
 }
 
 func (s *UserList) MarshalJSON() ([]byte, error) {
-	type noMethod UserList
-	raw := noMethod(*s)
+	type NoMethod UserList
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1213,7 +1212,7 @@ func (c *GlobalAccountsOperationsGetCall) Do(opts ...googleapi.CallOption) (*Ope
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1433,7 +1432,7 @@ func (c *GlobalAccountsOperationsListCall) Do(opts ...googleapi.CallOption) (*Op
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1615,7 +1614,7 @@ func (c *GroupsAddMemberCall) Do(opts ...googleapi.CallOption) (*Operation, erro
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1754,7 +1753,7 @@ func (c *GroupsDeleteCall) Do(opts ...googleapi.CallOption) (*Operation, error) 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1904,7 +1903,7 @@ func (c *GroupsGetCall) Do(opts ...googleapi.CallOption) (*Group, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2047,7 +2046,7 @@ func (c *GroupsInsertCall) Do(opts ...googleapi.CallOption) (*Operation, error) 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2260,7 +2259,7 @@ func (c *GroupsListCall) Do(opts ...googleapi.CallOption) (*GroupList, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2442,7 +2441,7 @@ func (c *GroupsRemoveMemberCall) Do(opts ...googleapi.CallOption) (*Operation, e
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2594,7 +2593,7 @@ func (c *LinuxGetAuthorizedKeysViewCall) Do(opts ...googleapi.CallOption) (*Linu
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2825,7 +2824,7 @@ func (c *LinuxGetLinuxAccountViewsCall) Do(opts ...googleapi.CallOption) (*Linux
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3002,7 +3001,7 @@ func (c *UsersAddPublicKeyCall) Do(opts ...googleapi.CallOption) (*Operation, er
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3141,7 +3140,7 @@ func (c *UsersDeleteCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3291,7 +3290,7 @@ func (c *UsersGetCall) Do(opts ...googleapi.CallOption) (*User, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3434,7 +3433,7 @@ func (c *UsersInsertCall) Do(opts ...googleapi.CallOption) (*Operation, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3647,7 +3646,7 @@ func (c *UsersListCall) Do(opts ...googleapi.CallOption) (*UserList, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3823,7 +3822,7 @@ func (c *UsersRemovePublicKeyCall) Do(opts ...googleapi.CallOption) (*Operation,
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil

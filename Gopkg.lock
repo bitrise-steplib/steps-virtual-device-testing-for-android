@@ -4,30 +4,47 @@
 [[projects]]
   branch = "master"
   name = "github.com/bitrise-io/go-utils"
-  packages = ["colorstring","command","errorutil","log","pathutil","sliceutil"]
-  revision = "961320f9011cedf55e1da0578949bf63450a96c0"
+  packages = [
+    "colorstring",
+    "command",
+    "errorutil",
+    "fileutil",
+    "log",
+    "pathutil",
+    "sliceutil"
+  ]
+  revision = "2a09aab8380d7842750328aebd5671bcccea89c8"
 
 [[projects]]
   branch = "master"
   name = "github.com/bitrise-tools/go-steputils"
-  packages = ["input","tools"]
-  revision = "a848c9870ff7d745a8fb2a951e1c81fcb147b4ec"
+  packages = [
+    "input",
+    "tools"
+  ]
+  revision = "ec226b2359fcd806be64f0ad2217d8e741a1ff11"
 
 [[projects]]
-  branch = "master"
-  name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp"]
-  revision = "1087133bc4af3073e18add999345c6ae75918503"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   branch = "master"
   name = "google.golang.org/api"
-  packages = ["gensupport","googleapi","googleapi/internal/uritemplates","testing/v1","toolresults/v1beta3"]
-  revision = "15b905a38723467e1c9cea66cc58ab8ee5ddbfd8"
+  packages = [
+    "gensupport",
+    "googleapi",
+    "googleapi/internal/uritemplates",
+    "testing/v1",
+    "toolresults/v1beta3"
+  ]
+  revision = "83a9d304b1e613fc253e1e2710778642fe81af53"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3cf20f8e21e23d6eafa2ea1d4074c2ba2da2d51a8d8fd44b5674650d4ee860e5"
+  inputs-digest = "c708f158c3720913ce982bde9de2aa6e35123950bf9a7773674f769fa882b561"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -11,18 +11,18 @@ package classroom // import "google.golang.org/api/classroom/v1"
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	context "golang.org/x/net/context"
-	ctxhttp "golang.org/x/net/context/ctxhttp"
-	gensupport "google.golang.org/api/gensupport"
-	googleapi "google.golang.org/api/googleapi"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	gensupport "google.golang.org/api/gensupport"
+	googleapi "google.golang.org/api/googleapi"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -38,7 +38,6 @@ var _ = googleapi.Version
 var _ = errors.New
 var _ = strings.Replace
 var _ = context.Canceled
-var _ = ctxhttp.Do
 
 const apiId = "classroom:v1"
 const apiName = "classroom"
@@ -89,6 +88,9 @@ const (
 
 	// View the profile photos of people in your classes
 	ClassroomProfilePhotosScope = "https://www.googleapis.com/auth/classroom.profile.photos"
+
+	// Receive notifications about your Google Classroom data
+	ClassroomPushNotificationsScope = "https://www.googleapis.com/auth/classroom.push-notifications"
 
 	// Manage your Google Classroom class rosters
 	ClassroomRostersScope = "https://www.googleapis.com/auth/classroom.rosters"
@@ -384,8 +386,8 @@ type Announcement struct {
 }
 
 func (s *Announcement) MarshalJSON() ([]byte, error) {
-	type noMethod Announcement
-	raw := noMethod(*s)
+	type NoMethod Announcement
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -415,8 +417,8 @@ type Assignment struct {
 }
 
 func (s *Assignment) MarshalJSON() ([]byte, error) {
-	type noMethod Assignment
-	raw := noMethod(*s)
+	type NoMethod Assignment
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -454,8 +456,8 @@ type AssignmentSubmission struct {
 }
 
 func (s *AssignmentSubmission) MarshalJSON() ([]byte, error) {
-	type noMethod AssignmentSubmission
-	raw := noMethod(*s)
+	type NoMethod AssignmentSubmission
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -493,8 +495,8 @@ type Attachment struct {
 }
 
 func (s *Attachment) MarshalJSON() ([]byte, error) {
-	type noMethod Attachment
-	raw := noMethod(*s)
+	type NoMethod Attachment
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -529,8 +531,8 @@ type CloudPubsubTopic struct {
 }
 
 func (s *CloudPubsubTopic) MarshalJSON() ([]byte, error) {
-	type noMethod CloudPubsubTopic
-	raw := noMethod(*s)
+	type NoMethod CloudPubsubTopic
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -738,8 +740,8 @@ type Course struct {
 }
 
 func (s *Course) MarshalJSON() ([]byte, error) {
-	type noMethod Course
-	raw := noMethod(*s)
+	type NoMethod Course
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -802,8 +804,8 @@ type CourseAlias struct {
 }
 
 func (s *CourseAlias) MarshalJSON() ([]byte, error) {
-	type noMethod CourseAlias
-	raw := noMethod(*s)
+	type NoMethod CourseAlias
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -840,8 +842,8 @@ type CourseMaterial struct {
 }
 
 func (s *CourseMaterial) MarshalJSON() ([]byte, error) {
-	type noMethod CourseMaterial
-	raw := noMethod(*s)
+	type NoMethod CourseMaterial
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -875,8 +877,8 @@ type CourseMaterialSet struct {
 }
 
 func (s *CourseMaterialSet) MarshalJSON() ([]byte, error) {
-	type noMethod CourseMaterialSet
-	raw := noMethod(*s)
+	type NoMethod CourseMaterialSet
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -905,8 +907,8 @@ type CourseRosterChangesInfo struct {
 }
 
 func (s *CourseRosterChangesInfo) MarshalJSON() ([]byte, error) {
-	type noMethod CourseRosterChangesInfo
-	raw := noMethod(*s)
+	type NoMethod CourseRosterChangesInfo
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1100,18 +1102,18 @@ type CourseWork struct {
 }
 
 func (s *CourseWork) MarshalJSON() ([]byte, error) {
-	type noMethod CourseWork
-	raw := noMethod(*s)
+	type NoMethod CourseWork
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 func (s *CourseWork) UnmarshalJSON(data []byte) error {
-	type noMethod CourseWork
+	type NoMethod CourseWork
 	var s1 struct {
 		MaxPoints gensupport.JSONFloat64 `json:"maxPoints"`
-		*noMethod
+		*NoMethod
 	}
-	s1.noMethod = (*noMethod)(s)
+	s1.NoMethod = (*NoMethod)(s)
 	if err := json.Unmarshal(data, &s1); err != nil {
 		return err
 	}
@@ -1119,26 +1121,62 @@ func (s *CourseWork) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Date: Represents a whole calendar date, e.g. date of birth. The time
-// of day and
-// time zone are either specified elsewhere or are not significant. The
-// date
-// is relative to the Proleptic Gregorian Calendar. The day may be 0
-// to
-// represent a year and month where the day is not significant, e.g.
-// credit card
-// expiration date. The year may be 0 to represent a month and day
-// independent
-// of year, e.g. anniversary date. Related types are
-// google.type.TimeOfDay
-// and `google.protobuf.Timestamp`.
+// CourseWorkChangesInfo: Information about a `Feed` with a `feed_type`
+// of `COURSE_WORK_CHANGES`.
+type CourseWorkChangesInfo struct {
+	// CourseId: The `course_id` of the course to subscribe to work changes
+	// for.
+	CourseId string `json:"courseId,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "CourseId") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "CourseId") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *CourseWorkChangesInfo) MarshalJSON() ([]byte, error) {
+	type NoMethod CourseWorkChangesInfo
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// Date: Represents a whole or partial calendar date, e.g. a birthday.
+// The time of day
+// and time zone are either specified elsewhere or are not significant.
+// The date
+// is relative to the Proleptic Gregorian Calendar. This can
+// represent:
+//
+// * A full date, with non-zero year, month and day values
+// * A month and day value, with a zero year, e.g. an anniversary
+// * A year on its own, with zero month and day values
+// * A year and month value, with a zero day, e.g. a credit card
+// expiration date
+//
+// Related types are google.type.TimeOfDay and
+// `google.protobuf.Timestamp`.
 type Date struct {
 	// Day: Day of month. Must be from 1 to 31 and valid for the year and
 	// month, or 0
-	// if specifying a year/month where the day is not significant.
+	// if specifying a year by itself or a year and month where the day is
+	// not
+	// significant.
 	Day int64 `json:"day,omitempty"`
 
-	// Month: Month of year. Must be from 1 to 12.
+	// Month: Month of year. Must be from 1 to 12, or 0 if specifying a year
+	// without a
+	// month and day.
 	Month int64 `json:"month,omitempty"`
 
 	// Year: Year of date. Must be from 1 to 9999, or 0 if specifying a date
@@ -1164,8 +1202,8 @@ type Date struct {
 }
 
 func (s *Date) MarshalJSON() ([]byte, error) {
-	type noMethod Date
-	raw := noMethod(*s)
+	type NoMethod Date
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1208,8 +1246,8 @@ type DriveFile struct {
 }
 
 func (s *DriveFile) MarshalJSON() ([]byte, error) {
-	type noMethod DriveFile
-	raw := noMethod(*s)
+	type NoMethod DriveFile
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1247,8 +1285,8 @@ type DriveFolder struct {
 }
 
 func (s *DriveFolder) MarshalJSON() ([]byte, error) {
-	type noMethod DriveFolder
-	raw := noMethod(*s)
+	type NoMethod DriveFolder
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1280,6 +1318,11 @@ type Feed struct {
 	// `COURSE_ROSTER_CHANGES`.
 	CourseRosterChangesInfo *CourseRosterChangesInfo `json:"courseRosterChangesInfo,omitempty"`
 
+	// CourseWorkChangesInfo: Information about a `Feed` with a `feed_type`
+	// of `COURSE_WORK_CHANGES`.
+	// This field must be specified if `feed_type` is `COURSE_WORK_CHANGES`.
+	CourseWorkChangesInfo *CourseWorkChangesInfo `json:"courseWorkChangesInfo,omitempty"`
+
 	// FeedType: The type of feed.
 	//
 	// Possible values:
@@ -1306,6 +1349,20 @@ type Feed struct {
 	// deleted, but notifications will be generated when a user joins a
 	// course
 	// by accepting an invitation.
+	//   "COURSE_WORK_CHANGES" - All course work activity for a particular
+	// course.
+	//
+	// Notifications will be generated when a CourseWork
+	// or
+	// StudentSubmission object is created or modified. No notification will
+	// be
+	// generated when a StudentSubmission object is created in connection
+	// with
+	// the creation or modification of its parent CourseWork object (but
+	// a
+	// notification will be generated for that CourseWork object's creation
+	// or
+	// modification).
 	FeedType string `json:"feedType,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g.
@@ -1328,8 +1385,8 @@ type Feed struct {
 }
 
 func (s *Feed) MarshalJSON() ([]byte, error) {
-	type noMethod Feed
-	raw := noMethod(*s)
+	type NoMethod Feed
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1374,8 +1431,8 @@ type Form struct {
 }
 
 func (s *Form) MarshalJSON() ([]byte, error) {
-	type noMethod Form
-	raw := noMethod(*s)
+	type NoMethod Form
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1408,8 +1465,8 @@ type GlobalPermission struct {
 }
 
 func (s *GlobalPermission) MarshalJSON() ([]byte, error) {
-	type noMethod GlobalPermission
-	raw := noMethod(*s)
+	type NoMethod GlobalPermission
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1461,19 +1518,19 @@ type GradeHistory struct {
 }
 
 func (s *GradeHistory) MarshalJSON() ([]byte, error) {
-	type noMethod GradeHistory
-	raw := noMethod(*s)
+	type NoMethod GradeHistory
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 func (s *GradeHistory) UnmarshalJSON(data []byte) error {
-	type noMethod GradeHistory
+	type NoMethod GradeHistory
 	var s1 struct {
 		MaxPoints    gensupport.JSONFloat64 `json:"maxPoints"`
 		PointsEarned gensupport.JSONFloat64 `json:"pointsEarned"`
-		*noMethod
+		*NoMethod
 	}
-	s1.noMethod = (*noMethod)(s)
+	s1.NoMethod = (*NoMethod)(s)
 	if err := json.Unmarshal(data, &s1); err != nil {
 		return err
 	}
@@ -1523,8 +1580,8 @@ type Guardian struct {
 }
 
 func (s *Guardian) MarshalJSON() ([]byte, error) {
-	type noMethod Guardian
-	raw := noMethod(*s)
+	type NoMethod Guardian
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1582,8 +1639,8 @@ type GuardianInvitation struct {
 }
 
 func (s *GuardianInvitation) MarshalJSON() ([]byte, error) {
-	type noMethod GuardianInvitation
-	raw := noMethod(*s)
+	type NoMethod GuardianInvitation
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1615,8 +1672,8 @@ type IndividualStudentsOptions struct {
 }
 
 func (s *IndividualStudentsOptions) MarshalJSON() ([]byte, error) {
-	type noMethod IndividualStudentsOptions
-	raw := noMethod(*s)
+	type NoMethod IndividualStudentsOptions
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1673,8 +1730,8 @@ type Invitation struct {
 }
 
 func (s *Invitation) MarshalJSON() ([]byte, error) {
-	type noMethod Invitation
-	raw := noMethod(*s)
+	type NoMethod Invitation
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1713,8 +1770,8 @@ type Link struct {
 }
 
 func (s *Link) MarshalJSON() ([]byte, error) {
-	type noMethod Link
-	raw := noMethod(*s)
+	type NoMethod Link
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1750,8 +1807,8 @@ type ListAnnouncementsResponse struct {
 }
 
 func (s *ListAnnouncementsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListAnnouncementsResponse
-	raw := noMethod(*s)
+	type NoMethod ListAnnouncementsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1787,8 +1844,8 @@ type ListCourseAliasesResponse struct {
 }
 
 func (s *ListCourseAliasesResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListCourseAliasesResponse
-	raw := noMethod(*s)
+	type NoMethod ListCourseAliasesResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1824,8 +1881,8 @@ type ListCourseWorkResponse struct {
 }
 
 func (s *ListCourseWorkResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListCourseWorkResponse
-	raw := noMethod(*s)
+	type NoMethod ListCourseWorkResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1861,8 +1918,8 @@ type ListCoursesResponse struct {
 }
 
 func (s *ListCoursesResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListCoursesResponse
-	raw := noMethod(*s)
+	type NoMethod ListCoursesResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1901,8 +1958,8 @@ type ListGuardianInvitationsResponse struct {
 }
 
 func (s *ListGuardianInvitationsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListGuardianInvitationsResponse
-	raw := noMethod(*s)
+	type NoMethod ListGuardianInvitationsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1940,8 +1997,8 @@ type ListGuardiansResponse struct {
 }
 
 func (s *ListGuardiansResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListGuardiansResponse
-	raw := noMethod(*s)
+	type NoMethod ListGuardiansResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1977,8 +2034,8 @@ type ListInvitationsResponse struct {
 }
 
 func (s *ListInvitationsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListInvitationsResponse
-	raw := noMethod(*s)
+	type NoMethod ListInvitationsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2015,8 +2072,8 @@ type ListStudentSubmissionsResponse struct {
 }
 
 func (s *ListStudentSubmissionsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListStudentSubmissionsResponse
-	raw := noMethod(*s)
+	type NoMethod ListStudentSubmissionsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2052,8 +2109,8 @@ type ListStudentsResponse struct {
 }
 
 func (s *ListStudentsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListStudentsResponse
-	raw := noMethod(*s)
+	type NoMethod ListStudentsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2089,8 +2146,8 @@ type ListTeachersResponse struct {
 }
 
 func (s *ListTeachersResponse) MarshalJSON() ([]byte, error) {
-	type noMethod ListTeachersResponse
-	raw := noMethod(*s)
+	type NoMethod ListTeachersResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2130,8 +2187,8 @@ type Material struct {
 }
 
 func (s *Material) MarshalJSON() ([]byte, error) {
-	type noMethod Material
-	raw := noMethod(*s)
+	type NoMethod Material
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2173,8 +2230,8 @@ type ModifyAnnouncementAssigneesRequest struct {
 }
 
 func (s *ModifyAnnouncementAssigneesRequest) MarshalJSON() ([]byte, error) {
-	type noMethod ModifyAnnouncementAssigneesRequest
-	raw := noMethod(*s)
+	type NoMethod ModifyAnnouncementAssigneesRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2206,8 +2263,8 @@ type ModifyAttachmentsRequest struct {
 }
 
 func (s *ModifyAttachmentsRequest) MarshalJSON() ([]byte, error) {
-	type noMethod ModifyAttachmentsRequest
-	raw := noMethod(*s)
+	type NoMethod ModifyAttachmentsRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2249,8 +2306,8 @@ type ModifyCourseWorkAssigneesRequest struct {
 }
 
 func (s *ModifyCourseWorkAssigneesRequest) MarshalJSON() ([]byte, error) {
-	type noMethod ModifyCourseWorkAssigneesRequest
-	raw := noMethod(*s)
+	type NoMethod ModifyCourseWorkAssigneesRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2286,8 +2343,8 @@ type ModifyIndividualStudentsOptions struct {
 }
 
 func (s *ModifyIndividualStudentsOptions) MarshalJSON() ([]byte, error) {
-	type noMethod ModifyIndividualStudentsOptions
-	raw := noMethod(*s)
+	type NoMethod ModifyIndividualStudentsOptions
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2315,8 +2372,8 @@ type MultipleChoiceQuestion struct {
 }
 
 func (s *MultipleChoiceQuestion) MarshalJSON() ([]byte, error) {
-	type noMethod MultipleChoiceQuestion
-	raw := noMethod(*s)
+	type NoMethod MultipleChoiceQuestion
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2344,8 +2401,8 @@ type MultipleChoiceSubmission struct {
 }
 
 func (s *MultipleChoiceSubmission) MarshalJSON() ([]byte, error) {
-	type noMethod MultipleChoiceSubmission
-	raw := noMethod(*s)
+	type NoMethod MultipleChoiceSubmission
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2386,8 +2443,8 @@ type Name struct {
 }
 
 func (s *Name) MarshalJSON() ([]byte, error) {
-	type noMethod Name
-	raw := noMethod(*s)
+	type NoMethod Name
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2398,7 +2455,7 @@ type ReclaimStudentSubmissionRequest struct {
 
 // Registration: An instruction to Classroom to send notifications from
 // the `feed` to the
-// provided `destination`.
+// provided destination.
 type Registration struct {
 	// CloudPubsubTopic: The Cloud Pub/Sub topic that notifications are to
 	// be sent to.
@@ -2412,7 +2469,7 @@ type Registration struct {
 
 	// Feed: Specification for the class of notifications that Classroom
 	// should deliver
-	// to the `destination`.
+	// to the destination.
 	Feed *Feed `json:"feed,omitempty"`
 
 	// RegistrationId: A server-generated unique identifier for this
@@ -2444,8 +2501,8 @@ type Registration struct {
 }
 
 func (s *Registration) MarshalJSON() ([]byte, error) {
-	type noMethod Registration
-	raw := noMethod(*s)
+	type NoMethod Registration
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2487,8 +2544,8 @@ type SharedDriveFile struct {
 }
 
 func (s *SharedDriveFile) MarshalJSON() ([]byte, error) {
-	type noMethod SharedDriveFile
-	raw := noMethod(*s)
+	type NoMethod SharedDriveFile
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2515,8 +2572,8 @@ type ShortAnswerSubmission struct {
 }
 
 func (s *ShortAnswerSubmission) MarshalJSON() ([]byte, error) {
-	type noMethod ShortAnswerSubmission
-	raw := noMethod(*s)
+	type NoMethod ShortAnswerSubmission
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2567,8 +2624,8 @@ type StateHistory struct {
 }
 
 func (s *StateHistory) MarshalJSON() ([]byte, error) {
-	type noMethod StateHistory
-	raw := noMethod(*s)
+	type NoMethod StateHistory
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2624,8 +2681,8 @@ type Student struct {
 }
 
 func (s *Student) MarshalJSON() ([]byte, error) {
-	type noMethod Student
-	raw := noMethod(*s)
+	type NoMethod Student
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2789,19 +2846,19 @@ type StudentSubmission struct {
 }
 
 func (s *StudentSubmission) MarshalJSON() ([]byte, error) {
-	type noMethod StudentSubmission
-	raw := noMethod(*s)
+	type NoMethod StudentSubmission
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 func (s *StudentSubmission) UnmarshalJSON(data []byte) error {
-	type noMethod StudentSubmission
+	type NoMethod StudentSubmission
 	var s1 struct {
 		AssignedGrade gensupport.JSONFloat64 `json:"assignedGrade"`
 		DraftGrade    gensupport.JSONFloat64 `json:"draftGrade"`
-		*noMethod
+		*NoMethod
 	}
-	s1.noMethod = (*noMethod)(s)
+	s1.NoMethod = (*NoMethod)(s)
 	if err := json.Unmarshal(data, &s1); err != nil {
 		return err
 	}
@@ -2840,8 +2897,8 @@ type SubmissionHistory struct {
 }
 
 func (s *SubmissionHistory) MarshalJSON() ([]byte, error) {
-	type noMethod SubmissionHistory
-	raw := noMethod(*s)
+	type NoMethod SubmissionHistory
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2890,8 +2947,8 @@ type Teacher struct {
 }
 
 func (s *Teacher) MarshalJSON() ([]byte, error) {
-	type noMethod Teacher
-	raw := noMethod(*s)
+	type NoMethod Teacher
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2937,8 +2994,8 @@ type TimeOfDay struct {
 }
 
 func (s *TimeOfDay) MarshalJSON() ([]byte, error) {
-	type noMethod TimeOfDay
-	raw := noMethod(*s)
+	type NoMethod TimeOfDay
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -3006,8 +3063,8 @@ type UserProfile struct {
 }
 
 func (s *UserProfile) MarshalJSON() ([]byte, error) {
-	type noMethod UserProfile
-	raw := noMethod(*s)
+	type NoMethod UserProfile
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -3051,8 +3108,8 @@ type YouTubeVideo struct {
 }
 
 func (s *YouTubeVideo) MarshalJSON() ([]byte, error) {
-	type noMethod YouTubeVideo
-	raw := noMethod(*s)
+	type NoMethod YouTubeVideo
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -3128,9 +3185,13 @@ func (c *CoursesCreateCall) doRequest(alt string) (*http.Response, error) {
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
@@ -3168,7 +3229,7 @@ func (c *CoursesCreateCall) Do(opts ...googleapi.CallOption) (*Course, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3250,9 +3311,13 @@ func (c *CoursesDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"id": c.id,
@@ -3293,7 +3358,7 @@ func (c *CoursesDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3395,9 +3460,13 @@ func (c *CoursesGetCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"id": c.id,
@@ -3438,7 +3507,7 @@ func (c *CoursesGetCall) Do(opts ...googleapi.CallOption) (*Course, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3607,9 +3676,13 @@ func (c *CoursesListCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
@@ -3647,7 +3720,7 @@ func (c *CoursesListCall) Do(opts ...googleapi.CallOption) (*ListCoursesResponse
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3825,9 +3898,13 @@ func (c *CoursesPatchCall) doRequest(alt string) (*http.Response, error) {
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("PATCH", urls, body)
+	req, err := http.NewRequest("PATCH", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"id": c.id,
@@ -3868,7 +3945,7 @@ func (c *CoursesPatchCall) Do(opts ...googleapi.CallOption) (*Course, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -3974,9 +4051,13 @@ func (c *CoursesUpdateCall) doRequest(alt string) (*http.Response, error) {
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("PUT", urls, body)
+	req, err := http.NewRequest("PUT", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"id": c.id,
@@ -4017,7 +4098,7 @@ func (c *CoursesUpdateCall) Do(opts ...googleapi.CallOption) (*Course, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4120,9 +4201,13 @@ func (c *CoursesAliasesCreateCall) doRequest(alt string) (*http.Response, error)
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/aliases")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -4163,7 +4248,7 @@ func (c *CoursesAliasesCreateCall) Do(opts ...googleapi.CallOption) (*CourseAlia
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4260,9 +4345,13 @@ func (c *CoursesAliasesDeleteCall) doRequest(alt string) (*http.Response, error)
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/aliases/{alias}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -4304,7 +4393,7 @@ func (c *CoursesAliasesDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, err
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4437,9 +4526,13 @@ func (c *CoursesAliasesListCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/aliases")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -4480,7 +4573,7 @@ func (c *CoursesAliasesListCall) Do(opts ...googleapi.CallOption) (*ListCourseAl
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4613,9 +4706,13 @@ func (c *CoursesAnnouncementsCreateCall) doRequest(alt string) (*http.Response, 
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/announcements")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -4656,7 +4753,7 @@ func (c *CoursesAnnouncementsCreateCall) Do(opts ...googleapi.CallOption) (*Anno
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4760,9 +4857,13 @@ func (c *CoursesAnnouncementsDeleteCall) doRequest(alt string) (*http.Response, 
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/announcements/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -4804,7 +4905,7 @@ func (c *CoursesAnnouncementsDeleteCall) Do(opts ...googleapi.CallOption) (*Empt
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -4916,9 +5017,13 @@ func (c *CoursesAnnouncementsGetCall) doRequest(alt string) (*http.Response, err
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/announcements/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -4960,7 +5065,7 @@ func (c *CoursesAnnouncementsGetCall) Do(opts ...googleapi.CallOption) (*Announc
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5128,9 +5233,13 @@ func (c *CoursesAnnouncementsListCall) doRequest(alt string) (*http.Response, er
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/announcements")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -5171,7 +5280,7 @@ func (c *CoursesAnnouncementsListCall) Do(opts ...googleapi.CallOption) (*ListAn
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5323,9 +5432,13 @@ func (c *CoursesAnnouncementsModifyAssigneesCall) doRequest(alt string) (*http.R
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/announcements/{id}:modifyAssignees")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -5367,7 +5480,7 @@ func (c *CoursesAnnouncementsModifyAssigneesCall) Do(opts ...googleapi.CallOptio
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5502,9 +5615,13 @@ func (c *CoursesAnnouncementsPatchCall) doRequest(alt string) (*http.Response, e
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/announcements/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("PATCH", urls, body)
+	req, err := http.NewRequest("PATCH", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -5546,7 +5663,7 @@ func (c *CoursesAnnouncementsPatchCall) Do(opts ...googleapi.CallOption) (*Annou
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5673,9 +5790,13 @@ func (c *CoursesCourseWorkCreateCall) doRequest(alt string) (*http.Response, err
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -5716,7 +5837,7 @@ func (c *CoursesCourseWorkCreateCall) Do(opts ...googleapi.CallOption) (*CourseW
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5820,9 +5941,13 @@ func (c *CoursesCourseWorkDeleteCall) doRequest(alt string) (*http.Response, err
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -5864,7 +5989,7 @@ func (c *CoursesCourseWorkDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -5976,9 +6101,13 @@ func (c *CoursesCourseWorkGetCall) doRequest(alt string) (*http.Response, error)
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -6020,7 +6149,7 @@ func (c *CoursesCourseWorkGetCall) Do(opts ...googleapi.CallOption) (*CourseWork
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -6192,9 +6321,13 @@ func (c *CoursesCourseWorkListCall) doRequest(alt string) (*http.Response, error
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -6235,7 +6368,7 @@ func (c *CoursesCourseWorkListCall) Do(opts ...googleapi.CallOption) (*ListCours
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -6389,9 +6522,13 @@ func (c *CoursesCourseWorkModifyAssigneesCall) doRequest(alt string) (*http.Resp
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{id}:modifyAssignees")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -6433,7 +6570,7 @@ func (c *CoursesCourseWorkModifyAssigneesCall) Do(opts ...googleapi.CallOption) 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -6587,9 +6724,13 @@ func (c *CoursesCourseWorkPatchCall) doRequest(alt string) (*http.Response, erro
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("PATCH", urls, body)
+	req, err := http.NewRequest("PATCH", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -6631,7 +6772,7 @@ func (c *CoursesCourseWorkPatchCall) Do(opts ...googleapi.CallOption) (*CourseWo
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -6755,9 +6896,13 @@ func (c *CoursesCourseWorkStudentSubmissionsGetCall) doRequest(alt string) (*htt
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId":     c.courseId,
@@ -6800,7 +6945,7 @@ func (c *CoursesCourseWorkStudentSubmissionsGetCall) Do(opts ...googleapi.CallOp
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7000,9 +7145,13 @@ func (c *CoursesCourseWorkStudentSubmissionsListCall) doRequest(alt string) (*ht
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId":     c.courseId,
@@ -7044,7 +7193,7 @@ func (c *CoursesCourseWorkStudentSubmissionsListCall) Do(opts ...googleapi.CallO
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7233,9 +7382,13 @@ func (c *CoursesCourseWorkStudentSubmissionsModifyAttachmentsCall) doRequest(alt
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:modifyAttachments")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId":     c.courseId,
@@ -7278,7 +7431,7 @@ func (c *CoursesCourseWorkStudentSubmissionsModifyAttachmentsCall) Do(opts ...go
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7425,9 +7578,13 @@ func (c *CoursesCourseWorkStudentSubmissionsPatchCall) doRequest(alt string) (*h
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("PATCH", urls, body)
+	req, err := http.NewRequest("PATCH", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId":     c.courseId,
@@ -7470,7 +7627,7 @@ func (c *CoursesCourseWorkStudentSubmissionsPatchCall) Do(opts ...googleapi.Call
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7616,9 +7773,13 @@ func (c *CoursesCourseWorkStudentSubmissionsReclaimCall) doRequest(alt string) (
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:reclaim")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId":     c.courseId,
@@ -7661,7 +7822,7 @@ func (c *CoursesCourseWorkStudentSubmissionsReclaimCall) Do(opts ...googleapi.Ca
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7799,9 +7960,13 @@ func (c *CoursesCourseWorkStudentSubmissionsReturnCall) doRequest(alt string) (*
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:return")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId":     c.courseId,
@@ -7844,7 +8009,7 @@ func (c *CoursesCourseWorkStudentSubmissionsReturnCall) Do(opts ...googleapi.Cal
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -7979,9 +8144,13 @@ func (c *CoursesCourseWorkStudentSubmissionsTurnInCall) doRequest(alt string) (*
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/courseWork/{courseWorkId}/studentSubmissions/{id}:turnIn")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId":     c.courseId,
@@ -8024,7 +8193,7 @@ func (c *CoursesCourseWorkStudentSubmissionsTurnInCall) Do(opts ...googleapi.Cal
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -8156,9 +8325,13 @@ func (c *CoursesStudentsCreateCall) doRequest(alt string) (*http.Response, error
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/students")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -8199,7 +8372,7 @@ func (c *CoursesStudentsCreateCall) Do(opts ...googleapi.CallOption) (*Student, 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -8301,9 +8474,13 @@ func (c *CoursesStudentsDeleteCall) doRequest(alt string) (*http.Response, error
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/students/{userId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -8345,7 +8522,7 @@ func (c *CoursesStudentsDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, er
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -8458,9 +8635,13 @@ func (c *CoursesStudentsGetCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/students/{userId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -8502,7 +8683,7 @@ func (c *CoursesStudentsGetCall) Do(opts ...googleapi.CallOption) (*Student, err
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -8635,9 +8816,13 @@ func (c *CoursesStudentsListCall) doRequest(alt string) (*http.Response, error) 
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/students")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -8678,7 +8863,7 @@ func (c *CoursesStudentsListCall) Do(opts ...googleapi.CallOption) (*ListStudent
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -8818,9 +9003,13 @@ func (c *CoursesTeachersCreateCall) doRequest(alt string) (*http.Response, error
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/teachers")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -8861,7 +9050,7 @@ func (c *CoursesTeachersCreateCall) Do(opts ...googleapi.CallOption) (*Teacher, 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -8961,9 +9150,13 @@ func (c *CoursesTeachersDeleteCall) doRequest(alt string) (*http.Response, error
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/teachers/{userId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -9005,7 +9198,7 @@ func (c *CoursesTeachersDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, er
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -9118,9 +9311,13 @@ func (c *CoursesTeachersGetCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/teachers/{userId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -9162,7 +9359,7 @@ func (c *CoursesTeachersGetCall) Do(opts ...googleapi.CallOption) (*Teacher, err
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -9295,9 +9492,13 @@ func (c *CoursesTeachersListCall) doRequest(alt string) (*http.Response, error) 
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/courses/{courseId}/teachers")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"courseId": c.courseId,
@@ -9338,7 +9539,7 @@ func (c *CoursesTeachersListCall) Do(opts ...googleapi.CallOption) (*ListTeacher
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -9470,9 +9671,13 @@ func (c *InvitationsAcceptCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/invitations/{id}:accept")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"id": c.id,
@@ -9513,7 +9718,7 @@ func (c *InvitationsAcceptCall) Do(opts ...googleapi.CallOption) (*Empty, error)
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -9614,9 +9819,13 @@ func (c *InvitationsCreateCall) doRequest(alt string) (*http.Response, error) {
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/invitations")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
@@ -9654,7 +9863,7 @@ func (c *InvitationsCreateCall) Do(opts ...googleapi.CallOption) (*Invitation, e
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -9736,9 +9945,13 @@ func (c *InvitationsDeleteCall) doRequest(alt string) (*http.Response, error) {
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/invitations/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"id": c.id,
@@ -9779,7 +9992,7 @@ func (c *InvitationsDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, error)
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -9881,9 +10094,13 @@ func (c *InvitationsGetCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/invitations/{id}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"id": c.id,
@@ -9924,7 +10141,7 @@ func (c *InvitationsGetCall) Do(opts ...googleapi.CallOption) (*Invitation, erro
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -10070,9 +10287,13 @@ func (c *InvitationsListCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/invitations")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
@@ -10110,7 +10331,7 @@ func (c *InvitationsListCall) Do(opts ...googleapi.CallOption) (*ListInvitations
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -10188,7 +10409,8 @@ type RegistrationsCreateCall struct {
 
 // Create: Creates a `Registration`, causing Classroom to start sending
 // notifications
-// from the provided `feed` to the provided `destination`.
+// from the provided `feed` to the destination provided in
+// `cloudPubSubTopic`.
 //
 // Returns the created `Registration`. Currently, this will be the same
 // as
@@ -10200,11 +10422,11 @@ type RegistrationsCreateCall struct {
 // will be
 // ignored.
 //
-// While Classroom may validate the `destination` and return errors on a
-// best
-// effort basis, it is the caller's responsibility to ensure that it
-// exists
-// and that Classroom has permission to publish to it.
+// While Classroom may validate the `cloudPubSubTopic` and return errors
+// on a
+// best effort basis, it is the caller's responsibility to ensure that
+// it
+// exists and that Classroom has permission to publish to it.
 //
 // This method may return the following error codes:
 //
@@ -10212,21 +10434,20 @@ type RegistrationsCreateCall struct {
 //     * the authenticated user does not have permission to receive
 //       notifications from the requested field; or
 //     * the credential provided does not include the appropriate scope
-// for the
-//       requested feed.
+// for
+//       the requested feed.
 //     * another access error is encountered.
 // * `INVALID_ARGUMENT` if:
-//     * no `destination` is specified, or the specified `destination`
-// is not
-//       valid; or
+//     * no `cloudPubsubTopic` is specified, or the specified
+//       `cloudPubsubTopic` is not valid; or
 //     * no `feed` is specified, or the specified `feed` is not valid.
 // * `NOT_FOUND` if:
 //     * the specified `feed` cannot be located, or the requesting user
-// does not
-//       have permission to determine whether or not it exists; or
-//     * the specified `destination` cannot be located, or Classroom has
-// not
-//       been granted permission to publish to it.
+// does
+//       not have permission to determine whether or not it exists; or
+//     * the specified `cloudPubsubTopic` cannot be located, or
+// Classroom has
+//       not been granted permission to publish to it.
 func (r *RegistrationsService) Create(registration *Registration) *RegistrationsCreateCall {
 	c := &RegistrationsCreateCall{s: r.s, urlParams_: make(gensupport.URLParams)}
 	c.registration = registration
@@ -10271,9 +10492,13 @@ func (c *RegistrationsCreateCall) doRequest(alt string) (*http.Response, error) 
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/registrations")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	return gensupport.SendRequest(c.ctx_, c.s.client, req)
 }
@@ -10311,12 +10536,12 @@ func (c *RegistrationsCreateCall) Do(opts ...googleapi.CallOption) (*Registratio
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
 	// {
-	//   "description": "Creates a `Registration`, causing Classroom to start sending notifications\nfrom the provided `feed` to the provided `destination`.\n\nReturns the created `Registration`. Currently, this will be the same as\nthe argument, but with server-assigned fields such as `expiry_time` and\n`id` filled in.\n\nNote that any value specified for the `expiry_time` or `id` fields will be\nignored.\n\nWhile Classroom may validate the `destination` and return errors on a best\neffort basis, it is the caller's responsibility to ensure that it exists\nand that Classroom has permission to publish to it.\n\nThis method may return the following error codes:\n\n* `PERMISSION_DENIED` if:\n    * the authenticated user does not have permission to receive\n      notifications from the requested field; or\n    * the credential provided does not include the appropriate scope for the\n      requested feed.\n    * another access error is encountered.\n* `INVALID_ARGUMENT` if:\n    * no `destination` is specified, or the specified `destination` is not\n      valid; or\n    * no `feed` is specified, or the specified `feed` is not valid.\n* `NOT_FOUND` if:\n    * the specified `feed` cannot be located, or the requesting user does not\n      have permission to determine whether or not it exists; or\n    * the specified `destination` cannot be located, or Classroom has not\n      been granted permission to publish to it.",
+	//   "description": "Creates a `Registration`, causing Classroom to start sending notifications\nfrom the provided `feed` to the destination provided in `cloudPubSubTopic`.\n\nReturns the created `Registration`. Currently, this will be the same as\nthe argument, but with server-assigned fields such as `expiry_time` and\n`id` filled in.\n\nNote that any value specified for the `expiry_time` or `id` fields will be\nignored.\n\nWhile Classroom may validate the `cloudPubSubTopic` and return errors on a\nbest effort basis, it is the caller's responsibility to ensure that it\nexists and that Classroom has permission to publish to it.\n\nThis method may return the following error codes:\n\n* `PERMISSION_DENIED` if:\n    * the authenticated user does not have permission to receive\n      notifications from the requested field; or\n    * the credential provided does not include the appropriate scope for\n      the requested feed.\n    * another access error is encountered.\n* `INVALID_ARGUMENT` if:\n    * no `cloudPubsubTopic` is specified, or the specified\n      `cloudPubsubTopic` is not valid; or\n    * no `feed` is specified, or the specified `feed` is not valid.\n* `NOT_FOUND` if:\n    * the specified `feed` cannot be located, or the requesting user does\n      not have permission to determine whether or not it exists; or\n    * the specified `cloudPubsubTopic` cannot be located, or Classroom has\n      not been granted permission to publish to it.",
 	//   "flatPath": "v1/registrations",
 	//   "httpMethod": "POST",
 	//   "id": "classroom.registrations.create",
@@ -10330,8 +10555,7 @@ func (c *RegistrationsCreateCall) Do(opts ...googleapi.CallOption) (*Registratio
 	//     "$ref": "Registration"
 	//   },
 	//   "scopes": [
-	//     "https://www.googleapis.com/auth/classroom.rosters",
-	//     "https://www.googleapis.com/auth/classroom.rosters.readonly"
+	//     "https://www.googleapis.com/auth/classroom.push-notifications"
 	//   ]
 	// }
 
@@ -10389,9 +10613,13 @@ func (c *RegistrationsDeleteCall) doRequest(alt string) (*http.Response, error) 
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/registrations/{registrationId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"registrationId": c.registrationId,
@@ -10432,7 +10660,7 @@ func (c *RegistrationsDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, erro
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -10457,8 +10685,7 @@ func (c *RegistrationsDeleteCall) Do(opts ...googleapi.CallOption) (*Empty, erro
 	//     "$ref": "Empty"
 	//   },
 	//   "scopes": [
-	//     "https://www.googleapis.com/auth/classroom.rosters",
-	//     "https://www.googleapis.com/auth/classroom.rosters.readonly"
+	//     "https://www.googleapis.com/auth/classroom.push-notifications"
 	//   ]
 	// }
 
@@ -10536,9 +10763,13 @@ func (c *UserProfilesGetCall) doRequest(alt string) (*http.Response, error) {
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/userProfiles/{userId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"userId": c.userId,
@@ -10579,7 +10810,7 @@ func (c *UserProfilesGetCall) Do(opts ...googleapi.CallOption) (*UserProfile, er
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -10715,9 +10946,13 @@ func (c *UserProfilesGuardianInvitationsCreateCall) doRequest(alt string) (*http
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/userProfiles/{studentId}/guardianInvitations")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"studentId": c.studentId,
@@ -10758,7 +10993,7 @@ func (c *UserProfilesGuardianInvitationsCreateCall) Do(opts ...googleapi.CallOpt
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -10877,9 +11112,13 @@ func (c *UserProfilesGuardianInvitationsGetCall) doRequest(alt string) (*http.Re
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/userProfiles/{studentId}/guardianInvitations/{invitationId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"studentId":    c.studentId,
@@ -10921,7 +11160,7 @@ func (c *UserProfilesGuardianInvitationsGetCall) Do(opts ...googleapi.CallOption
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -11094,9 +11333,13 @@ func (c *UserProfilesGuardianInvitationsListCall) doRequest(alt string) (*http.R
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/userProfiles/{studentId}/guardianInvitations")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"studentId": c.studentId,
@@ -11137,7 +11380,7 @@ func (c *UserProfilesGuardianInvitationsListCall) Do(opts ...googleapi.CallOptio
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -11318,9 +11561,13 @@ func (c *UserProfilesGuardianInvitationsPatchCall) doRequest(alt string) (*http.
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/userProfiles/{studentId}/guardianInvitations/{invitationId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("PATCH", urls, body)
+	req, err := http.NewRequest("PATCH", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"studentId":    c.studentId,
@@ -11362,7 +11609,7 @@ func (c *UserProfilesGuardianInvitationsPatchCall) Do(opts ...googleapi.CallOpti
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -11485,9 +11732,13 @@ func (c *UserProfilesGuardiansDeleteCall) doRequest(alt string) (*http.Response,
 	reqHeaders.Set("User-Agent", c.s.userAgent())
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/userProfiles/{studentId}/guardians/{guardianId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("DELETE", urls, body)
+	req, err := http.NewRequest("DELETE", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"studentId":  c.studentId,
@@ -11529,7 +11780,7 @@ func (c *UserProfilesGuardiansDeleteCall) Do(opts ...googleapi.CallOption) (*Emp
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -11654,9 +11905,13 @@ func (c *UserProfilesGuardiansGetCall) doRequest(alt string) (*http.Response, er
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/userProfiles/{studentId}/guardians/{guardianId}")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"studentId":  c.studentId,
@@ -11698,7 +11953,7 @@ func (c *UserProfilesGuardiansGetCall) Do(opts ...googleapi.CallOption) (*Guardi
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -11866,9 +12121,13 @@ func (c *UserProfilesGuardiansListCall) doRequest(alt string) (*http.Response, e
 	}
 	var body io.Reader = nil
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/userProfiles/{studentId}/guardians")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("GET", urls, body)
+	req, err := http.NewRequest("GET", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"studentId": c.studentId,
@@ -11909,7 +12168,7 @@ func (c *UserProfilesGuardiansListCall) Do(opts ...googleapi.CallOption) (*ListG
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil

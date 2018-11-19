@@ -11,18 +11,18 @@ package taskqueue // import "google.golang.org/api/taskqueue/v1beta2"
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	context "golang.org/x/net/context"
-	ctxhttp "golang.org/x/net/context/ctxhttp"
-	gensupport "google.golang.org/api/gensupport"
-	googleapi "google.golang.org/api/googleapi"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	gensupport "google.golang.org/api/gensupport"
+	googleapi "google.golang.org/api/googleapi"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -38,7 +38,6 @@ var _ = googleapi.Version
 var _ = errors.New
 var _ = strings.Replace
 var _ = context.Canceled
-var _ = ctxhttp.Do
 
 const apiId = "taskqueue:v1beta2"
 const apiName = "taskqueue"
@@ -152,8 +151,8 @@ type Task struct {
 }
 
 func (s *Task) MarshalJSON() ([]byte, error) {
-	type noMethod Task
-	raw := noMethod(*s)
+	type NoMethod Task
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -197,8 +196,8 @@ type TaskQueue struct {
 }
 
 func (s *TaskQueue) MarshalJSON() ([]byte, error) {
-	type noMethod TaskQueue
-	raw := noMethod(*s)
+	type NoMethod TaskQueue
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -236,8 +235,8 @@ type TaskQueueAcl struct {
 }
 
 func (s *TaskQueueAcl) MarshalJSON() ([]byte, error) {
-	type noMethod TaskQueueAcl
-	raw := noMethod(*s)
+	type NoMethod TaskQueueAcl
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -275,8 +274,8 @@ type TaskQueueStats struct {
 }
 
 func (s *TaskQueueStats) MarshalJSON() ([]byte, error) {
-	type noMethod TaskQueueStats
-	raw := noMethod(*s)
+	type NoMethod TaskQueueStats
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -310,8 +309,8 @@ type Tasks struct {
 }
 
 func (s *Tasks) MarshalJSON() ([]byte, error) {
-	type noMethod Tasks
-	raw := noMethod(*s)
+	type NoMethod Tasks
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -344,8 +343,8 @@ type Tasks2 struct {
 }
 
 func (s *Tasks2) MarshalJSON() ([]byte, error) {
-	type noMethod Tasks2
-	raw := noMethod(*s)
+	type NoMethod Tasks2
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -466,7 +465,7 @@ func (c *TaskqueuesGetCall) Do(opts ...googleapi.CallOption) (*TaskQueue, error)
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -738,7 +737,7 @@ func (c *TasksGetCall) Do(opts ...googleapi.CallOption) (*Task, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -886,7 +885,7 @@ func (c *TasksInsertCall) Do(opts ...googleapi.CallOption) (*Task, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1041,7 +1040,7 @@ func (c *TasksLeaseCall) Do(opts ...googleapi.CallOption) (*Tasks, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1215,7 +1214,7 @@ func (c *TasksListCall) Do(opts ...googleapi.CallOption) (*Tasks2, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1361,7 +1360,7 @@ func (c *TasksPatchCall) Do(opts ...googleapi.CallOption) (*Task, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -1522,7 +1521,7 @@ func (c *TasksUpdateCall) Do(opts ...googleapi.CallOption) (*Task, error) {
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil

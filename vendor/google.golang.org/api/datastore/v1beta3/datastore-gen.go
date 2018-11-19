@@ -1,4 +1,6 @@
-// Package datastore provides access to the Google Cloud Datastore API.
+// Package datastore provides access to the Cloud Datastore API.
+//
+// This package is DEPRECATED. Use package cloud.google.com/go/datastore instead.
 //
 // See https://cloud.google.com/datastore/
 //
@@ -11,18 +13,18 @@ package datastore // import "google.golang.org/api/datastore/v1beta3"
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	context "golang.org/x/net/context"
-	ctxhttp "golang.org/x/net/context/ctxhttp"
-	gensupport "google.golang.org/api/gensupport"
-	googleapi "google.golang.org/api/googleapi"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	gensupport "google.golang.org/api/gensupport"
+	googleapi "google.golang.org/api/googleapi"
 )
 
 // Always reference these packages, just in case the auto-generated code
@@ -38,7 +40,6 @@ var _ = googleapi.Version
 var _ = errors.New
 var _ = strings.Replace
 var _ = context.Canceled
-var _ = ctxhttp.Do
 
 const apiId = "datastore:v1beta3"
 const apiName = "datastore"
@@ -112,8 +113,8 @@ type AllocateIdsRequest struct {
 }
 
 func (s *AllocateIdsRequest) MarshalJSON() ([]byte, error) {
-	type noMethod AllocateIdsRequest
-	raw := noMethod(*s)
+	type NoMethod AllocateIdsRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -146,17 +147,17 @@ type AllocateIdsResponse struct {
 }
 
 func (s *AllocateIdsResponse) MarshalJSON() ([]byte, error) {
-	type noMethod AllocateIdsResponse
-	raw := noMethod(*s)
+	type NoMethod AllocateIdsResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 // ArrayValue: An array value.
 type ArrayValue struct {
 	// Values: Values in the array.
-	// The order of this array may not be preserved if it contains a mix
-	// of
-	// indexed and unindexed values.
+	// The order of values in an array is preserved as long as all values
+	// have
+	// identical settings for 'exclude_from_indexes'.
 	Values []*Value `json:"values,omitempty"`
 
 	// ForceSendFields is a list of field names (e.g. "Values") to
@@ -177,8 +178,8 @@ type ArrayValue struct {
 }
 
 func (s *ArrayValue) MarshalJSON() ([]byte, error) {
-	type noMethod ArrayValue
-	raw := noMethod(*s)
+	type NoMethod ArrayValue
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -206,8 +207,8 @@ type BeginTransactionRequest struct {
 }
 
 func (s *BeginTransactionRequest) MarshalJSON() ([]byte, error) {
-	type noMethod BeginTransactionRequest
-	raw := noMethod(*s)
+	type NoMethod BeginTransactionRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -239,8 +240,8 @@ type BeginTransactionResponse struct {
 }
 
 func (s *BeginTransactionResponse) MarshalJSON() ([]byte, error) {
-	type noMethod BeginTransactionResponse
-	raw := noMethod(*s)
+	type NoMethod BeginTransactionResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -301,8 +302,8 @@ type CommitRequest struct {
 }
 
 func (s *CommitRequest) MarshalJSON() ([]byte, error) {
-	type noMethod CommitRequest
-	raw := noMethod(*s)
+	type NoMethod CommitRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -340,8 +341,8 @@ type CommitResponse struct {
 }
 
 func (s *CommitResponse) MarshalJSON() ([]byte, error) {
-	type noMethod CommitResponse
-	raw := noMethod(*s)
+	type NoMethod CommitResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -378,8 +379,8 @@ type CompositeFilter struct {
 }
 
 func (s *CompositeFilter) MarshalJSON() ([]byte, error) {
-	type noMethod CompositeFilter
-	raw := noMethod(*s)
+	type NoMethod CompositeFilter
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -427,8 +428,8 @@ type Entity struct {
 }
 
 func (s *Entity) MarshalJSON() ([]byte, error) {
-	type noMethod Entity
-	raw := noMethod(*s)
+	type NoMethod Entity
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -474,8 +475,8 @@ type EntityResult struct {
 }
 
 func (s *EntityResult) MarshalJSON() ([]byte, error) {
-	type noMethod EntityResult
-	raw := noMethod(*s)
+	type NoMethod EntityResult
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -506,8 +507,336 @@ type Filter struct {
 }
 
 func (s *Filter) MarshalJSON() ([]byte, error) {
-	type noMethod Filter
-	raw := noMethod(*s)
+	type NoMethod Filter
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleDatastoreAdminV1CommonMetadata: Metadata common to all
+// Datastore Admin operations.
+type GoogleDatastoreAdminV1CommonMetadata struct {
+	// EndTime: The time the operation ended, either successfully or
+	// otherwise.
+	EndTime string `json:"endTime,omitempty"`
+
+	// Labels: The client-assigned labels which were provided when the
+	// operation was
+	// created. May also include additional labels.
+	Labels map[string]string `json:"labels,omitempty"`
+
+	// OperationType: The type of the operation. Can be used as a filter
+	// in
+	// ListOperationsRequest.
+	//
+	// Possible values:
+	//   "OPERATION_TYPE_UNSPECIFIED" - Unspecified.
+	//   "EXPORT_ENTITIES" - ExportEntities.
+	//   "IMPORT_ENTITIES" - ImportEntities.
+	//   "CREATE_INDEX" - CreateIndex.
+	//   "DELETE_INDEX" - DeleteIndex.
+	OperationType string `json:"operationType,omitempty"`
+
+	// StartTime: The time that work began on the operation.
+	StartTime string `json:"startTime,omitempty"`
+
+	// State: The current state of the Operation.
+	//
+	// Possible values:
+	//   "STATE_UNSPECIFIED" - Unspecified.
+	//   "INITIALIZING" - Request is being prepared for processing.
+	//   "PROCESSING" - Request is actively being processed.
+	//   "CANCELLING" - Request is in the process of being cancelled after
+	// user called
+	// google.longrunning.Operations.CancelOperation on the operation.
+	//   "FINALIZING" - Request has been processed and is in its
+	// finalization stage.
+	//   "SUCCESSFUL" - Request has completed successfully.
+	//   "FAILED" - Request has finished being processed, but encountered an
+	// error.
+	//   "CANCELLED" - Request has finished being cancelled after user
+	// called
+	// google.longrunning.Operations.CancelOperation.
+	State string `json:"state,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "EndTime") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "EndTime") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleDatastoreAdminV1CommonMetadata) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleDatastoreAdminV1CommonMetadata
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleDatastoreAdminV1EntityFilter: Identifies a subset of entities
+// in a project. This is specified as
+// combinations of kinds and namespaces (either or both of which may be
+// all, as
+// described in the following examples).
+// Example usage:
+//
+// Entire project:
+//   kinds=[], namespace_ids=[]
+//
+// Kinds Foo and Bar in all namespaces:
+//   kinds=['Foo', 'Bar'], namespace_ids=[]
+//
+// Kinds Foo and Bar only in the default namespace:
+//   kinds=['Foo', 'Bar'], namespace_ids=['']
+//
+// Kinds Foo and Bar in both the default and Baz namespaces:
+//   kinds=['Foo', 'Bar'], namespace_ids=['', 'Baz']
+//
+// The entire Baz namespace:
+//   kinds=[], namespace_ids=['Baz']
+type GoogleDatastoreAdminV1EntityFilter struct {
+	// Kinds: If empty, then this represents all kinds.
+	Kinds []string `json:"kinds,omitempty"`
+
+	// NamespaceIds: An empty list represents all namespaces. This is the
+	// preferred
+	// usage for projects that don't use namespaces.
+	//
+	// An empty string element represents the default namespace. This should
+	// be
+	// used if the project has data in non-default namespaces, but doesn't
+	// want to
+	// include them.
+	// Each namespace in this list must be unique.
+	NamespaceIds []string `json:"namespaceIds,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Kinds") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Kinds") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleDatastoreAdminV1EntityFilter) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleDatastoreAdminV1EntityFilter
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleDatastoreAdminV1ExportEntitiesMetadata: Metadata for
+// ExportEntities operations.
+type GoogleDatastoreAdminV1ExportEntitiesMetadata struct {
+	// Common: Metadata common to all Datastore Admin operations.
+	Common *GoogleDatastoreAdminV1CommonMetadata `json:"common,omitempty"`
+
+	// EntityFilter: Description of which entities are being exported.
+	EntityFilter *GoogleDatastoreAdminV1EntityFilter `json:"entityFilter,omitempty"`
+
+	// OutputUrlPrefix: Location for the export metadata and data files.
+	// This will be the same
+	// value as
+	// the
+	// google.datastore.admin.v1.ExportEntitiesRequest.output_url_prefix
+	//
+	// field. The final output location is provided
+	// in
+	// google.datastore.admin.v1.ExportEntitiesResponse.output_url.
+	OutputUrlPrefix string `json:"outputUrlPrefix,omitempty"`
+
+	// ProgressBytes: An estimate of the number of bytes processed.
+	ProgressBytes *GoogleDatastoreAdminV1Progress `json:"progressBytes,omitempty"`
+
+	// ProgressEntities: An estimate of the number of entities processed.
+	ProgressEntities *GoogleDatastoreAdminV1Progress `json:"progressEntities,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Common") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Common") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleDatastoreAdminV1ExportEntitiesMetadata) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleDatastoreAdminV1ExportEntitiesMetadata
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleDatastoreAdminV1ExportEntitiesResponse: The response
+// for
+// google.datastore.admin.v1.DatastoreAdmin.ExportEntities.
+type GoogleDatastoreAdminV1ExportEntitiesResponse struct {
+	// OutputUrl: Location of the output metadata file. This can be used to
+	// begin an import
+	// into Cloud Datastore (this project or another project).
+	// See
+	// google.datastore.admin.v1.ImportEntitiesRequest.input_url.
+	// Only present if the operation completed successfully.
+	OutputUrl string `json:"outputUrl,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "OutputUrl") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "OutputUrl") to include in
+	// API requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleDatastoreAdminV1ExportEntitiesResponse) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleDatastoreAdminV1ExportEntitiesResponse
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleDatastoreAdminV1ImportEntitiesMetadata: Metadata for
+// ImportEntities operations.
+type GoogleDatastoreAdminV1ImportEntitiesMetadata struct {
+	// Common: Metadata common to all Datastore Admin operations.
+	Common *GoogleDatastoreAdminV1CommonMetadata `json:"common,omitempty"`
+
+	// EntityFilter: Description of which entities are being imported.
+	EntityFilter *GoogleDatastoreAdminV1EntityFilter `json:"entityFilter,omitempty"`
+
+	// InputUrl: The location of the import metadata file. This will be the
+	// same value as
+	// the google.datastore.admin.v1.ExportEntitiesResponse.output_url
+	// field.
+	InputUrl string `json:"inputUrl,omitempty"`
+
+	// ProgressBytes: An estimate of the number of bytes processed.
+	ProgressBytes *GoogleDatastoreAdminV1Progress `json:"progressBytes,omitempty"`
+
+	// ProgressEntities: An estimate of the number of entities processed.
+	ProgressEntities *GoogleDatastoreAdminV1Progress `json:"progressEntities,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Common") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Common") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleDatastoreAdminV1ImportEntitiesMetadata) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleDatastoreAdminV1ImportEntitiesMetadata
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleDatastoreAdminV1IndexOperationMetadata: Metadata for Index
+// operations.
+type GoogleDatastoreAdminV1IndexOperationMetadata struct {
+	// Common: Metadata common to all Datastore Admin operations.
+	Common *GoogleDatastoreAdminV1CommonMetadata `json:"common,omitempty"`
+
+	// IndexId: The index resource ID that this operation is acting on.
+	IndexId string `json:"indexId,omitempty"`
+
+	// ProgressEntities: An estimate of the number of entities processed.
+	ProgressEntities *GoogleDatastoreAdminV1Progress `json:"progressEntities,omitempty"`
+
+	// ForceSendFields is a list of field names (e.g. "Common") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "Common") to include in API
+	// requests with the JSON null value. By default, fields with empty
+	// values are omitted from API requests. However, any field with an
+	// empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleDatastoreAdminV1IndexOperationMetadata) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleDatastoreAdminV1IndexOperationMetadata
+	raw := NoMethod(*s)
+	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
+}
+
+// GoogleDatastoreAdminV1Progress: Measures the progress of a particular
+// metric.
+type GoogleDatastoreAdminV1Progress struct {
+	// WorkCompleted: The amount of work that has been completed. Note that
+	// this may be greater
+	// than work_estimated.
+	WorkCompleted int64 `json:"workCompleted,omitempty,string"`
+
+	// WorkEstimated: An estimate of how much work needs to be performed.
+	// May be zero if the
+	// work estimate is unavailable.
+	WorkEstimated int64 `json:"workEstimated,omitempty,string"`
+
+	// ForceSendFields is a list of field names (e.g. "WorkCompleted") to
+	// unconditionally include in API requests. By default, fields with
+	// empty values are omitted from API requests. However, any non-pointer,
+	// non-interface field appearing in ForceSendFields will be sent to the
+	// server regardless of whether the field is empty or not. This may be
+	// used to include empty fields in Patch requests.
+	ForceSendFields []string `json:"-"`
+
+	// NullFields is a list of field names (e.g. "WorkCompleted") to include
+	// in API requests with the JSON null value. By default, fields with
+	// empty values are omitted from API requests. However, any field with
+	// an empty value appearing in NullFields will be sent to the server as
+	// null. It is an error if a field in this list has a non-empty value.
+	// This may be used to include null fields in Patch requests.
+	NullFields []string `json:"-"`
+}
+
+func (s *GoogleDatastoreAdminV1Progress) MarshalJSON() ([]byte, error) {
+	type NoMethod GoogleDatastoreAdminV1Progress
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -573,8 +902,8 @@ type GoogleDatastoreAdminV1beta1CommonMetadata struct {
 }
 
 func (s *GoogleDatastoreAdminV1beta1CommonMetadata) MarshalJSON() ([]byte, error) {
-	type noMethod GoogleDatastoreAdminV1beta1CommonMetadata
-	raw := noMethod(*s)
+	type NoMethod GoogleDatastoreAdminV1beta1CommonMetadata
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -633,8 +962,8 @@ type GoogleDatastoreAdminV1beta1EntityFilter struct {
 }
 
 func (s *GoogleDatastoreAdminV1beta1EntityFilter) MarshalJSON() ([]byte, error) {
-	type noMethod GoogleDatastoreAdminV1beta1EntityFilter
-	raw := noMethod(*s)
+	type NoMethod GoogleDatastoreAdminV1beta1EntityFilter
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -682,8 +1011,8 @@ type GoogleDatastoreAdminV1beta1ExportEntitiesMetadata struct {
 }
 
 func (s *GoogleDatastoreAdminV1beta1ExportEntitiesMetadata) MarshalJSON() ([]byte, error) {
-	type noMethod GoogleDatastoreAdminV1beta1ExportEntitiesMetadata
-	raw := noMethod(*s)
+	type NoMethod GoogleDatastoreAdminV1beta1ExportEntitiesMetadata
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -718,8 +1047,8 @@ type GoogleDatastoreAdminV1beta1ExportEntitiesResponse struct {
 }
 
 func (s *GoogleDatastoreAdminV1beta1ExportEntitiesResponse) MarshalJSON() ([]byte, error) {
-	type noMethod GoogleDatastoreAdminV1beta1ExportEntitiesResponse
-	raw := noMethod(*s)
+	type NoMethod GoogleDatastoreAdminV1beta1ExportEntitiesResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -764,8 +1093,8 @@ type GoogleDatastoreAdminV1beta1ImportEntitiesMetadata struct {
 }
 
 func (s *GoogleDatastoreAdminV1beta1ImportEntitiesMetadata) MarshalJSON() ([]byte, error) {
-	type noMethod GoogleDatastoreAdminV1beta1ImportEntitiesMetadata
-	raw := noMethod(*s)
+	type NoMethod GoogleDatastoreAdminV1beta1ImportEntitiesMetadata
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -800,8 +1129,8 @@ type GoogleDatastoreAdminV1beta1Progress struct {
 }
 
 func (s *GoogleDatastoreAdminV1beta1Progress) MarshalJSON() ([]byte, error) {
-	type noMethod GoogleDatastoreAdminV1beta1Progress
-	raw := noMethod(*s)
+	type NoMethod GoogleDatastoreAdminV1beta1Progress
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -859,8 +1188,8 @@ type GqlQuery struct {
 }
 
 func (s *GqlQuery) MarshalJSON() ([]byte, error) {
-	type noMethod GqlQuery
-	raw := noMethod(*s)
+	type NoMethod GqlQuery
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -891,8 +1220,8 @@ type GqlQueryParameter struct {
 }
 
 func (s *GqlQueryParameter) MarshalJSON() ([]byte, error) {
-	type noMethod GqlQueryParameter
-	raw := noMethod(*s)
+	type NoMethod GqlQueryParameter
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -953,8 +1282,8 @@ type Key struct {
 }
 
 func (s *Key) MarshalJSON() ([]byte, error) {
-	type noMethod Key
-	raw := noMethod(*s)
+	type NoMethod Key
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -981,8 +1310,8 @@ type KindExpression struct {
 }
 
 func (s *KindExpression) MarshalJSON() ([]byte, error) {
-	type noMethod KindExpression
-	raw := noMethod(*s)
+	type NoMethod KindExpression
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -995,40 +1324,6 @@ func (s *KindExpression) MarshalJSON() ([]byte, error) {
 // href="http://www.unoosa.org/pdf/icg/2012/template/WGS_84.pdf">WGS84
 // st
 // andard</a>. Values must be within normalized ranges.
-//
-// Example of normalization code in Python:
-//
-//     def NormalizeLongitude(longitude):
-//       """Wraps decimal degrees longitude to [-180.0, 180.0]."""
-//       q, r = divmod(longitude, 360.0)
-//       if r > 180.0 or (r == 180.0 and q <= -1.0):
-//         return r - 360.0
-//       return r
-//
-//     def NormalizeLatLng(latitude, longitude):
-//       """Wraps decimal degrees latitude and longitude to
-//       [-90.0, 90.0] and [-180.0, 180.0], respectively."""
-//       r = latitude % 360.0
-//       if r <= 90.0:
-//         return r, NormalizeLongitude(longitude)
-//       elif r >= 270.0:
-//         return r - 360, NormalizeLongitude(longitude)
-//       else:
-//         return 180 - r, NormalizeLongitude(longitude + 180.0)
-//
-//     assert 180.0 == NormalizeLongitude(180.0)
-//     assert -180.0 == NormalizeLongitude(-180.0)
-//     assert -179.0 == NormalizeLongitude(181.0)
-//     assert (0.0, 0.0) == NormalizeLatLng(360.0, 0.0)
-//     assert (0.0, 0.0) == NormalizeLatLng(-360.0, 0.0)
-//     assert (85.0, 180.0) == NormalizeLatLng(95.0, 0.0)
-//     assert (-85.0, -170.0) == NormalizeLatLng(-95.0, 10.0)
-//     assert (90.0, 10.0) == NormalizeLatLng(90.0, 10.0)
-//     assert (-90.0, -10.0) == NormalizeLatLng(-90.0, -10.0)
-//     assert (0.0, -170.0) == NormalizeLatLng(-180.0, 10.0)
-//     assert (0.0, -170.0) == NormalizeLatLng(180.0, 10.0)
-//     assert (-90.0, 10.0) == NormalizeLatLng(270.0, 10.0)
-//     assert (90.0, 10.0) == NormalizeLatLng(-270.0, 10.0)
 type LatLng struct {
 	// Latitude: The latitude in degrees. It must be in the range [-90.0,
 	// +90.0].
@@ -1056,19 +1351,19 @@ type LatLng struct {
 }
 
 func (s *LatLng) MarshalJSON() ([]byte, error) {
-	type noMethod LatLng
-	raw := noMethod(*s)
+	type NoMethod LatLng
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 func (s *LatLng) UnmarshalJSON(data []byte) error {
-	type noMethod LatLng
+	type NoMethod LatLng
 	var s1 struct {
 		Latitude  gensupport.JSONFloat64 `json:"latitude"`
 		Longitude gensupport.JSONFloat64 `json:"longitude"`
-		*noMethod
+		*NoMethod
 	}
-	s1.noMethod = (*noMethod)(s)
+	s1.NoMethod = (*NoMethod)(s)
 	if err := json.Unmarshal(data, &s1); err != nil {
 		return err
 	}
@@ -1103,8 +1398,8 @@ type LookupRequest struct {
 }
 
 func (s *LookupRequest) MarshalJSON() ([]byte, error) {
-	type noMethod LookupRequest
-	raw := noMethod(*s)
+	type NoMethod LookupRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1153,8 +1448,8 @@ type LookupResponse struct {
 }
 
 func (s *LookupResponse) MarshalJSON() ([]byte, error) {
-	type noMethod LookupResponse
-	raw := noMethod(*s)
+	type NoMethod LookupResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1202,8 +1497,8 @@ type Mutation struct {
 }
 
 func (s *Mutation) MarshalJSON() ([]byte, error) {
-	type noMethod Mutation
-	raw := noMethod(*s)
+	type NoMethod Mutation
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1248,8 +1543,8 @@ type MutationResult struct {
 }
 
 func (s *MutationResult) MarshalJSON() ([]byte, error) {
-	type noMethod MutationResult
-	raw := noMethod(*s)
+	type NoMethod MutationResult
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1302,8 +1597,8 @@ type PartitionId struct {
 }
 
 func (s *PartitionId) MarshalJSON() ([]byte, error) {
-	type noMethod PartitionId
-	raw := noMethod(*s)
+	type NoMethod PartitionId
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1349,8 +1644,8 @@ type PathElement struct {
 }
 
 func (s *PathElement) MarshalJSON() ([]byte, error) {
-	type noMethod PathElement
-	raw := noMethod(*s)
+	type NoMethod PathElement
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1377,8 +1672,8 @@ type Projection struct {
 }
 
 func (s *Projection) MarshalJSON() ([]byte, error) {
-	type noMethod Projection
-	raw := noMethod(*s)
+	type NoMethod Projection
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1420,8 +1715,8 @@ type PropertyFilter struct {
 }
 
 func (s *PropertyFilter) MarshalJSON() ([]byte, error) {
-	type noMethod PropertyFilter
-	raw := noMethod(*s)
+	type NoMethod PropertyFilter
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1456,8 +1751,8 @@ type PropertyOrder struct {
 }
 
 func (s *PropertyOrder) MarshalJSON() ([]byte, error) {
-	type noMethod PropertyOrder
-	raw := noMethod(*s)
+	type NoMethod PropertyOrder
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1486,8 +1781,8 @@ type PropertyReference struct {
 }
 
 func (s *PropertyReference) MarshalJSON() ([]byte, error) {
-	type noMethod PropertyReference
-	raw := noMethod(*s)
+	type NoMethod PropertyReference
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1562,8 +1857,8 @@ type Query struct {
 }
 
 func (s *Query) MarshalJSON() ([]byte, error) {
-	type noMethod Query
-	raw := noMethod(*s)
+	type NoMethod Query
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1646,8 +1941,8 @@ type QueryResultBatch struct {
 }
 
 func (s *QueryResultBatch) MarshalJSON() ([]byte, error) {
-	type noMethod QueryResultBatch
-	raw := noMethod(*s)
+	type NoMethod QueryResultBatch
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1694,8 +1989,8 @@ type ReadOptions struct {
 }
 
 func (s *ReadOptions) MarshalJSON() ([]byte, error) {
-	type noMethod ReadOptions
-	raw := noMethod(*s)
+	type NoMethod ReadOptions
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1724,8 +2019,8 @@ type ReadWrite struct {
 }
 
 func (s *ReadWrite) MarshalJSON() ([]byte, error) {
-	type noMethod ReadWrite
-	raw := noMethod(*s)
+	type NoMethod ReadWrite
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1758,8 +2053,8 @@ type ReserveIdsRequest struct {
 }
 
 func (s *ReserveIdsRequest) MarshalJSON() ([]byte, error) {
-	type noMethod ReserveIdsRequest
-	raw := noMethod(*s)
+	type NoMethod ReserveIdsRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1795,8 +2090,8 @@ type RollbackRequest struct {
 }
 
 func (s *RollbackRequest) MarshalJSON() ([]byte, error) {
-	type noMethod RollbackRequest
-	raw := noMethod(*s)
+	type NoMethod RollbackRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1845,8 +2140,8 @@ type RunQueryRequest struct {
 }
 
 func (s *RunQueryRequest) MarshalJSON() ([]byte, error) {
-	type noMethod RunQueryRequest
-	raw := noMethod(*s)
+	type NoMethod RunQueryRequest
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1881,8 +2176,8 @@ type RunQueryResponse struct {
 }
 
 func (s *RunQueryResponse) MarshalJSON() ([]byte, error) {
-	type noMethod RunQueryResponse
-	raw := noMethod(*s)
+	type NoMethod RunQueryResponse
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -1919,8 +2214,8 @@ type TransactionOptions struct {
 }
 
 func (s *TransactionOptions) MarshalJSON() ([]byte, error) {
-	type noMethod TransactionOptions
-	raw := noMethod(*s)
+	type NoMethod TransactionOptions
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
@@ -2008,18 +2303,18 @@ type Value struct {
 }
 
 func (s *Value) MarshalJSON() ([]byte, error) {
-	type noMethod Value
-	raw := noMethod(*s)
+	type NoMethod Value
+	raw := NoMethod(*s)
 	return gensupport.MarshalJSON(raw, s.ForceSendFields, s.NullFields)
 }
 
 func (s *Value) UnmarshalJSON(data []byte) error {
-	type noMethod Value
+	type NoMethod Value
 	var s1 struct {
 		DoubleValue *gensupport.JSONFloat64 `json:"doubleValue"`
-		*noMethod
+		*NoMethod
 	}
-	s1.noMethod = (*noMethod)(s)
+	s1.NoMethod = (*NoMethod)(s)
 	if err := json.Unmarshal(data, &s1); err != nil {
 		return err
 	}
@@ -2088,9 +2383,13 @@ func (c *ProjectsAllocateIdsCall) doRequest(alt string) (*http.Response, error) 
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta3/projects/{projectId}:allocateIds")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
@@ -2131,7 +2430,7 @@ func (c *ProjectsAllocateIdsCall) Do(opts ...googleapi.CallOption) (*AllocateIds
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2223,9 +2522,13 @@ func (c *ProjectsBeginTransactionCall) doRequest(alt string) (*http.Response, er
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta3/projects/{projectId}:beginTransaction")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
@@ -2266,7 +2569,7 @@ func (c *ProjectsBeginTransactionCall) Do(opts ...googleapi.CallOption) (*BeginT
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2360,9 +2663,13 @@ func (c *ProjectsCommitCall) doRequest(alt string) (*http.Response, error) {
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta3/projects/{projectId}:commit")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
@@ -2403,7 +2710,7 @@ func (c *ProjectsCommitCall) Do(opts ...googleapi.CallOption) (*CommitResponse, 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2495,9 +2802,13 @@ func (c *ProjectsLookupCall) doRequest(alt string) (*http.Response, error) {
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta3/projects/{projectId}:lookup")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
@@ -2538,7 +2849,7 @@ func (c *ProjectsLookupCall) Do(opts ...googleapi.CallOption) (*LookupResponse, 
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2632,9 +2943,13 @@ func (c *ProjectsReserveIdsCall) doRequest(alt string) (*http.Response, error) {
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta3/projects/{projectId}:reserveIds")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
@@ -2675,7 +2990,7 @@ func (c *ProjectsReserveIdsCall) Do(opts ...googleapi.CallOption) (*ReserveIdsRe
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2767,9 +3082,13 @@ func (c *ProjectsRollbackCall) doRequest(alt string) (*http.Response, error) {
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta3/projects/{projectId}:rollback")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
@@ -2810,7 +3129,7 @@ func (c *ProjectsRollbackCall) Do(opts ...googleapi.CallOption) (*RollbackRespon
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
@@ -2902,9 +3221,13 @@ func (c *ProjectsRunQueryCall) doRequest(alt string) (*http.Response, error) {
 	}
 	reqHeaders.Set("Content-Type", "application/json")
 	c.urlParams_.Set("alt", alt)
+	c.urlParams_.Set("prettyPrint", "false")
 	urls := googleapi.ResolveRelative(c.s.BasePath, "v1beta3/projects/{projectId}:runQuery")
 	urls += "?" + c.urlParams_.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
+	req, err := http.NewRequest("POST", urls, body)
+	if err != nil {
+		return nil, err
+	}
 	req.Header = reqHeaders
 	googleapi.Expand(req.URL, map[string]string{
 		"projectId": c.projectId,
@@ -2945,7 +3268,7 @@ func (c *ProjectsRunQueryCall) Do(opts ...googleapi.CallOption) (*RunQueryRespon
 		},
 	}
 	target := &ret
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := gensupport.DecodeResponse(target, res); err != nil {
 		return nil, err
 	}
 	return ret, nil
