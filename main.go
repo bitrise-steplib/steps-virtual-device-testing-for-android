@@ -19,6 +19,7 @@ import (
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 
 	"github.com/bitrise-io/go-utils/colorstring"
+	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
@@ -455,7 +456,16 @@ func main() {
 			if err != nil {
 				failf("Failed to read response body, error: %s", err)
 			}
-			failf("Failed to start test: %d, error: %s", resp.StatusCode, string(body))
+
+			var outFormatted string
+			if resp.StatusCode == 406 {
+				cmd := command.New("gcloud", "firebase", "test", "android", "models", "list", "--filter=VIRTUAL")
+				outFormatted, err = cmd.RunAndReturnTrimmedCombinedOutput()
+				if err != nil {
+					// return errors.Wrap(err, out)
+				}
+			}
+			failf("Failed to start test: %d, error: %s\navailable devices\n%s:", resp.StatusCode, string(body), outFormatted)
 		}
 
 		log.Donef("=> Test started")
