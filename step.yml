@@ -16,6 +16,8 @@ type_tags:
 is_always_run: false
 is_skippable: false
 run_if: ".IsCI"
+meta:
+  bitrise.io.addons.required: [{addon_id:"addons-firebase-testlab"}]
 
 deps:
   brew:
