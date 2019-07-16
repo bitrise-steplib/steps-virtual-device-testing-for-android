@@ -207,9 +207,10 @@ func (configs ConfigsModel) validate() error {
 	}
 
 	if tout, err := strconv.Atoi(configs.TestTimeout); err != nil {
-		log.Warnf("Issue with TestTimeout: could not parse integer value from %s, this might cause error later on.")
+		// not returning, because TestLab API accepts non-integers too: https://firebase.google.com/docs/test-lab/reference/testing/rest/v1/projects.testMatrices#testspecification
+		log.Warnf("Issue with TestTimeout: could not parse integer value from %s: %s, this might cause error later on.", configs.TestTimeout, err)
 	} else if tout > 2700 {
-		log.Warnf("Issue with TestTimeout: %s is greater than available maximum. 2700 will be used instead.")
+		log.Warnf("Issue with TestTimeout: %s is greater than available maximum. 2700 will be used instead.", configs.TestTimeout)
 		configs.TestTimeout = "2700"
 	}
 
