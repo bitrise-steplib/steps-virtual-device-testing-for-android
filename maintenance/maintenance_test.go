@@ -319,6 +319,8 @@ supportedAbis[9]:       27:armeabi
 supportedAbis[10]:      27:armeabi-v7a
 supportedAbis[11]:      28:armeabi
 supportedAbis[12]:      28:armeabi-v7a
+supportedAbis[13]:      29:armeabi
+supportedAbis[14]:      29:armeabi-v7a
 supportedVersionIds[0]: 23
 supportedVersionIds[1]: 24
 supportedVersionIds[2]: 25
@@ -343,6 +345,8 @@ supportedAbis[3]:       27:armeabi
 supportedAbis[4]:       27:armeabi-v7a
 supportedAbis[5]:       28:armeabi
 supportedAbis[6]:       28:armeabi-v7a
+supportedAbis[7]:       29:armeabi
+supportedAbis[8]:       29:armeabi-v7a
 supportedVersionIds[0]: 26
 supportedVersionIds[1]: 27
 supportedVersionIds[2]: 28`
