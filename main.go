@@ -206,6 +206,13 @@ func (configs ConfigsModel) validate() error {
 		}
 	}
 
+	if tout, err := strconv.Atoi(configs.TestTimeout); err != nil {
+		log.Warnf("Issue with TestTimeout: could not parse integer value from %s, this might cause error later on.")
+	} else if tout > 2700 {
+		log.Warnf("Issue with TestTimeout: %s is greater than available maximum. 2700 will be used instead.")
+		configs.TestTimeout = "2700"
+	}
+
 	return nil
 }
 
