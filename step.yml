@@ -234,9 +234,9 @@ inputs:
       category: "Debug"
       title: "Test timeout"
       summary: |
-        The max time this test execution can run before it is cancelled. It does not include any time necessary to prepare and clean up the target device. The maximum possible testing time is 2700 seconds.
+        The max time this test execution can run before it is cancelled. It does not include any time necessary to prepare and clean up the target device. The maximum possible testing time is 1800 seconds.
       description: |
-        The max time this test execution can run before it is cancelled. It does not include any time necessary to prepare and clean up the target device. The maximum possible testing time is 2700 seconds.
+        The max time this test execution can run before it is cancelled. It does not include any time necessary to prepare and clean up the target device. The maximum possible testing time is 1800 seconds.
   - directories_to_pull:
     opts:
       category: "Debug"
