@@ -26,6 +26,10 @@ import (
 	"github.com/bitrise-tools/go-steputils/tools"
 )
 
+const (
+	maxTimeout = 2700
+)
+
 // ConfigsModel ...
 type ConfigsModel struct {
 	// api
@@ -209,9 +213,9 @@ func (configs ConfigsModel) validate() error {
 	if tout, err := strconv.Atoi(configs.TestTimeout); err != nil {
 		// not returning, because TestLab API accepts non-integers too: https://firebase.google.com/docs/test-lab/reference/testing/rest/v1/projects.testMatrices#testspecification
 		log.Warnf("Issue with TestTimeout: could not parse integer value from %s: %s, this might cause error later on.", configs.TestTimeout, err)
-	} else if tout > 2700 {
-		log.Warnf("Issue with TestTimeout: %s is greater than available maximum. 2700 will be used instead.", configs.TestTimeout)
-		configs.TestTimeout = "2700"
+	} else if tout > maxTimeout {
+		log.Warnf("Issue with TestTimeout: %s is greater than available maximum. %d will be used instead.", configs.TestTimeout, maxTimeout)
+		configs.TestTimeout = strconv.Itoa(maxTimeout)
 	}
 
 	return nil
