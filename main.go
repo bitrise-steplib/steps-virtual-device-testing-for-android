@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -28,6 +29,7 @@ import (
 
 const (
 	maxTimeout = 1800
+	timeoutPattern = `^\d+$|^\d+\.\d{1,9}$` // see: https://firebase.google.com/docs/test-lab/reference/testing/rest/v1/projects.testMatrices#testspecification
 )
 
 // ConfigsModel ...
@@ -107,6 +109,16 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		LoopScenarios:      os.Getenv("loop_scenarios"),
 		LoopScenarioLabels: os.Getenv("loop_scenario_labels"),
 	}
+}
+
+func validateTimeout(duration string) error {
+	if match, err := regexp.MatchString(timeoutPattern, duration); err != nil {
+		return err
+	} else if !match {
+		return fmt.Errorf("%s does not match pattern %s", duration, timeoutPattern)
+	}
+
+	return nil
 }
 
 func (configs ConfigsModel) print() {
@@ -210,12 +222,8 @@ func (configs ConfigsModel) validate() error {
 		}
 	}
 
-	if tout, err := strconv.Atoi(configs.TestTimeout); err != nil {
-		// not returning, because TestLab API accepts non-integers too: https://firebase.google.com/docs/test-lab/reference/testing/rest/v1/projects.testMatrices#testspecification
-		log.Warnf("Issue with TestTimeout: could not parse integer value from %s: %s, this might cause error later on.", configs.TestTimeout, err)
-	} else if tout > maxTimeout {
-		log.Warnf("Issue with TestTimeout: %s is greater than available maximum. %d will be used instead.", configs.TestTimeout, maxTimeout)
-		configs.TestTimeout = strconv.Itoa(maxTimeout)
+	if err := validateTimeout(configs.TestTimeout); err != nil {
+		return fmt.Errorf("Issue with TestTimeout: %s", err)
 	}
 
 	return nil
@@ -239,6 +247,12 @@ func main() {
 	fmt.Println()
 
 	successful := true
+
+	if val, err := strconv.ParseFloat(configs.TestTimeout, 64); err != nil {
+
+	} else if val > float64(maxTimeout) {
+		log.Warnf("%f is greater than available maximum (%f). %f will be used instead.", val, maxTimeout, maxTimeout)
+	}
 
 	log.Infof("Upload APKs")
 	{
