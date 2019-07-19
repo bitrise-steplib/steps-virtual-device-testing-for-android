@@ -248,12 +248,6 @@ func main() {
 
 	successful := true
 
-	if val, err := strconv.ParseFloat(configs.TestTimeout, 64); err != nil {
-
-	} else if val > float64(maxTimeout) {
-		log.Warnf("%f is greater than available maximum (%f). %f will be used instead.", val, maxTimeout, maxTimeout)
-	}
-
 	log.Infof("Upload APKs")
 	{
 		url := configs.APIBaseURL + "/assets/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
@@ -367,6 +361,14 @@ func main() {
 			envValue := strings.Join(envStrSplit[1:], "=")
 
 			envs = append(envs, &testing.EnvironmentVariable{Key: envKey, Value: envValue})
+		}
+
+		timeout := configs.TestTimeout
+		if val, err := strconv.ParseFloat(timeout, 64); err != nil {
+			failf("could not parse float from timeout value (%s): %s", timeout, err)
+		} else if val > float64(maxTimeout) {
+			log.Warnf("timeout value (%f) is greater than available maximum (%f). Maximum will be used instead.", val, maxTimeout)
+			timeout = strconv.Itoa(maxTimeout)
 		}
 
 		testModel.TestSpecification = &testing.TestSpecification{
