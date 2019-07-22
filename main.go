@@ -372,7 +372,7 @@ func main() {
 		}
 
 		testModel.TestSpecification = &testing.TestSpecification{
-			TestTimeout: fmt.Sprintf("%ss", configs.TestTimeout),
+			TestTimeout: fmt.Sprintf("%ss", timeout),
 			TestSetup: &testing.TestSetup{
 				EnvironmentVariables: envs,
 				DirectoriesToPull:    directoriesToPull,
