@@ -121,6 +121,11 @@ func validateTimeout(duration string) error {
 	return nil
 }
 
+func normalize(configs ConfigsModel) ConfigsModel {
+	configs.TestTimeout = strings.TrimSuffix(configs.TestTimeout, "s")
+	return configs
+}
+
 func (configs ConfigsModel) print() {
 	log.Infof("Configs:")
 	log.Printf("- ApkPath: %s", configs.ApkPath)
@@ -243,6 +248,8 @@ func main() {
 	if err := configs.validate(); err != nil {
 		failf("%s", err)
 	}
+
+	configs = normalize(configs)
 
 	fmt.Println()
 
