@@ -28,7 +28,7 @@ import (
 )
 
 const (
-	maxTimeout = 1800
+	maxTimeoutSeconds = 1800
 	timeoutPattern = `^\d+$|^\d+\.\d{1,9}$` // see: https://firebase.google.com/docs/test-lab/reference/testing/rest/v1/projects.testMatrices#testspecification
 )
 
@@ -109,16 +109,6 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		LoopScenarios:      os.Getenv("loop_scenarios"),
 		LoopScenarioLabels: os.Getenv("loop_scenario_labels"),
 	}
-}
-
-func validateTimeout(duration string) error {
-	if match, err := regexp.MatchString(timeoutPattern, duration); err != nil {
-		return err
-	} else if !match {
-		return fmt.Errorf("%s does not match pattern %s", duration, timeoutPattern)
-	}
-
-	return nil
 }
 
 func normalize(configs ConfigsModel) ConfigsModel {
@@ -227,8 +217,10 @@ func (configs ConfigsModel) validate() error {
 		}
 	}
 
-	if err := validateTimeout(configs.TestTimeout); err != nil {
-		return fmt.Errorf("Issue with TestTimeout: %s", err)
+	if match, err := regexp.MatchString(timeoutPattern, configs.TestTimeout); err != nil {
+		return err
+	} else if !match {
+		return fmt.Errorf("Issue with TestTimeout: %s does not match pattern %s", configs.TestTimeout, timeoutPattern)
 	}
 
 	return nil
@@ -373,9 +365,9 @@ func main() {
 		timeout := configs.TestTimeout
 		if val, err := strconv.ParseFloat(timeout, 64); err != nil {
 			failf("could not parse float from timeout value (%s): %s", timeout, err)
-		} else if val > float64(maxTimeout) {
-			log.Warnf("timeout value (%f) is greater than available maximum (%f). Maximum will be used instead.", val, maxTimeout)
-			timeout = strconv.Itoa(maxTimeout)
+		} else if val > float64(maxTimeoutSeconds) {
+			log.Warnf("timeout value (%f) is greater than available maximum (%f). Maximum will be used instead.", val, maxTimeoutSeconds)
+			timeout = strconv.Itoa(maxTimeoutSeconds)
 		}
 
 		testModel.TestSpecification = &testing.TestSpecification{
