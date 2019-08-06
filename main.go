@@ -111,6 +111,16 @@ func createConfigsModelFromEnvs() ConfigsModel {
 	}
 }
 
+func validateTestTimeoutFormat(testTimeout string) error {
+	if match, err := regexp.MatchString(timeoutPattern, testTimeout); err != nil {
+		return err
+	} else if !match {
+		return fmt.Errorf("%s does not match pattern %s", testTimeout, timeoutPattern)
+	}
+
+	return nil
+}
+
 func normalize(configs ConfigsModel) ConfigsModel {
 	configs.TestTimeout = strings.TrimSuffix(configs.TestTimeout, "s")
 	return configs
@@ -217,10 +227,8 @@ func (configs ConfigsModel) validate() error {
 		}
 	}
 
-	if match, err := regexp.MatchString(timeoutPattern, configs.TestTimeout); err != nil {
-		return err
-	} else if !match {
-		return fmt.Errorf("Issue with TestTimeout: %s does not match pattern %s", configs.TestTimeout, timeoutPattern)
+	if err := validateTestTimeoutFormat(configs.TestTimeout); err != nil {
+		return fmt.Errorf("Issue with TestTimeout: %s", err)
 	}
 
 	return nil
