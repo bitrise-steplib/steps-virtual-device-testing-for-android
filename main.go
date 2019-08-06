@@ -29,7 +29,7 @@ import (
 
 const (
 	maxTimeoutSeconds = 1800
-	timeoutPattern = `^\d+$|^\d+\.\d{1,9}$` // see: https://firebase.google.com/docs/test-lab/reference/testing/rest/v1/projects.testMatrices#testspecification
+	timeoutPattern = `^\d+s?$|^\d+\.\d{1,9}s?$` // see: https://firebase.google.com/docs/test-lab/reference/testing/rest/v1/projects.testMatrices#testspecification
 )
 
 // ConfigsModel ...
