@@ -234,9 +234,9 @@ inputs:
       category: "Debug"
       title: "Test timeout"
       summary: |
-        Max time a test execution is allowed to run before it is automatically canceled. The default value is 15 min.  Duration in seconds with up to nine fractional digits. Example: "3.5".
+        Max time a test execution is allowed to run before it is automatically canceled. The default value is 900 (15 min).  Duration in seconds with up to nine fractional digits. Example: "3.5".
       description: |
-        Max time a test execution is allowed to run before it is automatically canceled. The default value is 15 min.  Duration in seconds with up to nine fractional digits. Example: "3.5".
+        Max time a test execution is allowed to run before it is automatically canceled. The default value is 900 (15 min).  Duration in seconds with up to nine fractional digits. Example: "3.5".
   - directories_to_pull:
     opts:
       category: "Debug"
