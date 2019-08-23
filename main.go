@@ -48,12 +48,16 @@ type ConfigsModel struct {
 	DownloadTestResults  string
 	DirectoriesToPull    string
 	EnvironmentVariables string
+	FlakyTestAttempts    string
+	ObbFilesList         string
+	AutoGoogleLogin      string
 
 	// instrumentation
 	InstTestPackageID   string
 	InstTestRunnerClass string
 	InstTestTargets     string
 	UseOrchestrator     string
+	RoboScenarioFile    string
 
 	// robo
 	RoboInitialActivity string
@@ -62,8 +66,9 @@ type ConfigsModel struct {
 	RoboDirectives      string
 
 	// loop
-	LoopScenarios      string
-	LoopScenarioLabels string
+	LoopScenarios       string
+	LoopScenarioLabels  string
+	LoopScenarioNumbers string
 }
 
 // UploadURLRequest ...
@@ -81,15 +86,20 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		APIToken:   os.Getenv("api_token"),
 
 		// shared
-		ApkPath:              os.Getenv("apk_path"),
-		TestApkPath:          os.Getenv("test_apk_path"),
-		TestType:             os.Getenv("test_type"),
-		TestDevices:          os.Getenv("test_devices"),
-		AppPackageID:         os.Getenv("app_package_id"),
+		ApkPath:      os.Getenv("apk_path"),
+		TestApkPath:  os.Getenv("test_apk_path"),
+		TestType:     os.Getenv("test_type"),
+		TestDevices:  os.Getenv("test_devices"),
+		AppPackageID: os.Getenv("app_package_id"),
+
+		// shared debug
 		TestTimeout:          os.Getenv("test_timeout"),
 		DownloadTestResults:  os.Getenv("download_test_results"),
 		DirectoriesToPull:    os.Getenv("directories_to_pull"),
 		EnvironmentVariables: os.Getenv("environment_variables"),
+		FlakyTestAttempts:    os.Getenv("num_flaky_test_attempts"),
+		ObbFilesList:         os.Getenv("obb_files_list"),
+		AutoGoogleLogin:      os.Getenv("auto_google_login"),
 
 		// instrumentation
 		InstTestPackageID:   os.Getenv("inst_test_package_id"),
@@ -102,10 +112,12 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		RoboMaxDepth:        os.Getenv("robo_max_depth"),
 		RoboMaxSteps:        os.Getenv("robo_max_steps"),
 		RoboDirectives:      os.Getenv("robo_directives"),
+		RoboScenarioFile:    os.Getenv("robo_scenario_file"),
 
 		// loop
-		LoopScenarios:      os.Getenv("loop_scenarios"),
-		LoopScenarioLabels: os.Getenv("loop_scenario_labels"),
+		LoopScenarios:       os.Getenv("loop_scenarios"),
+		LoopScenarioLabels:  os.Getenv("loop_scenario_labels"),
+		LoopScenarioNumbers: os.Getenv("loop_scenario_numbers"),
 	}
 }
 
@@ -114,6 +126,8 @@ func (configs ConfigsModel) print() {
 	log.Printf("- ApkPath: %s", configs.ApkPath)
 
 	log.Printf("- TestTimeout: %s", configs.TestTimeout)
+	log.Printf("- FlakyTestAttempts: %s", configs.FlakyTestAttempts)
+	log.Printf("- DownloadTestResults: %s", configs.DownloadTestResults)
 	log.Printf("- DirectoriesToPull: %s", configs.DirectoriesToPull)
 	log.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariables)
 	log.Printf("- TestDevices:\n---")
@@ -144,8 +158,9 @@ func (configs ConfigsModel) print() {
 	}
 	log.Printf("---")
 	log.Printf("- AppPackageID: %s", configs.AppPackageID)
-	log.Printf("- TestType: %s", configs.TestType)
+	log.Printf("- AutoGoogleLogin: %s", configs.AutoGoogleLogin)
 
+	log.Printf("- TestType: %s", configs.TestType)
 	// instruments
 	if configs.TestType == "instrumentation" {
 		log.Printf("- TestApkPath: %s", configs.TestApkPath)
@@ -158,15 +173,17 @@ func (configs ConfigsModel) print() {
 	//robo
 	if configs.TestType == "robo" {
 		log.Printf("- RoboInitialActivity: %s", configs.RoboInitialActivity)
+		log.Printf("- RoboScenarioFile: %s", configs.RoboScenarioFile)
+		log.Printf("- RoboDirectives: %s", configs.RoboDirectives)
 		log.Printf("- RoboMaxDepth: %s", configs.RoboMaxDepth)
 		log.Printf("- RoboMaxSteps: %s", configs.RoboMaxSteps)
-		log.Printf("- RoboDirectives: %s", configs.RoboDirectives)
 	}
 
 	if configs.TestType == "gameloop" {
 		// loop
 		log.Printf("- LoopScenarios: %s", configs.LoopScenarios)
 		log.Printf("- LoopScenarioLabels: %s", configs.LoopScenarioLabels)
+		log.Printf("- LoopScenarioNumbers: %s", configs.LoopScenarioNumbers)
 	}
 }
 
