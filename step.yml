@@ -37,7 +37,6 @@ inputs:
       description: |
         The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
       is_required: true
-  - 
   - test_devices: "NexusLowRes,24,en,portrait"
     opts:
       title: "Test devices"

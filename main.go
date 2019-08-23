@@ -235,6 +235,30 @@ func failf(f string, v ...interface{}) {
 	os.Exit(1)
 }
 
+// TestAssetRequestAndroid describes needed Android test asset upload URLs
+type TestAssetRequestAndroid struct {
+	Apk        bool `json:"apk,omitempty"`
+	Aab        bool `json:"aab,omitmepty"`
+	TestApk    bool `json:"testApk,omitempty"`
+	RoboScript bool `json:"roboScript,omitempty"`
+	ObbFiles   int  `json:"obbFiles,omitempty"`
+}
+
+// TestAsset describes a requested test asset
+type TestAsset struct {
+	UploadURL string `json:"uploadUrl"`
+	GcsPath   string `json:"gcsPath"`
+}
+
+// TestAssetsAndroid contains Android test asset upload URLs
+type TestAssetsAndroid struct {
+	Apk        TestAsset   `json:"apk,omitempty"`
+	Aab        TestAsset   `json:"aab,omitmepty"`
+	TestApk    TestAsset   `json:"testApk,omitempty"`
+	RoboScript TestAsset   `json:"roboScript,omitempty"`
+	ObbFiles   []TestAsset `json:"obbFiles,omitempty"`
+}
+
 func main() {
 	configs := createConfigsModelFromEnvs()
 
@@ -250,10 +274,21 @@ func main() {
 	successful := true
 
 	log.Infof("Upload APKs")
+	var testAssets TestAssetsAndroid
 	{
-		url := configs.APIBaseURL + "/assets/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
+		url := configs.APIBaseURL + "/assets_android/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
-		req, err := http.NewRequest("POST", url, nil)
+		requestData := TestAssetRequestAndroid{
+			Apk:     true,
+			TestApk: true,
+		}
+
+		data, err := json.Marshal(requestData)
+		if err != nil {
+			failf("Failed to encode to json: %s", requestData)
+		}
+
+		req, err := http.NewRequest("POST", url, bytes.NewReader(data))
 		if err != nil {
 			failf("Failed to create http request, error: %s", err)
 		}
@@ -277,22 +312,20 @@ func main() {
 			failf("Failed to read response body, error: %s", err)
 		}
 
-		responseModel := &UploadURLRequest{}
-
-		err = json.Unmarshal(body, responseModel)
+		err = json.Unmarshal(body, &testAssets)
 		if err != nil {
 			failf("Failed to unmarshal response body, error: %s", err)
 		}
 
-		err = uploadFile(responseModel.AppURL, configs.ApkPath)
+		err = uploadFile(testAssets.Apk.UploadURL, configs.ApkPath)
 		if err != nil {
-			failf("Failed to upload file(%s) to (%s), error: %s", configs.ApkPath, responseModel.AppURL, err)
+			failf("Failed to upload file(%s) to (%s), error: %s", configs.ApkPath, testAssets.Apk.UploadURL, err)
 		}
 
 		if configs.TestType == "instrumentation" {
-			err = uploadFile(responseModel.TestAppURL, configs.TestApkPath)
+			err = uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath)
 			if err != nil {
-				failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, responseModel.TestAppURL, err)
+				failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, testAssets.Apk.UploadURL, err)
 			}
 		}
 
@@ -383,6 +416,9 @@ func main() {
 		switch configs.TestType {
 		case "instrumentation":
 			testModel.TestSpecification.AndroidInstrumentationTest = &testing.AndroidInstrumentationTest{}
+
+			testModel.TestSpecification.AndroidInstrumentationTest.AppApk = &testing.FileReference{GcsPath: testAssets.Apk.GcsPath}
+			testModel.TestSpecification.AndroidInstrumentationTest.TestApk = &testing.FileReference{GcsPath: testAssets.TestApk.GcsPath}
 			if configs.AppPackageID != "" {
 				testModel.TestSpecification.AndroidInstrumentationTest.AppPackageId = configs.AppPackageID
 			}
@@ -403,6 +439,7 @@ func main() {
 			}
 		case "robo":
 			testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
+			testModel.TestSpecification.AndroidRoboTest.AppApk = &testing.FileReference{GcsPath: testAssets.Apk.GcsPath}
 			if configs.AppPackageID != "" {
 				testModel.TestSpecification.AndroidRoboTest.AppPackageId = configs.AppPackageID
 			}
@@ -443,6 +480,7 @@ func main() {
 			}
 		case "gameloop":
 			testModel.TestSpecification.AndroidTestLoop = &testing.AndroidTestLoop{}
+			testModel.TestSpecification.AndroidTestLoop.AppApk = &testing.FileReference{GcsPath: testAssets.Apk.GcsPath}
 			if configs.AppPackageID != "" {
 				testModel.TestSpecification.AndroidTestLoop.AppPackageId = configs.AppPackageID
 			}
