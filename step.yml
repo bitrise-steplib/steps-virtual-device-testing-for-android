@@ -369,7 +369,7 @@ inputs:
       title: "Verbose log"
       summary: |
         If set to `true` will enable verbose level logging.
-     is_required: true
+      is_required: true
       value_options:
         - "false"
         - "true"
