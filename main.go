@@ -71,12 +71,6 @@ type ConfigsModel struct {
 	LoopScenarioNumbers string
 }
 
-// UploadURLRequest ...
-type UploadURLRequest struct {
-	AppURL     string `json:"appUrl"`
-	TestAppURL string `json:"testAppUrl"`
-}
-
 func createConfigsModelFromEnvs() ConfigsModel {
 	return ConfigsModel{
 		// api
@@ -364,6 +358,14 @@ func main() {
 			testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices = append(testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices, &newDevice)
 		}
 
+		testAttempts, err := strconv.ParseInt(configs.FlakyTestAttempts, 10, 64)
+		if err != nil {
+			failf("Invalid input 'Number of times a test execution is reattempted': failed to parse int from value (%s), error: %s", configs.FlakyTestAttempts, err)
+		} else if testAttempts < 0 || testAttempts > 10 {
+			failf("Invalid input 'Number of times a test execution is reattempted': has to be between 0 and 10, provided %s", configs.FlakyTestAttempts)
+		}
+		testModel.FlakyTestAttempts = testAttempts
+
 		// parse directories to pull
 		scanner = bufio.NewScanner(strings.NewReader(configs.DirectoriesToPull))
 		directoriesToPull := []string{}
@@ -405,11 +407,20 @@ func main() {
 			timeout = strconv.Itoa(maxTimeoutSeconds)
 		}
 
+		// a nil account does not log in to test Google account before test is stared
+		var account *testing.Account
+		if configs.AutoGoogleLogin == "true" {
+			account = &testing.Account{
+				GoogleAuto: &testing.GoogleAuto{},
+			}
+		}
+
 		testModel.TestSpecification = &testing.TestSpecification{
 			TestTimeout: fmt.Sprintf("%ss", timeout),
 			TestSetup: &testing.TestSetup{
 				EnvironmentVariables: envs,
 				DirectoriesToPull:    directoriesToPull,
+				Account:              account,
 			},
 		}
 

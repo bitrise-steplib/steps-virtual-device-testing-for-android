@@ -277,7 +277,7 @@ inputs:
         The maximum number of reruns allowed is 10. (Default: 0, which implies no reruns.)
   - obb_files_list: ""
     opts:
-      category: "Debug"
+      category: "Test setup"
       title: "OBB files"
       summary: "Upload OBB files before tests will run"
       description: |
@@ -291,14 +291,14 @@ inputs:
         main.0300110.com.example.android.obb
         patch.0300110.com.example.android.obb
         ```
-  - auto_google_login: "true"
+  - auto_google_login: "false"
     opts:
-      category: "Debug"
+      category: "Test setup"
       title: "Add preconfigured Google account"
       summary: "Add preconfigured Google account before tests will run"
       description: |-
         Automatically log into the test device using a preconfigured Google
-        account before beginning the test. Enabled by default.
+        account before beginning the test.
       is_required: true
       value_options:
       - "false"
@@ -331,7 +331,7 @@ inputs:
         If `download_test_results` input is set to `false` then these files will be available on the dashboard only. To have them downloaded set that input to `true` as well.
   - environment_variables:
     opts:
-      category: "Debug"
+      category: "Test setup"
       title: Environment Variables
       summary: |
         One variable per line, key and value seperated by `=`
