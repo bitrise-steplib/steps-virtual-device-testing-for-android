@@ -231,23 +231,6 @@ inputs:
     opts:
       category: "Game Loop Test"
       title: "Loop scenarios"
-  - loop_scenario_labels:
-    opts:
-      category: "Game Loop Test"
-      title: "Loop scenario labels"
-      description: |
-        A list of game-loop scenario labels (default: None). Each game-loop
-        scenario may be labeled in the APK manifest file with one or more
-        arbitrary strings, creating logical groupings (e.g.
-        GPU_COMPATIBILITY_TESTS). If --scenario-numbers and --scenario-labels
-        are specified together, Firebase Test Lab will first execute each
-        scenario from --scenario-numbers. It will then expand each given
-        scenario label into a list of scenario numbers marked with that label,
-        and execute those scenarios.
-  - loop_scenario_numbers:
-    opts:
-      category: "Game Loop Test"
-      title: "Loop scenario numbers"
       description: |
         A list of game-loop scenario numbers which will be run as part of the test (default: all scenarios).
         A maximum of 1024 scenarios may be specified in one test matrix.
@@ -257,6 +240,13 @@ inputs:
         ```
         1,2
         ```
+  - loop_scenario_labels:
+    opts:
+      category: "Game Loop Test"
+      title: "Loop scenario labels"
+      description: |
+        A list of game-loop scenario labels (default: None).
+        Each game-loop scenario may be labeled in the APK manifest file with one or more arbitrary strings, creating logical groupings (e.g. GPU_COMPATIBILITY_TESTS).
   - test_timeout: 900
     opts:
       category: "Debug"

@@ -197,6 +197,9 @@ func (configs ConfigsModel) validate() error {
 	if err := input.ValidateIfNotEmpty(configs.AppSlug); err != nil {
 		return fmt.Errorf("Issue with AppSlug: %s", err)
 	}
+	if err := input.ValidateWithOptions(configs.AutoGoogleLogin, "false", "true"); err != nil {
+		return fmt.Errorf("Issue with AutoGoogleLogin: %s", err)
+	}
 	if err := input.ValidateIfNotEmpty(configs.TestType); err != nil {
 		return fmt.Errorf("Issue with TestType: %s", err)
 	}
@@ -218,6 +221,13 @@ func (configs ConfigsModel) validate() error {
 		}
 		if err := input.ValidateIfPathExists(configs.TestApkPath); err != nil {
 			return fmt.Errorf("Issue with TestApkPath: %s. Is it possible that you used gradle-runner step and forgot to set `assembleDebugAndroidTest` task?", err)
+		}
+	}
+
+	configs.RoboScenarioFile = strings.TrimSpace(configs.RoboScenarioFile)
+	if configs.TestType == "robo" && configs.RoboScenarioFile != "" {
+		if err := input.ValidateIfPathExists(configs.RoboScenarioFile); err != nil {
+			return fmt.Errorf("Issue with RoboScenarioFile: %s", err)
 		}
 	}
 
@@ -267,14 +277,30 @@ func main() {
 
 	successful := true
 
+	var obbFiles []string
+	files := strings.Split(configs.ObbFilesList, "\n")
+	for _, file := range files {
+		file = strings.TrimSpace(file)
+		if file == "" {
+			continue
+		}
+		if _, err := os.Stat(file); err != nil {
+			failf("Could not get file info for obb file (%s), error: %s", file, err)
+		}
+
+		obbFiles = append(obbFiles, file)
+	}
+
 	log.Infof("Upload APKs")
 	var testAssets TestAssetsAndroid
 	{
 		url := configs.APIBaseURL + "/assets_android/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
 		requestData := TestAssetRequestAndroid{
-			Apk:     true,
-			TestApk: true,
+			Apk:        true,
+			TestApk:    true,
+			RoboScript: configs.TestType == "robo" && configs.RoboScenarioFile != "",
+			ObbFiles:   len(obbFiles),
 		}
 
 		data, err := json.Marshal(requestData)
@@ -320,6 +346,15 @@ func main() {
 			err = uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath)
 			if err != nil {
 				failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, testAssets.Apk.UploadURL, err)
+			}
+		}
+
+		if len(testAssets.ObbFiles) != len(obbFiles) {
+			failf("Invalid length of obb file upload URLs in response: %+v", testAssets)
+		}
+		for i, obbFile := range obbFiles {
+			if err := uploadFile(testAssets.ObbFiles[i].UploadURL, obbFile); err != nil {
+				failf("Failed to upload obb file (%s) to (%s), error: %s", obbFile, testAssets.ObbFiles[i].UploadURL, err)
 			}
 		}
 
@@ -399,6 +434,19 @@ func main() {
 			envs = append(envs, &testing.EnvironmentVariable{Key: envKey, Value: envValue})
 		}
 
+		// obb files to upload
+		var filesToPush []*testing.DeviceFile
+		for i, obbFile := range testAssets.ObbFiles {
+			filesToPush = append(filesToPush, &testing.DeviceFile{
+				ObbFile: &testing.ObbFile{
+					Obb: &testing.FileReference{
+						GcsPath: obbFile.GcsPath,
+					},
+					ObbFileName: filepath.Base(obbFiles[i]),
+				},
+			})
+		}
+
 		timeout := configs.TestTimeout
 		if val, err := strconv.ParseFloat(timeout, 64); err != nil {
 			failf("could not parse float from timeout value (%s): %s", timeout, err)
@@ -419,6 +467,7 @@ func main() {
 			TestTimeout: fmt.Sprintf("%ss", timeout),
 			TestSetup: &testing.TestSetup{
 				EnvironmentVariables: envs,
+				FilesToPush:          filesToPush,
 				DirectoriesToPull:    directoriesToPull,
 				Account:              account,
 			},
@@ -488,6 +537,11 @@ func main() {
 					roboDirectives = append(roboDirectives, &testing.RoboDirective{ResourceName: directiveParams[0], InputText: directiveParams[1], ActionType: directiveParams[2]})
 				}
 				testModel.TestSpecification.AndroidRoboTest.RoboDirectives = roboDirectives
+			}
+			if configs.RoboScenarioFile != "" {
+				testModel.TestSpecification.AndroidRoboTest.RoboScript = &testing.FileReference{
+					GcsPath: testAssets.RoboScript.GcsPath,
+				}
 			}
 		case "gameloop":
 			testModel.TestSpecification.AndroidTestLoop = &testing.AndroidTestLoop{}
