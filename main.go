@@ -289,6 +289,12 @@ func main() {
 		log.Warnf("'Apk path' (%s) is specified, overrides App path (%s)", configs.ApkPath, configs.AppPath)
 		configs.AppPath = configs.ApkPath
 	}
+	if configs.AppPackageID != "" {
+		log.Warnf("'App package ID' (app_package_id) input is deprecated. Leave empty to automatically extract it from the App manifest")
+	}
+	if configs.FlakyTestAttempts != "" {
+		log.Warnf("'Test package ID' (inst_test_package_id) input is deprecatad. Leave empty to automatically extract it from the App manifest")
+	}
 
 	fmt.Println()
 
