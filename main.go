@@ -39,7 +39,7 @@ type ConfigsModel struct {
 	APIToken   string
 
 	// shared
-	ApkPath              string
+	AppPath              string
 	TestApkPath          string
 	TestType             string
 	TestDevices          string
@@ -69,6 +69,9 @@ type ConfigsModel struct {
 	LoopScenarios       string
 	LoopScenarioLabels  string
 	LoopScenarioNumbers string
+
+	// deprecated
+	ApkPath string
 }
 
 func createConfigsModelFromEnvs() ConfigsModel {
@@ -80,7 +83,7 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		APIToken:   os.Getenv("api_token"),
 
 		// shared
-		ApkPath:      os.Getenv("apk_path"),
+		AppPath:      os.Getenv("app_path"),
 		TestApkPath:  os.Getenv("test_apk_path"),
 		TestType:     os.Getenv("test_type"),
 		TestDevices:  os.Getenv("test_devices"),
@@ -112,13 +115,18 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		LoopScenarios:       os.Getenv("loop_scenarios"),
 		LoopScenarioLabels:  os.Getenv("loop_scenario_labels"),
 		LoopScenarioNumbers: os.Getenv("loop_scenario_numbers"),
+
+		// deprected
+		ApkPath: os.Getenv("apk_path"),
 	}
 }
 
 func (configs ConfigsModel) print() {
 	log.Infof("Configs:")
-	log.Printf("- ApkPath: %s", configs.ApkPath)
-
+	log.Printf("- AppPath: %s", configs.AppPath)
+	if configs.ApkPath != "" {
+		log.Printf("- ApkPath: %s", configs.ApkPath)
+	}
 	log.Printf("- TestTimeout: %s", configs.TestTimeout)
 	log.Printf("- FlakyTestAttempts: %s", configs.FlakyTestAttempts)
 	log.Printf("- DownloadTestResults: %s", configs.DownloadTestResults)
@@ -209,10 +217,13 @@ func (configs ConfigsModel) validate() error {
 	if err := input.ValidateWithOptions(configs.UseOrchestrator, "false", "true"); err != nil {
 		return fmt.Errorf("Issue with UseOrchestrator: %s", err)
 	}
-	if err := input.ValidateIfNotEmpty(configs.ApkPath); err != nil {
+	if configs.ApkPath != "" {
+		configs.AppPath = configs.ApkPath
+	}
+	if err := input.ValidateIfNotEmpty(configs.AppPath); err != nil {
 		return fmt.Errorf("Issue with ApkPath: %s", err)
 	}
-	if err := input.ValidateIfPathExists(configs.ApkPath); err != nil {
+	if err := input.ValidateIfPathExists(configs.AppPath); err != nil {
 		return fmt.Errorf("Issue with ApkPath: %s", err)
 	}
 	if configs.TestType == "instrumentation" {
@@ -269,9 +280,21 @@ func main() {
 	fmt.Println()
 	configs.print()
 
+	log.Infof("AAB %s", configs.AppPath)
+	log.Infof("APK %s", configs.ApkPath)
+
 	if err := configs.validate(); err != nil {
 		failf("%s", err)
 	}
+
+	if configs.ApkPath != "" {
+		log.Warnf("'Apk path' (apk_path) input is deprected, use 'App path' (app_path) instead.")
+		log.Warnf("'Apk path' (apk_path) is specified, overrides App path (%s)", configs.AppPath)
+		configs.AppPath = configs.ApkPath
+	}
+
+	log.Infof("AAB %s", configs.AppPath)
+	log.Infof("APK %s", configs.ApkPath)
 
 	fmt.Println()
 
@@ -291,13 +314,20 @@ func main() {
 		obbFiles = append(obbFiles, file)
 	}
 
-	log.Infof("Upload APKs")
+	var isBundle bool
+	log.Infof("Uploading app and test files")
 	var testAssets TestAssetsAndroid
+	var testApp TestAsset
 	{
 		url := configs.APIBaseURL + "/assets_android/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
+		if strings.ToLower(filepath.Ext(configs.AppPath)) == ".aab" {
+			isBundle = true
+		}
+
 		requestData := TestAssetRequestAndroid{
-			Apk:        true,
+			Aab:        isBundle,
+			Apk:        !isBundle,
 			TestApk:    true,
 			RoboScript: configs.TestType == "robo" && configs.RoboScenarioFile != "",
 			ObbFiles:   len(obbFiles),
@@ -337,9 +367,18 @@ func main() {
 			failf("Failed to unmarshal response body, error: %s", err)
 		}
 
-		err = uploadFile(testAssets.Apk.UploadURL, configs.ApkPath)
+		log.Infof("AAB %s | %s", configs.AppPath, testAssets.Aab.UploadURL)
+		log.Infof("APK %s | %s", configs.ApkPath, testAssets.Apk.UploadURL)
+
+		if isBundle {
+			testApp = testAssets.Aab
+		} else {
+			testApp = testAssets.Apk
+		}
+
+		err = uploadFile(testApp.UploadURL, configs.AppPath)
 		if err != nil {
-			failf("Failed to upload file(%s) to (%s), error: %s", configs.ApkPath, testAssets.Apk.UploadURL, err)
+			failf("Failed to upload file(%s) to (%s), error: %s", configs.AppPath, testApp.UploadURL, err)
 		}
 
 		if configs.TestType == "instrumentation" {
@@ -358,7 +397,7 @@ func main() {
 			}
 		}
 
-		log.Donef("=> APKs uploaded")
+		log.Donef("=> Files uploaded")
 	}
 
 	fmt.Println()
@@ -477,7 +516,14 @@ func main() {
 		case "instrumentation":
 			testModel.TestSpecification.AndroidInstrumentationTest = &testing.AndroidInstrumentationTest{}
 
-			testModel.TestSpecification.AndroidInstrumentationTest.AppApk = &testing.FileReference{GcsPath: testAssets.Apk.GcsPath}
+			if isBundle {
+				testModel.TestSpecification.AndroidInstrumentationTest.AppBundle = &testing.AppBundle{
+					BundleLocation: &testing.FileReference{GcsPath: testApp.GcsPath},
+				}
+			} else {
+				testModel.TestSpecification.AndroidInstrumentationTest.AppApk = &testing.FileReference{GcsPath: testApp.GcsPath}
+			}
+
 			testModel.TestSpecification.AndroidInstrumentationTest.TestApk = &testing.FileReference{GcsPath: testAssets.TestApk.GcsPath}
 			if configs.AppPackageID != "" {
 				testModel.TestSpecification.AndroidInstrumentationTest.AppPackageId = configs.AppPackageID
@@ -499,7 +545,15 @@ func main() {
 			}
 		case "robo":
 			testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
-			testModel.TestSpecification.AndroidRoboTest.AppApk = &testing.FileReference{GcsPath: testAssets.Apk.GcsPath}
+
+			if isBundle {
+				testModel.TestSpecification.AndroidRoboTest.AppBundle = &testing.AppBundle{
+					BundleLocation: &testing.FileReference{GcsPath: testApp.GcsPath},
+				}
+			} else {
+				testModel.TestSpecification.AndroidRoboTest.AppApk = &testing.FileReference{GcsPath: testApp.GcsPath}
+			}
+
 			if configs.AppPackageID != "" {
 				testModel.TestSpecification.AndroidRoboTest.AppPackageId = configs.AppPackageID
 			}
@@ -545,7 +599,15 @@ func main() {
 			}
 		case "gameloop":
 			testModel.TestSpecification.AndroidTestLoop = &testing.AndroidTestLoop{}
-			testModel.TestSpecification.AndroidTestLoop.AppApk = &testing.FileReference{GcsPath: testAssets.Apk.GcsPath}
+
+			if isBundle {
+				testModel.TestSpecification.AndroidTestLoop.AppBundle = &testing.AppBundle{
+					BundleLocation: &testing.FileReference{GcsPath: testApp.GcsPath},
+				}
+			} else {
+				testModel.TestSpecification.AndroidTestLoop.AppApk = &testing.FileReference{GcsPath: testApp.GcsPath}
+			}
+
 			if configs.AppPackageID != "" {
 				testModel.TestSpecification.AndroidTestLoop.AppPackageId = configs.AppPackageID
 			}
