@@ -39,11 +39,13 @@ type ConfigsModel struct {
 	APIToken   string
 
 	// shared
-	AppPath              string
-	TestApkPath          string
-	TestType             string
-	TestDevices          string
-	AppPackageID         string
+	AppPath      string
+	TestApkPath  string
+	TestType     string
+	TestDevices  string
+	AppPackageID string
+
+	// shared debug
 	TestTimeout          string
 	DownloadTestResults  string
 	DirectoriesToPull    string
@@ -51,6 +53,7 @@ type ConfigsModel struct {
 	FlakyTestAttempts    string
 	ObbFilesList         string
 	AutoGoogleLogin      string
+	VerboseLog           string
 
 	// instrumentation
 	InstTestPackageID   string
@@ -97,6 +100,7 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		FlakyTestAttempts:    os.Getenv("num_flaky_test_attempts"),
 		ObbFilesList:         os.Getenv("obb_files_list"),
 		AutoGoogleLogin:      os.Getenv("auto_google_login"),
+		VerboseLog:           os.Getenv("use_verbose_log"),
 
 		// instrumentation
 		InstTestPackageID:   os.Getenv("inst_test_package_id"),
@@ -217,6 +221,9 @@ func (configs ConfigsModel) validate() error {
 	if err := input.ValidateWithOptions(configs.UseOrchestrator, "false", "true"); err != nil {
 		return fmt.Errorf("Issue with UseOrchestrator: %s", err)
 	}
+	if err := input.ValidateWithOptions(configs.VerboseLog, "false", "true"); err != nil {
+		return fmt.Errorf("Issue with VerboseLog: %s", err)
+	}
 	if configs.ApkPath != "" {
 		configs.AppPath = configs.ApkPath
 	}
@@ -250,22 +257,14 @@ func failf(f string, v ...interface{}) {
 	os.Exit(1)
 }
 
-// TestAssetRequestAndroid describes needed Android test asset upload URLs
-type TestAssetRequestAndroid struct {
-	Apk        bool `json:"apk,omitempty"`
-	Aab        bool `json:"aab,omitmepty"`
-	TestApk    bool `json:"testApk,omitempty"`
-	RoboScript bool `json:"roboScript,omitempty"`
-	ObbFiles   int  `json:"obbFiles,omitempty"`
-}
-
 // TestAsset describes a requested test asset
 type TestAsset struct {
 	UploadURL string `json:"uploadUrl"`
 	GcsPath   string `json:"gcsPath"`
+	Filename  string `json:"filename"`
 }
 
-// TestAssetsAndroid contains Android test asset upload URLs
+// TestAssetsAndroid describes requested Android test asset and as the returned test asset upload URLs
 type TestAssetsAndroid struct {
 	Apk        TestAsset   `json:"apk,omitempty"`
 	Aab        TestAsset   `json:"aab,omitmepty"`
@@ -280,21 +279,16 @@ func main() {
 	fmt.Println()
 	configs.print()
 
-	log.Infof("AAB %s", configs.AppPath)
-	log.Infof("APK %s", configs.ApkPath)
-
 	if err := configs.validate(); err != nil {
 		failf("%s", err)
 	}
+	log.SetEnableDebugLog(configs.VerboseLog == "true")
 
 	if configs.ApkPath != "" {
 		log.Warnf("'Apk path' (apk_path) input is deprected, use 'App path' (app_path) instead.")
-		log.Warnf("'Apk path' (apk_path) is specified, overrides App path (%s)", configs.AppPath)
+		log.Warnf("'Apk path' (%s) is specified, overrides App path (%s)", configs.ApkPath, configs.AppPath)
 		configs.AppPath = configs.ApkPath
 	}
-
-	log.Infof("AAB %s", configs.AppPath)
-	log.Infof("APK %s", configs.ApkPath)
 
 	fmt.Println()
 
@@ -319,23 +313,44 @@ func main() {
 	var testAssets TestAssetsAndroid
 	var testApp TestAsset
 	{
-		url := configs.APIBaseURL + "/assets_android/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
+		url := configs.APIBaseURL + "/assets/android/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
 		if strings.ToLower(filepath.Ext(configs.AppPath)) == ".aab" {
 			isBundle = true
 		}
+		log.Debugf("App path (%s), is bundle: %b", configs.AppPath, isBundle)
 
-		requestData := TestAssetRequestAndroid{
-			Aab:        isBundle,
-			Apk:        !isBundle,
-			TestApk:    true,
-			RoboScript: configs.TestType == "robo" && configs.RoboScenarioFile != "",
-			ObbFiles:   len(obbFiles),
+		var requestedAssets TestAssetsAndroid
+		if isBundle {
+			requestedAssets.Aab = TestAsset{
+				Filename: filepath.Base(configs.AppPath),
+			}
+		} else {
+			requestedAssets.Apk = TestAsset{
+				Filename: filepath.Base(configs.AppPath),
+			}
+		}
+		if configs.TestType == "instrumentation" {
+			requestedAssets.TestApk = TestAsset{
+				Filename: filepath.Base(configs.TestApkPath),
+			}
+		}
+		if configs.TestType == "robo" && configs.RoboScenarioFile != "" {
+			requestedAssets.RoboScript = TestAsset{
+				Filename: filepath.Base(configs.RoboScenarioFile),
+			}
+		}
+		for _, obbFile := range obbFiles {
+			requestedAssets.ObbFiles = append(requestedAssets.ObbFiles, TestAsset{
+				Filename: filepath.Base(obbFile),
+			})
 		}
 
-		data, err := json.Marshal(requestData)
+		log.Debugf("Assets requested: %+v", requestedAssets)
+
+		data, err := json.Marshal(requestedAssets)
 		if err != nil {
-			failf("Failed to encode to json: %s", requestData)
+			failf("Failed to encode to json: %s", requestedAssets)
 		}
 
 		req, err := http.NewRequest("POST", url, bytes.NewReader(data))
@@ -367,14 +382,12 @@ func main() {
 			failf("Failed to unmarshal response body, error: %s", err)
 		}
 
-		log.Infof("AAB %s | %s", configs.AppPath, testAssets.Aab.UploadURL)
-		log.Infof("APK %s | %s", configs.ApkPath, testAssets.Apk.UploadURL)
-
 		if isBundle {
 			testApp = testAssets.Aab
 		} else {
 			testApp = testAssets.Apk
 		}
+		log.Debugf("Uploading file(%s) to (%s)", configs.AppPath, testApp.GcsPath)
 
 		err = uploadFile(testApp.UploadURL, configs.AppPath)
 		if err != nil {
@@ -384,7 +397,7 @@ func main() {
 		if configs.TestType == "instrumentation" {
 			err = uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath)
 			if err != nil {
-				failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, testAssets.Apk.UploadURL, err)
+				failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, testAssets.TestApk.UploadURL, err)
 			}
 		}
 
@@ -475,13 +488,13 @@ func main() {
 
 		// obb files to upload
 		var filesToPush []*testing.DeviceFile
-		for i, obbFile := range testAssets.ObbFiles {
+		for _, obbFile := range testAssets.ObbFiles {
 			filesToPush = append(filesToPush, &testing.DeviceFile{
 				ObbFile: &testing.ObbFile{
 					Obb: &testing.FileReference{
 						GcsPath: obbFile.GcsPath,
 					},
-					ObbFileName: filepath.Base(obbFiles[i]),
+					ObbFileName: obbFile.Filename,
 				},
 			})
 		}
@@ -543,6 +556,7 @@ func main() {
 			} else {
 				testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "DO_NOT_USE_ORCHESTRATOR"
 			}
+			log.Debugf("AndroidInstrumentationTest: %+v", testModel.TestSpecification.AndroidInstrumentationTest)
 		case "robo":
 			testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
 

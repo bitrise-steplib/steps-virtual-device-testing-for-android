@@ -303,6 +303,28 @@ inputs:
       value_options:
       - "false"
       - "true"
+  - environment_variables:
+    opts:
+      category: "Test setup"
+      title: Environment Variables
+      summary: |
+        One variable per line, key and value seperated by `=`
+
+        For example:
+
+        ```
+        coverage=true
+        coverageFile=/sdcard/tempDir/coverage.ec
+        ```
+      description: |
+        One variable per line, key and value seperated by `=`
+
+        For example:
+
+        ```
+        coverage=true
+        coverageFile=/sdcard/tempDir/coverage.ec
+        ```
   - directories_to_pull:
     opts:
       category: "Debug"
@@ -329,28 +351,6 @@ inputs:
         ```
         
         If `download_test_results` input is set to `false` then these files will be available on the dashboard only. To have them downloaded set that input to `true` as well.
-  - environment_variables:
-    opts:
-      category: "Test setup"
-      title: Environment Variables
-      summary: |
-        One variable per line, key and value seperated by `=`
-
-        For example:
-
-        ```
-        coverage=true
-        coverageFile=/sdcard/tempDir/coverage.ec
-        ```
-      description: |
-        One variable per line, key and value seperated by `=`
-
-        For example:
-
-        ```
-        coverage=true
-        coverageFile=/sdcard/tempDir/coverage.ec
-        ```
   - download_test_results: "false"
     opts:
       category: "Debug"
@@ -360,6 +360,16 @@ inputs:
       description: |
         If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded.
       is_required: true
+      value_options:
+        - "false"
+        - "true"
+  - use_verbose_log: "false"
+    opts:
+      category: "Debug"
+      title: "Verbose log"
+      summary: |
+        If set to `true` will enable verbose level logging.
+     is_required: true
       value_options:
         - "false"
         - "true"
