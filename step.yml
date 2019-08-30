@@ -121,11 +121,16 @@ inputs:
         - "gameloop"
   - app_package_id:
     opts:
-      title: "App package ID (Deprecated)"
+      category: "Deprecated"
+      title: "App package ID"
       summary: |
-        The Java package of the application under test (leave empty to get it extracted from the APK manifest).
+        Deprecated: If not specified will be automatically extracted from the App manifest.
+
+        The Java package of the application under test.
       description: |
-        The Java package of the application under test (leave empty to get it extracted from the APK manifest).
+        Deprecated: If not specified will be automatically extracted from the App manifest.
+
+        The Java package of the application under test.
   - test_apk_path: "$BITRISE_TEST_APK_PATH"
     opts:
       category: "Instrumentation Test"
@@ -134,10 +139,16 @@ inputs:
       description: The path to the APK that contains instrumentation tests
   - inst_test_package_id:
     opts:
-      category: "Instrumentation Test"
-      title: "Test package ID (Deprecated)"
-      summary: The Java package name of the instrumentation test (leave empty to get it extracted from the APK manifest).
-      description: The Java package name of the instrumentation test (leave empty to get it extracted from the APK manifest).
+      category: "Deprecated"
+      title: "Test package ID"
+      summary: |
+        Deprecated: If not specified will be automatically extracted from the Test App manifest.
+
+        The Java package name of the instrumentation test.
+      description: |
+        Deprecated: If not specified will be automatically extracted from the Test App manifest.
+
+        The Java package name of the instrumentation test.
   - inst_test_runner_class:
     opts:
       category: "Instrumentation Test"
