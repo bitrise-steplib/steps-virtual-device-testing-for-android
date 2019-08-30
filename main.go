@@ -42,11 +42,12 @@ type ConfigsModel struct {
 	APIToken   string `env:"api_token,required"`
 
 	// shared
-	AppPath      string `env:"app_path"`
-	TestApkPath  string `env:"test_apk_path"`
-	TestType     string `env:"test_type,opt[instrumentation,robo,gameloop]"`
-	TestDevices  string `env:"test_devices"`
-	AppPackageID string `env:"app_package_id"`
+	AppPath         string `env:"app_path"`
+	TestApkPath     string `env:"test_apk_path"`
+	TestType        string `env:"test_type,opt[instrumentation,robo,gameloop]"`
+	testDevicesList string `env:"test_devices"`
+	TestDevices     []*testing.AndroidDevice
+	AppPackageID    string `env:"app_package_id"`
 
 	// test setup
 	AutoGoogleLogin          bool   `env:"auto_google_login,opt[true,false]"`
@@ -97,16 +98,16 @@ func (configs *ConfigsModel) print() {
 	log.Printf("- TestTimeout: %f", configs.TestTimeout)
 	log.Printf("- FlakyTestAttempts: %d", configs.FlakyTestAttempts)
 	log.Printf("- DownloadTestResults: %t", configs.DownloadTestResults)
-	log.Printf("- DirectoriesToPull: %s", configs.DirectoriesToPull)
+	log.Printf("- DirectoriesToPull: %s", configs.directoriesToPullList)
 	log.Printf("- AutoGoogleLogin: %t", configs.AutoGoogleLogin)
-	log.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariables)
+	log.Printf("- EnvironmentVariables: %s", configs.environmentVariablesList)
 	log.Printf("- ObbFilesList: %s", configs.obbFilesList)
 	log.Printf("- TestDevices:\n---")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 	if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\t"); err != nil {
 		failf("Failed to write in tabwriter, error: %s", err)
 	}
-	scanner := bufio.NewScanner(strings.NewReader(configs.TestDevices))
+	scanner := bufio.NewScanner(strings.NewReader(configs.testDevicesList))
 	for scanner.Scan() {
 		device := scanner.Text()
 		device = strings.TrimSpace(device)
@@ -196,6 +197,10 @@ func (configs *ConfigsModel) validate() error {
 	}
 
 	var err error
+	if configs.TestDevices, err = parseDeviceList(configs.testDevicesList); err != nil {
+		return err
+	}
+
 	if configs.ObbFiles, err = parseObbFilesList(configs.obbFilesList); err != nil {
 		return err
 	}
@@ -219,6 +224,33 @@ func (configs *ConfigsModel) migrate() {
 	if configs.InstTestPackageID != "" {
 		log.Warnf("'Test package ID' (inst_test_package_id) input is deprecatad. Leave empty to automatically extract it from the App manifest")
 	}
+}
+
+func parseDeviceList(deviceList string) ([]*testing.AndroidDevice, error) {
+	var testDevices []*testing.AndroidDevice
+
+	scanner := bufio.NewScanner(strings.NewReader(deviceList))
+	for scanner.Scan() {
+		device := scanner.Text()
+		device = strings.TrimSpace(device)
+		if device == "" {
+			continue
+		}
+
+		deviceParams := strings.Split(device, ",")
+		if len(deviceParams) != 4 {
+			return nil, fmt.Errorf("invalid test device configuration: %s", device)
+		}
+
+		testDevices = append(testDevices, &testing.AndroidDevice{
+			AndroidModelId:   deviceParams[0],
+			AndroidVersionId: deviceParams[1],
+			Locale:           deviceParams[2],
+			Orientation:      deviceParams[3],
+		})
+	}
+
+	return testDevices, nil
 }
 
 func parseObbFilesList(obbFilesList string) ([]string, error) {
@@ -410,34 +442,8 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 
 	testModel := &testing.TestMatrix{}
 	testModel.EnvironmentMatrix = &testing.EnvironmentMatrix{AndroidDeviceList: &testing.AndroidDeviceList{}}
-	testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices = []*testing.AndroidDevice{}
 
-	scanner := bufio.NewScanner(strings.NewReader(configs.TestDevices))
-	for scanner.Scan() {
-		device := scanner.Text()
-		device = strings.TrimSpace(device)
-		if device == "" {
-			continue
-		}
-
-		deviceParams := strings.Split(device, ",")
-		if len(deviceParams) != 4 {
-			return fmt.Errorf("invalid test device configuration: %s", device)
-		}
-
-		newDevice := testing.AndroidDevice{
-			AndroidModelId:   deviceParams[0],
-			AndroidVersionId: deviceParams[1],
-			Locale:           deviceParams[2],
-			Orientation:      deviceParams[3],
-		}
-
-		testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices = append(testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices, &newDevice)
-	}
-
-	if configs.FlakyTestAttempts < 0 || configs.FlakyTestAttempts > 10 {
-		return fmt.Errorf("invalid input 'Number of times a test execution is reattempted': has to be between 0 and 10, provided %s", configs.FlakyTestAttempts)
-	}
+	testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices = configs.TestDevices
 	testModel.FlakyTestAttempts = int64(configs.FlakyTestAttempts)
 
 	// obb files to upload
