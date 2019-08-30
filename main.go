@@ -18,6 +18,7 @@ import (
 	testing "google.golang.org/api/testing/v1"
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 
+	"github.com/bitrise-io/go-steputils/stepconf"
 	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
@@ -33,96 +34,48 @@ const (
 // ConfigsModel ...
 type ConfigsModel struct {
 	// api
-	APIBaseURL string
-	BuildSlug  string
-	AppSlug    string
-	APIToken   string
+	APIBaseURL string `env:"api_base_url"`
+	BuildSlug  string `env:"BITRISE_BUILD_SLUG"`
+	AppSlug    string `env:"BITRISE_APP_SLUG"`
+	APIToken   string `env:"api_token"`
 
 	// shared
-	AppPath      string
-	TestApkPath  string
-	TestType     string
-	TestDevices  string
-	AppPackageID string
+	AppPath      string `env:"app_path"`
+	TestApkPath  string `env:"test_apk_path"`
+	TestType     string `env:"test_type"`
+	TestDevices  string `env:"test_devices"`
+	AppPackageID string `env:"app_package_id"`
 
 	// shared debug
-	TestTimeout          string
-	DownloadTestResults  string
-	DirectoriesToPull    string
-	EnvironmentVariables string
-	FlakyTestAttempts    string
-	ObbFilesList         string
-	AutoGoogleLogin      string
-	VerboseLog           string
+	TestTimeout          string `env:"test_timeout"`
+	DownloadTestResults  string `env:"download_test_results"`
+	DirectoriesToPull    string `env:"directories_to_pull"`
+	EnvironmentVariables string `env:"environment_variables"`
+	FlakyTestAttempts    string `env:"num_flaky_test_attempts"`
+	ObbFilesList         string `env:"obb_files_list"`
+	AutoGoogleLogin      string `env:"auto_google_login"`
+	VerboseLog           string `env:"use_verbose_log"`
 
 	// instrumentation
-	InstTestPackageID   string
-	InstTestRunnerClass string
-	InstTestTargets     string
-	UseOrchestrator     string
-	RoboScenarioFile    string
+	InstTestPackageID   string `env:"inst_test_package_id"`
+	InstTestRunnerClass string `env:"inst_test_runner_class"`
+	InstTestTargets     string `env:"inst_test_targets"`
+	UseOrchestrator     string `env:"inst_use_orchestrator"`
 
 	// robo
-	RoboInitialActivity string
-	RoboMaxDepth        string
-	RoboMaxSteps        string
-	RoboDirectives      string
+	RoboInitialActivity string `env:"robo_initial_activity"`
+	RoboMaxDepth        string `env:"robo_max_depth"`
+	RoboMaxSteps        string `env:"robo_max_steps"`
+	RoboDirectives      string `env:"robo_directives"`
+	RoboScenarioFile    string `env:"robo_scenario_file"`
 
 	// loop
-	LoopScenarios       string
-	LoopScenarioLabels  string
-	LoopScenarioNumbers string
+	LoopScenarios       string `env:"loop_scenarios"`
+	LoopScenarioLabels  string `env:"loop_scenario_labels"`
+	LoopScenarioNumbers string `env:"loop_scenario_numbers"`
 
 	// deprecated
-	ApkPath string
-}
-
-func createConfigsModelFromEnvs() ConfigsModel {
-	return ConfigsModel{
-		// api
-		APIBaseURL: os.Getenv("api_base_url"),
-		BuildSlug:  os.Getenv("BITRISE_BUILD_SLUG"),
-		AppSlug:    os.Getenv("BITRISE_APP_SLUG"),
-		APIToken:   os.Getenv("api_token"),
-
-		// shared
-		AppPath:      os.Getenv("app_path"),
-		TestApkPath:  os.Getenv("test_apk_path"),
-		TestType:     os.Getenv("test_type"),
-		TestDevices:  os.Getenv("test_devices"),
-		AppPackageID: os.Getenv("app_package_id"),
-
-		// shared debug
-		TestTimeout:          os.Getenv("test_timeout"),
-		DownloadTestResults:  os.Getenv("download_test_results"),
-		DirectoriesToPull:    os.Getenv("directories_to_pull"),
-		EnvironmentVariables: os.Getenv("environment_variables"),
-		FlakyTestAttempts:    os.Getenv("num_flaky_test_attempts"),
-		ObbFilesList:         os.Getenv("obb_files_list"),
-		AutoGoogleLogin:      os.Getenv("auto_google_login"),
-		VerboseLog:           os.Getenv("use_verbose_log"),
-
-		// instrumentation
-		InstTestPackageID:   os.Getenv("inst_test_package_id"),
-		InstTestRunnerClass: os.Getenv("inst_test_runner_class"),
-		InstTestTargets:     os.Getenv("inst_test_targets"),
-		UseOrchestrator:     os.Getenv("inst_use_orchestrator"),
-
-		// robo
-		RoboInitialActivity: os.Getenv("robo_initial_activity"),
-		RoboMaxDepth:        os.Getenv("robo_max_depth"),
-		RoboMaxSteps:        os.Getenv("robo_max_steps"),
-		RoboDirectives:      os.Getenv("robo_directives"),
-		RoboScenarioFile:    os.Getenv("robo_scenario_file"),
-
-		// loop
-		LoopScenarios:       os.Getenv("loop_scenarios"),
-		LoopScenarioLabels:  os.Getenv("loop_scenario_labels"),
-		LoopScenarioNumbers: os.Getenv("loop_scenario_numbers"),
-
-		// deprected
-		ApkPath: os.Getenv("apk_path"),
-	}
+	ApkPath string `env:"apk_path"`
 }
 
 func (configs ConfigsModel) print() {
@@ -274,7 +227,11 @@ type TestAssetsAndroid struct {
 }
 
 func main() {
-	configs := createConfigsModelFromEnvs()
+	var configs ConfigsModel
+	if err := stepconf.Parse(&configs); err != nil {
+		failf("Invalid input: %s", err)
+	}
+	// configs := createConfigsModelFromEnvs()
 
 	fmt.Println()
 	configs.print()
@@ -292,7 +249,7 @@ func main() {
 	if configs.AppPackageID != "" {
 		log.Warnf("'App package ID' (app_package_id) input is deprecated. Leave empty to automatically extract it from the App manifest")
 	}
-	if configs.FlakyTestAttempts != "" {
+	if configs.InstTestPackageID != "" {
 		log.Warnf("'Test package ID' (inst_test_package_id) input is deprecatad. Leave empty to automatically extract it from the App manifest")
 	}
 
