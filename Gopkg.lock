@@ -11,7 +11,15 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:ff62f75d1b13140f99ae7d2569954b6c484369110e5b3e9a24a5c848f735ccb3"
+  digest = "1:a3afea7f3c972b809af1a79472585115af175fbf1bcc5bebccd495f19bb551db"
+  name = "github.com/bitrise-io/go-steputils"
+  packages = ["stepconf"]
+  pruneopts = "UT"
+  revision = "f540824d77dfd382ce84fd0ee0a9da2fba1cce0a"
+
+[[projects]]
+  branch = "master"
+  digest = "1:09a08f51eae5abe05464667e12f6ed03f4ea0de2ec2d1593059a77ee3e937209"
   name = "github.com/bitrise-io/go-utils"
   packages = [
     "colorstring",
@@ -19,7 +27,9 @@
     "errorutil",
     "fileutil",
     "log",
+    "parseutil",
     "pathutil",
+    "pointers",
     "sliceutil",
   ]
   pruneopts = "UT"
@@ -27,12 +37,9 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:43da17ea138b6bb4f49383bbfa3a1976d92f4b04b143ac0ac383f8f470630680"
+  digest = "1:659157c334882ba37fe50584d691ea469fb6e708a49e81dcd4381fef6ba611b0"
   name = "github.com/bitrise-tools/go-steputils"
-  packages = [
-    "input",
-    "tools",
-  ]
+  packages = ["tools"]
   pruneopts = "UT"
   revision = "f540824d77dfd382ce84fd0ee0a9da2fba1cce0a"
 
@@ -101,7 +108,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:37cf5c1105f46a9e4c5e6f0a2c9bcfc08e78462be487c2538cc3dccb73c36993"
+  digest = "1:e93fe09ca93cf16f8b2dc48053f56c2f91ed4f3fd16bfaf9596b6548c7b48a7f"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -114,7 +121,7 @@
     "trace",
   ]
   pruneopts = "UT"
-  revision = "74dc4d7220e7acc4e100824340f3e66577424772"
+  revision = "ba9fcec4b297b415637633c5a6e8fa592e4a16c3"
 
 [[projects]]
   branch = "master"
@@ -132,11 +139,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:47844666be86089349a441f5f0ece22f42a87a8cb8c9a31294c593f43209ad19"
+  digest = "1:d0c076b09de3e3682b81fa13a5150f7fc8ac93d9d90a0a7d46a882fb539d3523"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "fde4db37ae7ad8191b03d30d27f258b5291ae4e3"
+  revision = "1e83adbbebd0f5dc971915fd7e5db032c3d2b731"
 
 [[projects]]
   digest = "1:8d8faad6b12a3a4c819a3f9618cb6ee1fa1cfc33253abeeea8b55336721e3405"
@@ -198,8 +205,8 @@
     "urlfetch",
   ]
   pruneopts = "UT"
-  revision = "b2f4a3cf3c67576a2ee09e1fe62656a5086ce880"
-  version = "v1.6.1"
+  revision = "5f2a59506353b8d5ba8cbbcd9f3c1f41f1eaf079"
+  version = "v1.6.2"
 
 [[projects]]
   branch = "master"
@@ -207,7 +214,7 @@
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
   pruneopts = "UT"
-  revision = "fa694d86fc64c7654a660f8908de4e879866748d"
+  revision = "24fa4b261c55da65468f2abfdae2b024eef27dfb"
 
 [[projects]]
   digest = "1:3b97661db2e5d4c87f7345e875ea28f911e54c715ba0a74be08e1649d67e05cd"
@@ -255,13 +262,13 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/bitrise-io/go-steputils/stepconf",
     "github.com/bitrise-io/go-utils/colorstring",
     "github.com/bitrise-io/go-utils/command",
     "github.com/bitrise-io/go-utils/fileutil",
     "github.com/bitrise-io/go-utils/log",
     "github.com/bitrise-io/go-utils/pathutil",
     "github.com/bitrise-io/go-utils/sliceutil",
-    "github.com/bitrise-tools/go-steputils/input",
     "github.com/bitrise-tools/go-steputils/tools",
     "github.com/pkg/errors",
     "google.golang.org/api/testing/v1",
