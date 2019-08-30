@@ -28,7 +28,9 @@ import (
 )
 
 const (
-	maxTimeoutSeconds = 1800
+	maxTimeoutSeconds       = 1800
+	testTypeInstrumentation = "instrumentation"
+	testTypeRobo            = "robo"
 )
 
 // ConfigsModel ...
@@ -126,7 +128,7 @@ func (configs ConfigsModel) print() {
 
 	log.Printf("- TestType: %s", configs.TestType)
 	// instruments
-	if configs.TestType == "instrumentation" {
+	if configs.TestType == testTypeInstrumentation {
 		log.Printf("- TestApkPath: %s", configs.TestApkPath)
 		log.Printf("- InstTestPackageID: %s", configs.InstTestPackageID)
 		log.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
@@ -135,7 +137,7 @@ func (configs ConfigsModel) print() {
 	}
 
 	//robo
-	if configs.TestType == "robo" {
+	if configs.TestType == testTypeRobo {
 		log.Printf("- RoboInitialActivity: %s", configs.RoboInitialActivity)
 		log.Printf("- RoboScenarioFile: %s", configs.RoboScenarioFile)
 		log.Printf("- RoboDirectives: %s", configs.RoboDirectives)
@@ -169,7 +171,7 @@ func (configs ConfigsModel) validate() error {
 		return fmt.Errorf("Issue with ApkPath: %s", err)
 	}
 
-	if configs.TestType == "instrumentation" {
+	if configs.TestType == testTypeInstrumentation {
 		if err := input.ValidateIfNotEmpty(configs.TestApkPath); err != nil {
 			return fmt.Errorf("Issue with TestApkPath: %s. Is it possible that you used gradle-runner step and forgot to set `assembleDebugAndroidTest` task?", err)
 		}
@@ -179,7 +181,7 @@ func (configs ConfigsModel) validate() error {
 	}
 
 	configs.RoboScenarioFile = strings.TrimSpace(configs.RoboScenarioFile)
-	if configs.TestType == "robo" && configs.RoboScenarioFile != "" {
+	if configs.TestType == testTypeRobo && configs.RoboScenarioFile != "" {
 		if err := input.ValidateIfPathExists(configs.RoboScenarioFile); err != nil {
 			return fmt.Errorf("Issue with RoboScenarioFile: %s", err)
 		}
@@ -276,12 +278,12 @@ func main() {
 				Filename: filepath.Base(configs.AppPath),
 			}
 		}
-		if configs.TestType == "instrumentation" {
+		if configs.TestType == testTypeInstrumentation {
 			requestedAssets.TestApk = TestAsset{
 				Filename: filepath.Base(configs.TestApkPath),
 			}
 		}
-		if configs.TestType == "robo" && configs.RoboScenarioFile != "" {
+		if configs.TestType == testTypeRobo && configs.RoboScenarioFile != "" {
 			requestedAssets.RoboScript = TestAsset{
 				Filename: filepath.Base(configs.RoboScenarioFile),
 			}
@@ -340,7 +342,7 @@ func main() {
 			failf("Failed to upload file(%s) to (%s), error: %s", configs.AppPath, testApp.UploadURL, err)
 		}
 
-		if configs.TestType == "instrumentation" {
+		if configs.TestType == testTypeInstrumentation {
 			err = uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath)
 			if err != nil {
 				failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, testAssets.TestApk.UploadURL, err)
@@ -447,7 +449,7 @@ func main() {
 			configs.TestTimeout = maxTimeoutSeconds
 		}
 
-		// a nil account does not log in to test Google account before test is stared
+		// a nil account does not log in to test Google account before test is started
 		var account *testing.Account
 		if configs.AutoGoogleLogin {
 			account = &testing.Account{
@@ -456,7 +458,7 @@ func main() {
 		}
 
 		testModel.TestSpecification = &testing.TestSpecification{
-			TestTimeout: fmt.Sprintf("%ss", configs.TestTimeout),
+			TestTimeout: fmt.Sprintf("%fs", configs.TestTimeout),
 			TestSetup: &testing.TestSetup{
 				EnvironmentVariables: envs,
 				FilesToPush:          filesToPush,
@@ -466,7 +468,7 @@ func main() {
 		}
 
 		switch configs.TestType {
-		case "instrumentation":
+		case testTypeInstrumentation:
 			testModel.TestSpecification.AndroidInstrumentationTest = &testing.AndroidInstrumentationTest{}
 
 			if isBundle {
@@ -497,7 +499,7 @@ func main() {
 				testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "DO_NOT_USE_ORCHESTRATOR"
 			}
 			log.Debugf("AndroidInstrumentationTest: %+v", testModel.TestSpecification.AndroidInstrumentationTest)
-		case "robo":
+		case testTypeRobo:
 			testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
 
 			if isBundle {
