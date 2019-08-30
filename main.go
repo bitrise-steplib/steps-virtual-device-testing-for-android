@@ -49,17 +49,19 @@ type ConfigsModel struct {
 	AppPackageID string `env:"app_package_id"`
 
 	// test setup
-	AutoGoogleLogin      bool   `env:"auto_google_login,opt[true,false]"`
-	EnvironmentVariables string `env:"environment_variables"`
-	obbFilesList         string `env:"obb_files_list"`
-	ObbFiles             []string
+	AutoGoogleLogin          bool   `env:"auto_google_login,opt[true,false]"`
+	environmentVariablesList string `env:"environment_variables"`
+	EnvironmentVariables     []*testing.EnvironmentVariable
+	obbFilesList             string `env:"obb_files_list"`
+	ObbFiles                 []string
 
 	// shared debug
-	TestTimeout         float64 `env:"test_timeout,required"`
-	FlakyTestAttempts   int     `env:"num_flaky_test_attempts,range[0..10]"`
-	DownloadTestResults bool    `env:"download_test_results,opt[true,false]"`
-	DirectoriesToPull   string  `env:"directories_to_pull"`
-	VerboseLog          bool    `env:"use_verbose_log,opt[true,false]"`
+	TestTimeout           float64 `env:"test_timeout,required"`
+	FlakyTestAttempts     int     `env:"num_flaky_test_attempts,range[0..10]"`
+	DownloadTestResults   bool    `env:"download_test_results,opt[true,false]"`
+	directoriesToPullList string  `env:"directories_to_pull"`
+	DirectoriesToPull     []string
+	VerboseLog            bool `env:"use_verbose_log,opt[true,false]"`
 
 	// instrumentation
 	InstTestPackageID   string `env:"inst_test_package_id"`
@@ -188,10 +190,19 @@ func (configs *ConfigsModel) validate() error {
 		}
 	}
 
+	if configs.TestTimeout > float64(maxTimeoutSeconds) {
+		log.Warnf("timeout value (%f) is greater than available maximum (%f). Maximum will be used instead.", configs.TestTimeout, maxTimeoutSeconds)
+		configs.TestTimeout = maxTimeoutSeconds
+	}
+
 	var err error
 	if configs.ObbFiles, err = parseObbFilesList(configs.obbFilesList); err != nil {
 		return err
 	}
+
+	configs.DirectoriesToPull = parseDirectoriesToPull(configs.directoriesToPullList)
+
+	configs.EnvironmentVariables = parseTestSetupEnvVars(configs.environmentVariablesList)
 
 	return nil
 }
@@ -227,6 +238,45 @@ func parseObbFilesList(obbFilesList string) ([]string, error) {
 	}
 
 	return obbFiles, nil
+}
+
+func parseDirectoriesToPull(directoriesToPullList string) []string {
+	scanner := bufio.NewScanner(strings.NewReader(directoriesToPullList))
+	directoriesToPull := []string{}
+	for scanner.Scan() {
+		path := scanner.Text()
+		path = strings.TrimSpace(path)
+		if path == "" {
+			continue
+		}
+		directoriesToPull = append(directoriesToPull, path)
+	}
+
+	return directoriesToPull
+}
+
+func parseTestSetupEnvVars(envVarList string) []*testing.EnvironmentVariable {
+	scanner := bufio.NewScanner(strings.NewReader(envVarList))
+	envs := []*testing.EnvironmentVariable{}
+	for scanner.Scan() {
+		envStr := scanner.Text()
+
+		if envStr == "" {
+			continue
+		}
+
+		if !strings.Contains(envStr, "=") {
+			continue
+		}
+
+		envStrSplit := strings.Split(envStr, "=")
+		envKey := envStrSplit[0]
+		envValue := strings.Join(envStrSplit[1:], "=")
+
+		envs = append(envs, &testing.EnvironmentVariable{Key: envKey, Value: envValue})
+	}
+
+	return envs
 }
 
 func failf(f string, v ...interface{}) {
@@ -292,7 +342,7 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 
 	data, err := json.Marshal(requestedAssets)
 	if err != nil {
-		return TestAssetsAndroid{}, fmt.Errorf("failed to encode to json: %s", requestedAssets)
+		return TestAssetsAndroid{}, fmt.Errorf("failed to encode to json: %+v", requestedAssets)
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(data))
@@ -354,6 +404,10 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 	log.Donef("=> Files uploaded")
 
 	return testAssets, nil
+}
+
+func startTests() {
+
 }
 
 func main() {
@@ -418,39 +472,6 @@ func main() {
 		}
 		testModel.FlakyTestAttempts = int64(configs.FlakyTestAttempts)
 
-		// parse directories to pull
-		scanner = bufio.NewScanner(strings.NewReader(configs.DirectoriesToPull))
-		directoriesToPull := []string{}
-		for scanner.Scan() {
-			path := scanner.Text()
-			path = strings.TrimSpace(path)
-			if path == "" {
-				continue
-			}
-			directoriesToPull = append(directoriesToPull, path)
-		}
-
-		// parse environment variables
-		scanner = bufio.NewScanner(strings.NewReader(configs.EnvironmentVariables))
-		envs := []*testing.EnvironmentVariable{}
-		for scanner.Scan() {
-			envStr := scanner.Text()
-
-			if envStr == "" {
-				continue
-			}
-
-			if !strings.Contains(envStr, "=") {
-				continue
-			}
-
-			envStrSplit := strings.Split(envStr, "=")
-			envKey := envStrSplit[0]
-			envValue := strings.Join(envStrSplit[1:], "=")
-
-			envs = append(envs, &testing.EnvironmentVariable{Key: envKey, Value: envValue})
-		}
-
 		// obb files to upload
 		var filesToPush []*testing.DeviceFile
 		for _, obbFile := range testAssets.ObbFiles {
@@ -464,11 +485,6 @@ func main() {
 			})
 		}
 
-		if configs.TestTimeout > float64(maxTimeoutSeconds) {
-			log.Warnf("timeout value (%f) is greater than available maximum (%f). Maximum will be used instead.", configs.TestTimeout, maxTimeoutSeconds)
-			configs.TestTimeout = maxTimeoutSeconds
-		}
-
 		// a nil account does not log in to test Google account before test is started
 		var account *testing.Account
 		if configs.AutoGoogleLogin {
@@ -480,9 +496,9 @@ func main() {
 		testModel.TestSpecification = &testing.TestSpecification{
 			TestTimeout: fmt.Sprintf("%fs", configs.TestTimeout),
 			TestSetup: &testing.TestSetup{
-				EnvironmentVariables: envs,
+				EnvironmentVariables: configs.EnvironmentVariables,
 				FilesToPush:          filesToPush,
-				DirectoriesToPull:    directoriesToPull,
+				DirectoriesToPull:    configs.DirectoriesToPull,
 				Account:              account,
 			},
 		}
