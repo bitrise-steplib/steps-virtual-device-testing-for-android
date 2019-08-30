@@ -243,11 +243,117 @@ type TestAsset struct {
 
 // TestAssetsAndroid describes requested Android test asset and as the returned test asset upload URLs
 type TestAssetsAndroid struct {
+	isBundle   bool
+	testApp    *TestAsset
 	Apk        TestAsset   `json:"apk,omitempty"`
 	Aab        TestAsset   `json:"aab,omitmepty"`
 	TestApk    TestAsset   `json:"testApk,omitempty"`
 	RoboScript TestAsset   `json:"roboScript,omitempty"`
 	ObbFiles   []TestAsset `json:"obbFiles,omitempty"`
+}
+
+func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
+	var testAssets TestAssetsAndroid
+
+	url := configs.APIBaseURL + "/assets/android/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
+
+	if strings.ToLower(filepath.Ext(configs.AppPath)) == ".aab" {
+		testAssets.isBundle = true
+	}
+	log.Debugf("App path (%s), is bundle: %t", configs.AppPath, testAssets.isBundle)
+
+	var requestedAssets TestAssetsAndroid
+	if testAssets.isBundle {
+		requestedAssets.Aab = TestAsset{
+			Filename: filepath.Base(configs.AppPath),
+		}
+	} else {
+		requestedAssets.Apk = TestAsset{
+			Filename: filepath.Base(configs.AppPath),
+		}
+	}
+	if configs.TestType == testTypeInstrumentation {
+		requestedAssets.TestApk = TestAsset{
+			Filename: filepath.Base(configs.TestApkPath),
+		}
+	}
+	if configs.TestType == testTypeRobo && configs.RoboScenarioFile != "" {
+		requestedAssets.RoboScript = TestAsset{
+			Filename: filepath.Base(configs.RoboScenarioFile),
+		}
+	}
+	for _, obbFile := range configs.ObbFiles {
+		requestedAssets.ObbFiles = append(requestedAssets.ObbFiles, TestAsset{
+			Filename: filepath.Base(obbFile),
+		})
+	}
+
+	log.Debugf("Assets requested: %+v", requestedAssets)
+
+	data, err := json.Marshal(requestedAssets)
+	if err != nil {
+		return TestAssetsAndroid{}, fmt.Errorf("failed to encode to json: %s", requestedAssets)
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewReader(data))
+	if err != nil {
+		return TestAssetsAndroid{}, fmt.Errorf("failed to create http request, error: %s", err)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return TestAssetsAndroid{}, fmt.Errorf("failed to get http response, error: %s", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return TestAssetsAndroid{}, fmt.Errorf("failed to read response body, error: %s", err)
+		}
+		return TestAssetsAndroid{}, fmt.Errorf("failed to start test: %d, error: %s", resp.StatusCode, string(body))
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return TestAssetsAndroid{}, fmt.Errorf("failed to read response body, error: %s", err)
+	}
+
+	err = json.Unmarshal(body, &testAssets)
+	if err != nil {
+		return TestAssetsAndroid{}, fmt.Errorf("failed to unmarshal response body, error: %s", err)
+	}
+
+	if testAssets.isBundle {
+		testAssets.testApp = &testAssets.Aab
+	} else {
+		testAssets.testApp = &testAssets.Apk
+	}
+	log.Debugf("Uploading file(%s) to (%s)", configs.AppPath, testAssets.testApp.GcsPath)
+
+	err = uploadFile(testAssets.testApp.UploadURL, configs.AppPath)
+	if err != nil {
+		return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.AppPath, testAssets.testApp.UploadURL, err)
+	}
+
+	if configs.TestType == testTypeInstrumentation {
+		err = uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath)
+		if err != nil {
+			return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, testAssets.TestApk.UploadURL, err)
+		}
+	}
+
+	if len(testAssets.ObbFiles) != len(configs.ObbFiles) {
+		return TestAssetsAndroid{}, fmt.Errorf("invalid length of obb file upload URLs in response: %+v", testAssets)
+	}
+	for i, obbFile := range configs.ObbFiles {
+		if err := uploadFile(testAssets.ObbFiles[i].UploadURL, obbFile); err != nil {
+			return TestAssetsAndroid{}, fmt.Errorf("failed to upload obb file (%s) to (%s), error: %s", obbFile, testAssets.ObbFiles[i].UploadURL, err)
+		}
+	}
+	log.Donef("=> Files uploaded")
+
+	return testAssets, nil
 }
 
 func main() {
@@ -269,109 +375,10 @@ func main() {
 	fmt.Println()
 	successful := true
 
-	var isBundle bool
 	log.Infof("Uploading app and test files")
-	var testAssets TestAssetsAndroid
-	var testApp TestAsset
-	{
-		url := configs.APIBaseURL + "/assets/android/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
-
-		if strings.ToLower(filepath.Ext(configs.AppPath)) == ".aab" {
-			isBundle = true
-		}
-		log.Debugf("App path (%s), is bundle: %t", configs.AppPath, isBundle)
-
-		var requestedAssets TestAssetsAndroid
-		if isBundle {
-			requestedAssets.Aab = TestAsset{
-				Filename: filepath.Base(configs.AppPath),
-			}
-		} else {
-			requestedAssets.Apk = TestAsset{
-				Filename: filepath.Base(configs.AppPath),
-			}
-		}
-		if configs.TestType == testTypeInstrumentation {
-			requestedAssets.TestApk = TestAsset{
-				Filename: filepath.Base(configs.TestApkPath),
-			}
-		}
-		if configs.TestType == testTypeRobo && configs.RoboScenarioFile != "" {
-			requestedAssets.RoboScript = TestAsset{
-				Filename: filepath.Base(configs.RoboScenarioFile),
-			}
-		}
-		for _, obbFile := range configs.ObbFiles {
-			requestedAssets.ObbFiles = append(requestedAssets.ObbFiles, TestAsset{
-				Filename: filepath.Base(obbFile),
-			})
-		}
-
-		log.Debugf("Assets requested: %+v", requestedAssets)
-
-		data, err := json.Marshal(requestedAssets)
-		if err != nil {
-			failf("Failed to encode to json: %s", requestedAssets)
-		}
-
-		req, err := http.NewRequest("POST", url, bytes.NewReader(data))
-		if err != nil {
-			failf("Failed to create http request, error: %s", err)
-		}
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			failf("Failed to get http response, error: %s", err)
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				failf("Failed to read response body, error: %s", err)
-			}
-			failf("Failed to start test: %d, error: %s", resp.StatusCode, string(body))
-		}
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			failf("Failed to read response body, error: %s", err)
-		}
-
-		err = json.Unmarshal(body, &testAssets)
-		if err != nil {
-			failf("Failed to unmarshal response body, error: %s", err)
-		}
-
-		if isBundle {
-			testApp = testAssets.Aab
-		} else {
-			testApp = testAssets.Apk
-		}
-		log.Debugf("Uploading file(%s) to (%s)", configs.AppPath, testApp.GcsPath)
-
-		err = uploadFile(testApp.UploadURL, configs.AppPath)
-		if err != nil {
-			failf("Failed to upload file(%s) to (%s), error: %s", configs.AppPath, testApp.UploadURL, err)
-		}
-
-		if configs.TestType == testTypeInstrumentation {
-			err = uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath)
-			if err != nil {
-				failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, testAssets.TestApk.UploadURL, err)
-			}
-		}
-
-		if len(testAssets.ObbFiles) != len(configs.ObbFiles) {
-			failf("Invalid length of obb file upload URLs in response: %+v", testAssets)
-		}
-		for i, obbFile := range configs.ObbFiles {
-			if err := uploadFile(testAssets.ObbFiles[i].UploadURL, obbFile); err != nil {
-				failf("Failed to upload obb file (%s) to (%s), error: %s", obbFile, testAssets.ObbFiles[i].UploadURL, err)
-			}
-		}
-
-		log.Donef("=> Files uploaded")
+	testAssets, err := uploadTestAssets(configs)
+	if err != nil {
+		failf("Failed to upload test assets, error: %s", err)
 	}
 
 	fmt.Println()
@@ -484,12 +491,12 @@ func main() {
 		case testTypeInstrumentation:
 			testModel.TestSpecification.AndroidInstrumentationTest = &testing.AndroidInstrumentationTest{}
 
-			if isBundle {
+			if testAssets.isBundle {
 				testModel.TestSpecification.AndroidInstrumentationTest.AppBundle = &testing.AppBundle{
-					BundleLocation: &testing.FileReference{GcsPath: testApp.GcsPath},
+					BundleLocation: &testing.FileReference{GcsPath: testAssets.testApp.GcsPath},
 				}
 			} else {
-				testModel.TestSpecification.AndroidInstrumentationTest.AppApk = &testing.FileReference{GcsPath: testApp.GcsPath}
+				testModel.TestSpecification.AndroidInstrumentationTest.AppApk = &testing.FileReference{GcsPath: testAssets.testApp.GcsPath}
 			}
 
 			testModel.TestSpecification.AndroidInstrumentationTest.TestApk = &testing.FileReference{GcsPath: testAssets.TestApk.GcsPath}
@@ -515,12 +522,12 @@ func main() {
 		case testTypeRobo:
 			testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
 
-			if isBundle {
+			if testAssets.isBundle {
 				testModel.TestSpecification.AndroidRoboTest.AppBundle = &testing.AppBundle{
-					BundleLocation: &testing.FileReference{GcsPath: testApp.GcsPath},
+					BundleLocation: &testing.FileReference{GcsPath: testAssets.testApp.GcsPath},
 				}
 			} else {
-				testModel.TestSpecification.AndroidRoboTest.AppApk = &testing.FileReference{GcsPath: testApp.GcsPath}
+				testModel.TestSpecification.AndroidRoboTest.AppApk = &testing.FileReference{GcsPath: testAssets.testApp.GcsPath}
 			}
 
 			if configs.AppPackageID != "" {
@@ -569,12 +576,12 @@ func main() {
 		case "gameloop":
 			testModel.TestSpecification.AndroidTestLoop = &testing.AndroidTestLoop{}
 
-			if isBundle {
+			if testAssets.isBundle {
 				testModel.TestSpecification.AndroidTestLoop.AppBundle = &testing.AppBundle{
-					BundleLocation: &testing.FileReference{GcsPath: testApp.GcsPath},
+					BundleLocation: &testing.FileReference{GcsPath: testAssets.testApp.GcsPath},
 				}
 			} else {
-				testModel.TestSpecification.AndroidTestLoop.AppApk = &testing.FileReference{GcsPath: testApp.GcsPath}
+				testModel.TestSpecification.AndroidTestLoop.AppApk = &testing.FileReference{GcsPath: testAssets.testApp.GcsPath}
 			}
 
 			if configs.AppPackageID != "" {
