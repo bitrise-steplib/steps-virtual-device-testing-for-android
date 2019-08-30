@@ -57,7 +57,7 @@ type ConfigsModel struct {
 	// shared debug
 	TestTimeout         float64 `env:"test_timeout,required"`
 	FlakyTestAttempts   int     `env:"num_flaky_test_attempts,range[0..10]"`
-	DownloadTestResults string  `env:"download_test_results"`
+	DownloadTestResults bool    `env:"download_test_results,opt[true,false]"`
 	DirectoriesToPull   string  `env:"directories_to_pull"`
 	VerboseLog          bool    `env:"use_verbose_log,opt[true,false]"`
 
@@ -83,7 +83,7 @@ type ConfigsModel struct {
 	ApkPath string `env:"apk_path"`
 }
 
-func (configs ConfigsModel) print() {
+func (configs *ConfigsModel) print() {
 	log.Infof("Configs:")
 	log.Printf("- AppPath: %s", configs.AppPath)
 	if configs.ApkPath != "" {
@@ -92,11 +92,11 @@ func (configs ConfigsModel) print() {
 	if configs.AppPackageID != "" {
 		log.Printf("- AppPackageID: %s", configs.AppPackageID)
 	}
-	log.Printf("- TestTimeout: %s", configs.TestTimeout)
-	log.Printf("- FlakyTestAttempts: %s", configs.FlakyTestAttempts)
-	log.Printf("- DownloadTestResults: %s", configs.DownloadTestResults)
+	log.Printf("- TestTimeout: %f", configs.TestTimeout)
+	log.Printf("- FlakyTestAttempts: %d", configs.FlakyTestAttempts)
+	log.Printf("- DownloadTestResults: %t", configs.DownloadTestResults)
 	log.Printf("- DirectoriesToPull: %s", configs.DirectoriesToPull)
-	log.Printf("- AutoGoogleLogin: %s", configs.AutoGoogleLogin)
+	log.Printf("- AutoGoogleLogin: %t", configs.AutoGoogleLogin)
 	log.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariables)
 	log.Printf("- ObbFilesList: %s", configs.obbFilesList)
 	log.Printf("- TestDevices:\n---")
@@ -134,7 +134,7 @@ func (configs ConfigsModel) print() {
 		log.Printf("- InstTestPackageID: %s", configs.InstTestPackageID)
 		log.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
 		log.Printf("- InstTestTargets: %s", configs.InstTestTargets)
-		log.Printf("- UseOrchestrator: %s", configs.UseOrchestrator)
+		log.Printf("- UseOrchestrator: %t", configs.UseOrchestrator)
 	}
 
 	//robo
@@ -154,7 +154,7 @@ func (configs ConfigsModel) print() {
 	}
 }
 
-func (configs ConfigsModel) validate() error {
+func (configs *ConfigsModel) validate() error {
 	if err := input.ValidateIfNotEmpty(configs.APIBaseURL); err != nil {
 		if _, set := os.LookupEnv("BITRISE_IO"); !set {
 			log.Warnf("Warning: please make sure that Virtual Device Testing add-on is turned on under your app's settings tab.")
@@ -194,6 +194,20 @@ func (configs ConfigsModel) validate() error {
 	}
 
 	return nil
+}
+
+func (configs *ConfigsModel) migrate() {
+	if configs.ApkPath != "" {
+		log.Warnf("'Apk path' (apk_path) input is deprected, use 'App path' (app_path) instead.")
+		log.Warnf("'Apk path' (%s) is specified, overrides App path (%s)", configs.ApkPath, configs.AppPath)
+		configs.AppPath = configs.ApkPath
+	}
+	if configs.AppPackageID != "" {
+		log.Warnf("'App package ID' (app_package_id) input is deprecated. Leave empty to automatically extract it from the App manifest")
+	}
+	if configs.InstTestPackageID != "" {
+		log.Warnf("'Test package ID' (inst_test_package_id) input is deprecatad. Leave empty to automatically extract it from the App manifest")
+	}
 }
 
 func parseObbFilesList(obbFilesList string) ([]string, error) {
@@ -248,19 +262,9 @@ func main() {
 	if err := configs.validate(); err != nil {
 		failf("%s", err)
 	}
-	log.SetEnableDebugLog(configs.VerboseLog)
+	configs.migrate()
 
-	if configs.ApkPath != "" {
-		log.Warnf("'Apk path' (apk_path) input is deprected, use 'App path' (app_path) instead.")
-		log.Warnf("'Apk path' (%s) is specified, overrides App path (%s)", configs.ApkPath, configs.AppPath)
-		configs.AppPath = configs.ApkPath
-	}
-	if configs.AppPackageID != "" {
-		log.Warnf("'App package ID' (app_package_id) input is deprecated. Leave empty to automatically extract it from the App manifest")
-	}
-	if configs.InstTestPackageID != "" {
-		log.Warnf("'Test package ID' (inst_test_package_id) input is deprecatad. Leave empty to automatically extract it from the App manifest")
-	}
+	log.SetEnableDebugLog(configs.VerboseLog)
 
 	fmt.Println()
 	successful := true
@@ -275,7 +279,7 @@ func main() {
 		if strings.ToLower(filepath.Ext(configs.AppPath)) == ".aab" {
 			isBundle = true
 		}
-		log.Debugf("App path (%s), is bundle: %b", configs.AppPath, isBundle)
+		log.Debugf("App path (%s), is bundle: %t", configs.AppPath, isBundle)
 
 		var requestedAssets TestAssetsAndroid
 		if isBundle {
@@ -762,7 +766,7 @@ func main() {
 		}
 	}
 
-	if configs.DownloadTestResults == "true" {
+	if configs.DownloadTestResults {
 		fmt.Println()
 		log.Infof("Downloading test assets")
 		{
