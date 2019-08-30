@@ -35,39 +35,41 @@ const (
 type ConfigsModel struct {
 	// api
 	APIBaseURL string `env:"api_base_url"`
-	BuildSlug  string `env:"BITRISE_BUILD_SLUG"`
-	AppSlug    string `env:"BITRISE_APP_SLUG"`
-	APIToken   string `env:"api_token"`
+	BuildSlug  string `env:"BITRISE_BUILD_SLUG,required"`
+	AppSlug    string `env:"BITRISE_APP_SLUG,required"`
+	APIToken   string `env:"api_token,required"`
 
 	// shared
 	AppPath      string `env:"app_path"`
 	TestApkPath  string `env:"test_apk_path"`
-	TestType     string `env:"test_type"`
+	TestType     string `env:"test_type,opt[instrumentation,robo,gameloop]"`
 	TestDevices  string `env:"test_devices"`
 	AppPackageID string `env:"app_package_id"`
 
-	// shared debug
-	TestTimeout          string `env:"test_timeout"`
-	DownloadTestResults  string `env:"download_test_results"`
-	DirectoriesToPull    string `env:"directories_to_pull"`
+	// test setup
+	AutoGoogleLogin      bool   `env:"auto_google_login,opt[true,false]"`
 	EnvironmentVariables string `env:"environment_variables"`
-	FlakyTestAttempts    string `env:"num_flaky_test_attempts"`
 	ObbFilesList         string `env:"obb_files_list"`
-	AutoGoogleLogin      string `env:"auto_google_login"`
-	VerboseLog           string `env:"use_verbose_log"`
+
+	// shared debug
+	TestTimeout         float64 `env:"test_timeout,required"`
+	FlakyTestAttempts   int     `env:"num_flaky_test_attempts,range[0..10]"`
+	DownloadTestResults string  `env:"download_test_results"`
+	DirectoriesToPull   string  `env:"directories_to_pull"`
+	VerboseLog          bool    `env:"use_verbose_log,opt[true,false]"`
 
 	// instrumentation
 	InstTestPackageID   string `env:"inst_test_package_id"`
 	InstTestRunnerClass string `env:"inst_test_runner_class"`
 	InstTestTargets     string `env:"inst_test_targets"`
-	UseOrchestrator     string `env:"inst_use_orchestrator"`
+	UseOrchestrator     bool   `env:"inst_use_orchestrator,opt[true,false]"`
 
 	// robo
 	RoboInitialActivity string `env:"robo_initial_activity"`
-	RoboMaxDepth        string `env:"robo_max_depth"`
-	RoboMaxSteps        string `env:"robo_max_steps"`
 	RoboDirectives      string `env:"robo_directives"`
 	RoboScenarioFile    string `env:"robo_scenario_file"`
+	RoboMaxDepth        string `env:"robo_max_depth"`
+	RoboMaxSteps        string `env:"robo_max_steps"`
 
 	// loop
 	LoopScenarios       string `env:"loop_scenarios"`
@@ -84,11 +86,16 @@ func (configs ConfigsModel) print() {
 	if configs.ApkPath != "" {
 		log.Printf("- ApkPath: %s", configs.ApkPath)
 	}
+	if configs.AppPackageID != "" {
+		log.Printf("- AppPackageID: %s", configs.AppPackageID)
+	}
 	log.Printf("- TestTimeout: %s", configs.TestTimeout)
 	log.Printf("- FlakyTestAttempts: %s", configs.FlakyTestAttempts)
 	log.Printf("- DownloadTestResults: %s", configs.DownloadTestResults)
 	log.Printf("- DirectoriesToPull: %s", configs.DirectoriesToPull)
+	log.Printf("- AutoGoogleLogin: %s", configs.AutoGoogleLogin)
 	log.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariables)
+	log.Printf("- ObbFilesList: %s", configs.ObbFilesList)
 	log.Printf("- TestDevices:\n---")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 	if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\t"); err != nil {
@@ -116,8 +123,6 @@ func (configs ConfigsModel) print() {
 		log.Errorf("Failed to flush writer, error: %s", err)
 	}
 	log.Printf("---")
-	log.Printf("- AppPackageID: %s", configs.AppPackageID)
-	log.Printf("- AutoGoogleLogin: %s", configs.AutoGoogleLogin)
 
 	log.Printf("- TestType: %s", configs.TestType)
 	// instruments
@@ -153,30 +158,7 @@ func (configs ConfigsModel) validate() error {
 		}
 		return fmt.Errorf("Issue with APIBaseURL: %s", err)
 	}
-	if err := input.ValidateIfNotEmpty(configs.APIToken); err != nil {
-		return fmt.Errorf("Issue with APIToken: %s", err)
-	}
-	if err := input.ValidateIfNotEmpty(configs.BuildSlug); err != nil {
-		return fmt.Errorf("Issue with BuildSlug: %s", err)
-	}
-	if err := input.ValidateIfNotEmpty(configs.AppSlug); err != nil {
-		return fmt.Errorf("Issue with AppSlug: %s", err)
-	}
-	if err := input.ValidateWithOptions(configs.AutoGoogleLogin, "false", "true"); err != nil {
-		return fmt.Errorf("Issue with AutoGoogleLogin: %s", err)
-	}
-	if err := input.ValidateIfNotEmpty(configs.TestType); err != nil {
-		return fmt.Errorf("Issue with TestType: %s", err)
-	}
-	if err := input.ValidateWithOptions(configs.TestType, "instrumentation", "robo", "gameloop"); err != nil {
-		return fmt.Errorf("Issue with TestType: %s", err)
-	}
-	if err := input.ValidateWithOptions(configs.UseOrchestrator, "false", "true"); err != nil {
-		return fmt.Errorf("Issue with UseOrchestrator: %s", err)
-	}
-	if err := input.ValidateWithOptions(configs.VerboseLog, "false", "true"); err != nil {
-		return fmt.Errorf("Issue with VerboseLog: %s", err)
-	}
+
 	if configs.ApkPath != "" {
 		configs.AppPath = configs.ApkPath
 	}
@@ -186,6 +168,7 @@ func (configs ConfigsModel) validate() error {
 	if err := input.ValidateIfPathExists(configs.AppPath); err != nil {
 		return fmt.Errorf("Issue with ApkPath: %s", err)
 	}
+
 	if configs.TestType == "instrumentation" {
 		if err := input.ValidateIfNotEmpty(configs.TestApkPath); err != nil {
 			return fmt.Errorf("Issue with TestApkPath: %s. Is it possible that you used gradle-runner step and forgot to set `assembleDebugAndroidTest` task?", err)
@@ -239,7 +222,7 @@ func main() {
 	if err := configs.validate(); err != nil {
 		failf("%s", err)
 	}
-	log.SetEnableDebugLog(configs.VerboseLog == "true")
+	log.SetEnableDebugLog(configs.VerboseLog)
 
 	if configs.ApkPath != "" {
 		log.Warnf("'Apk path' (apk_path) input is deprected, use 'App path' (app_path) instead.")
@@ -408,13 +391,10 @@ func main() {
 			testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices = append(testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices, &newDevice)
 		}
 
-		testAttempts, err := strconv.ParseInt(configs.FlakyTestAttempts, 10, 64)
-		if err != nil {
-			failf("Invalid input 'Number of times a test execution is reattempted': failed to parse int from value (%s), error: %s", configs.FlakyTestAttempts, err)
-		} else if testAttempts < 0 || testAttempts > 10 {
+		if configs.FlakyTestAttempts < 0 || configs.FlakyTestAttempts > 10 {
 			failf("Invalid input 'Number of times a test execution is reattempted': has to be between 0 and 10, provided %s", configs.FlakyTestAttempts)
 		}
-		testModel.FlakyTestAttempts = testAttempts
+		testModel.FlakyTestAttempts = int64(configs.FlakyTestAttempts)
 
 		// parse directories to pull
 		scanner = bufio.NewScanner(strings.NewReader(configs.DirectoriesToPull))
@@ -462,24 +442,21 @@ func main() {
 			})
 		}
 
-		timeout := configs.TestTimeout
-		if val, err := strconv.ParseFloat(timeout, 64); err != nil {
-			failf("could not parse float from timeout value (%s): %s", timeout, err)
-		} else if val > float64(maxTimeoutSeconds) {
-			log.Warnf("timeout value (%f) is greater than available maximum (%f). Maximum will be used instead.", val, maxTimeoutSeconds)
-			timeout = strconv.Itoa(maxTimeoutSeconds)
+		if configs.TestTimeout > float64(maxTimeoutSeconds) {
+			log.Warnf("timeout value (%f) is greater than available maximum (%f). Maximum will be used instead.", configs.TestTimeout, maxTimeoutSeconds)
+			configs.TestTimeout = maxTimeoutSeconds
 		}
 
 		// a nil account does not log in to test Google account before test is stared
 		var account *testing.Account
-		if configs.AutoGoogleLogin == "true" {
+		if configs.AutoGoogleLogin {
 			account = &testing.Account{
 				GoogleAuto: &testing.GoogleAuto{},
 			}
 		}
 
 		testModel.TestSpecification = &testing.TestSpecification{
-			TestTimeout: fmt.Sprintf("%ss", timeout),
+			TestTimeout: fmt.Sprintf("%ss", configs.TestTimeout),
 			TestSetup: &testing.TestSetup{
 				EnvironmentVariables: envs,
 				FilesToPush:          filesToPush,
@@ -514,7 +491,7 @@ func main() {
 				targets := strings.Split(strings.TrimSpace(configs.InstTestTargets), ",")
 				testModel.TestSpecification.AndroidInstrumentationTest.TestTargets = targets
 			}
-			if configs.UseOrchestrator == "true" {
+			if configs.UseOrchestrator {
 				testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "USE_ORCHESTRATOR"
 			} else {
 				testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "DO_NOT_USE_ORCHESTRATOR"
