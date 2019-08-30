@@ -51,7 +51,8 @@ type ConfigsModel struct {
 	// test setup
 	AutoGoogleLogin      bool   `env:"auto_google_login,opt[true,false]"`
 	EnvironmentVariables string `env:"environment_variables"`
-	ObbFilesList         string `env:"obb_files_list"`
+	obbFilesList         string `env:"obb_files_list"`
+	ObbFiles             []string
 
 	// shared debug
 	TestTimeout         float64 `env:"test_timeout,required"`
@@ -97,7 +98,7 @@ func (configs ConfigsModel) print() {
 	log.Printf("- DirectoriesToPull: %s", configs.DirectoriesToPull)
 	log.Printf("- AutoGoogleLogin: %s", configs.AutoGoogleLogin)
 	log.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariables)
-	log.Printf("- ObbFilesList: %s", configs.ObbFilesList)
+	log.Printf("- ObbFilesList: %s", configs.obbFilesList)
 	log.Printf("- TestDevices:\n---")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 	if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\t"); err != nil {
@@ -124,8 +125,8 @@ func (configs ConfigsModel) print() {
 	if err := w.Flush(); err != nil {
 		log.Errorf("Failed to flush writer, error: %s", err)
 	}
-	log.Printf("---")
 
+	log.Printf("---")
 	log.Printf("- TestType: %s", configs.TestType)
 	// instruments
 	if configs.TestType == testTypeInstrumentation {
@@ -145,8 +146,8 @@ func (configs ConfigsModel) print() {
 		log.Printf("- RoboMaxSteps: %s", configs.RoboMaxSteps)
 	}
 
+	// loop
 	if configs.TestType == "gameloop" {
-		// loop
 		log.Printf("- LoopScenarios: %s", configs.LoopScenarios)
 		log.Printf("- LoopScenarioLabels: %s", configs.LoopScenarioLabels)
 		log.Printf("- LoopScenarioNumbers: %s", configs.LoopScenarioNumbers)
@@ -187,7 +188,31 @@ func (configs ConfigsModel) validate() error {
 		}
 	}
 
+	var err error
+	if configs.ObbFiles, err = parseObbFilesList(configs.obbFilesList); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func parseObbFilesList(obbFilesList string) ([]string, error) {
+	var obbFiles []string
+	files := strings.Split(obbFilesList, "\n")
+
+	for _, file := range files {
+		file = strings.TrimSpace(file)
+		if file == "" {
+			continue
+		}
+		if _, err := os.Stat(file); err != nil {
+			return nil, fmt.Errorf("could not get file info for obb file (%s), error: %s", file, err)
+		}
+
+		obbFiles = append(obbFiles, file)
+	}
+
+	return obbFiles, nil
 }
 
 func failf(f string, v ...interface{}) {
@@ -216,7 +241,6 @@ func main() {
 	if err := stepconf.Parse(&configs); err != nil {
 		failf("Invalid input: %s", err)
 	}
-	// configs := createConfigsModelFromEnvs()
 
 	fmt.Println()
 	configs.print()
@@ -239,22 +263,7 @@ func main() {
 	}
 
 	fmt.Println()
-
 	successful := true
-
-	var obbFiles []string
-	files := strings.Split(configs.ObbFilesList, "\n")
-	for _, file := range files {
-		file = strings.TrimSpace(file)
-		if file == "" {
-			continue
-		}
-		if _, err := os.Stat(file); err != nil {
-			failf("Could not get file info for obb file (%s), error: %s", file, err)
-		}
-
-		obbFiles = append(obbFiles, file)
-	}
 
 	var isBundle bool
 	log.Infof("Uploading app and test files")
@@ -288,7 +297,7 @@ func main() {
 				Filename: filepath.Base(configs.RoboScenarioFile),
 			}
 		}
-		for _, obbFile := range obbFiles {
+		for _, obbFile := range configs.ObbFiles {
 			requestedAssets.ObbFiles = append(requestedAssets.ObbFiles, TestAsset{
 				Filename: filepath.Base(obbFile),
 			})
@@ -349,10 +358,10 @@ func main() {
 			}
 		}
 
-		if len(testAssets.ObbFiles) != len(obbFiles) {
+		if len(testAssets.ObbFiles) != len(configs.ObbFiles) {
 			failf("Invalid length of obb file upload URLs in response: %+v", testAssets)
 		}
-		for i, obbFile := range obbFiles {
+		for i, obbFile := range configs.ObbFiles {
 			if err := uploadFile(testAssets.ObbFiles[i].UploadURL, obbFile); err != nil {
 				failf("Failed to upload obb file (%s) to (%s), error: %s", obbFile, testAssets.ObbFiles[i].UploadURL, err)
 			}
