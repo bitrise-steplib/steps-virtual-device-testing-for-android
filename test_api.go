@@ -118,9 +118,14 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 	}
 
 	if configs.TestType == testTypeInstrumentation {
-		err = uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath)
-		if err != nil {
+		if err := uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath); err != nil {
 			return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, testAssets.TestApk.UploadURL, err)
+		}
+	}
+
+	if configs.TestType == testTypeRobo && configs.RoboScenarioFile != "" {
+		if err := uploadFile(testAssets.RoboScript.UploadURL, configs.RoboScenarioFile); err != nil {
+			return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.RoboScenarioFile, testAssets.RoboScript.UploadURL, err)
 		}
 	}
 
@@ -258,6 +263,7 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 			testModel.TestSpecification.AndroidRoboTest.RoboDirectives = roboDirectives
 		}
 		if configs.RoboScenarioFile != "" {
+			log.Debugf("Robo scenario file: %s", testAssets.RoboScript.GcsPath)
 			testModel.TestSpecification.AndroidRoboTest.RoboScript = &testing.FileReference{
 				GcsPath: testAssets.RoboScript.GcsPath,
 			}
