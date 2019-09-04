@@ -87,17 +87,13 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 		return TestAssetsAndroid{}, fmt.Errorf("failed to get http response, error: %s", err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return TestAssetsAndroid{}, fmt.Errorf("failed to read response body, error: %s", err)
-		}
-		return TestAssetsAndroid{}, fmt.Errorf("failed to start test: %d, error: %s", resp.StatusCode, string(body))
-	}
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return TestAssetsAndroid{}, fmt.Errorf("failed to read response body, error: %s", err)
+		return TestAssetsAndroid{}, fmt.Errorf("failed to read response body (status code: %d), error: %s", resp.StatusCode, err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return TestAssetsAndroid{}, fmt.Errorf("failed to start test: %d, error: %s", resp.StatusCode, string(body))
 	}
 
 	err = json.Unmarshal(body, &testAssets)
