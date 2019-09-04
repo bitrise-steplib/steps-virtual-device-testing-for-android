@@ -30,13 +30,23 @@ toolkit:
   go:
     package_name: github.com/bitrise-steplib/steps-virtual-device-testing-for-android
 inputs:
-  - apk_path: "$BITRISE_APK_PATH"
+  - apk_path: ""
     opts:
       title: "APK path"
       summary: |
+        Deprecated. Use 'App path' input instead of this one.
+
         The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
       description: |
         The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
+      is_required: false
+  - app_path: "$BITRISE_APK_PATH"
+    opts:
+      title: "App path"
+      summary: |
+        The path to the app to test. Can specify an apk ($BITRISE_APK_PATH) or aab file as input ($BITRISE_AAB_PATH).
+      description: |
+        The path to the app to test. By default `android-build` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
       is_required: true
   - test_devices: "NexusLowRes,24,en,portrait"
     opts:
@@ -112,11 +122,16 @@ inputs:
         - "gameloop"
   - app_package_id:
     opts:
+      category: "Deprecated"
       title: "App package ID"
       summary: |
-        The Java package of the application under test (leave empty to get it extracted from the APK manifest).
+        Deprecated: If not specified will be automatically extracted from the App manifest.
+
+        The Java package of the application under test.
       description: |
-        The Java package of the application under test (leave empty to get it extracted from the APK manifest).
+        Deprecated: If not specified will be automatically extracted from the App manifest.
+
+        The Java package of the application under test.
   - test_apk_path: "$BITRISE_TEST_APK_PATH"
     opts:
       category: "Instrumentation Test"
@@ -125,10 +140,16 @@ inputs:
       description: The path to the APK that contains instrumentation tests
   - inst_test_package_id:
     opts:
-      category: "Instrumentation Test"
+      category: "Deprecated"
       title: "Test package ID"
-      summary: The Java package name of the instrumentation test (leave empty to get it extracted from the APK manifest).
-      description: The Java package name of the instrumentation test (leave empty to get it extracted from the APK manifest).
+      summary: |
+        Deprecated: If not specified will be automatically extracted from the Test App manifest.
+
+        The Java package name of the instrumentation test.
+      description: |
+        Deprecated: If not specified will be automatically extracted from the Test App manifest.
+
+        The Java package name of the instrumentation test.
   - inst_test_runner_class:
     opts:
       category: "Instrumentation Test"
@@ -222,14 +243,32 @@ inputs:
         ```
 
         One directive per line, the parameters are separated with `,` character. For example: `ResourceName,InputText,ActionType`
+  - robo_scenario_file:
+    opts:
+      category: "Robo Test"
+      title: "Robo scenario file path"
+      summary: "A path to a JSON file with a sequence of recorded actions Robo should perform before the Robo crawl."
+      description:
   - loop_scenarios:
     opts:
       category: "Game Loop Test"
       title: "Loop scenarios"
+      description: |
+        A list of game-loop scenario numbers which will be run as part of the test (default: all scenarios).
+        A maximum of 1024 scenarios may be specified in one test matrix.
+
+        Format: int,[int,...]
+        For example:
+        ```
+        1,2
+        ```
   - loop_scenario_labels:
     opts:
       category: "Game Loop Test"
       title: "Loop scenario labels"
+      description: |
+        A list of game-loop scenario labels (default: None).
+        Each game-loop scenario may be labeled in the APK manifest file with one or more arbitrary strings, creating logical groupings (e.g. GPU_COMPATIBILITY_TESTS).
   - test_timeout: 900
     opts:
       category: "Debug"
@@ -238,6 +277,68 @@ inputs:
         Max time a test execution is allowed to run before it is automatically canceled. The default value is 900 (15 min).  Duration in seconds with up to nine fractional digits. Example: "3.5".
       description: |
         Max time a test execution is allowed to run before it is automatically canceled. The default value is 900 (15 min).  Duration in seconds with up to nine fractional digits. Example: "3.5".
+      is_required: true
+  - num_flaky_test_attempts: 0
+    opts:
+      category: "Debug"
+      title: "Number of times a test execution is reattempted"
+      summary: ""
+      description: |
+        Specifies the number of times a test execution should be reattempted if one or more of its test cases fail for any reason. An execution that
+        initially fails but succeeds on any reattempt is reported as FLAKY.
+
+        The maximum number of reruns allowed is 10. (Default: 0, which implies no reruns.)
+      is_required: true
+  - obb_files_list: ""
+    opts:
+      category: "Test setup"
+      title: "OBB files"
+      summary: "Upload OBB files before tests will run"
+      description: |
+        A list of one or two Android OBB file names which will be copied to each test device before the tests will run (default: None).
+        Each OBB file name must conform to the format as specified by Android (e.g. [main|patch].0300110.com.example.android.obb) and will be installed into <shared-storage>/Android/obb/<package-name>/ on the test device.
+
+        Files should be seperated by newline.
+        For example:
+
+        ```
+        main.0300110.com.example.android.obb
+        patch.0300110.com.example.android.obb
+        ```
+  - auto_google_login: "false"
+    opts:
+      category: "Test setup"
+      title: "Add preconfigured Google account"
+      summary: "Add preconfigured Google account before tests will run"
+      description: |-
+        Automatically log into the test device using a preconfigured Google
+        account before beginning the test.
+      is_required: true
+      value_options:
+      - "false"
+      - "true"
+  - environment_variables:
+    opts:
+      category: "Test setup"
+      title: Environment Variables
+      summary: |
+        One variable per line, key and value seperated by `=`
+
+        For example:
+
+        ```
+        coverage=true
+        coverageFile=/sdcard/tempDir/coverage.ec
+        ```
+      description: |
+        One variable per line, key and value seperated by `=`
+
+        For example:
+
+        ```
+        coverage=true
+        coverageFile=/sdcard/tempDir/coverage.ec
+        ```
   - directories_to_pull:
     opts:
       category: "Debug"
@@ -264,28 +365,6 @@ inputs:
         ```
         
         If `download_test_results` input is set to `false` then these files will be available on the dashboard only. To have them downloaded set that input to `true` as well.
-  - environment_variables:
-    opts:
-      category: "Debug"
-      title: Environment Variables
-      summary: |
-        One variable per line, key and value seperated by `=`
-
-        For example:
-
-        ```
-        coverage=true
-        coverageFile=/sdcard/tempDir/coverage.ec
-        ```
-      description: |
-        One variable per line, key and value seperated by `=`
-
-        For example:
-
-        ```
-        coverage=true
-        coverageFile=/sdcard/tempDir/coverage.ec
-        ```
   - download_test_results: "false"
     opts:
       category: "Debug"
@@ -294,6 +373,16 @@ inputs:
         If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded. 
       description: |
         If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded.
+      is_required: true
+      value_options:
+        - "false"
+        - "true"
+  - use_verbose_log: "false"
+    opts:
+      category: "Debug"
+      title: "Verbose log"
+      summary: |
+        If set to `true` will enable verbose level logging.
       is_required: true
       value_options:
         - "false"

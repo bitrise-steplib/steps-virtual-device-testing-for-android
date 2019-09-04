@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,207 +9,23 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"text/tabwriter"
 	"time"
 
-	testing "google.golang.org/api/testing/v1"
-	toolresults "google.golang.org/api/toolresults/v1beta3"
-
+	"github.com/bitrise-io/go-steputils/stepconf"
 	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
-	"github.com/bitrise-tools/go-steputils/input"
 	"github.com/bitrise-tools/go-steputils/tools"
+	toolresults "google.golang.org/api/toolresults/v1beta3"
 )
 
 const (
-	maxTimeoutSeconds = 1800
+	maxTimeoutSeconds       = 1800
+	testTypeInstrumentation = "instrumentation"
+	testTypeRobo            = "robo"
 )
-
-// ConfigsModel ...
-type ConfigsModel struct {
-	// api
-	APIBaseURL string
-	BuildSlug  string
-	AppSlug    string
-	APIToken   string
-
-	// shared
-	ApkPath              string
-	TestApkPath          string
-	TestType             string
-	TestDevices          string
-	AppPackageID         string
-	TestTimeout          string
-	DownloadTestResults  string
-	DirectoriesToPull    string
-	EnvironmentVariables string
-
-	// instrumentation
-	InstTestPackageID   string
-	InstTestRunnerClass string
-	InstTestTargets     string
-	UseOrchestrator     string
-
-	// robo
-	RoboInitialActivity string
-	RoboMaxDepth        string
-	RoboMaxSteps        string
-	RoboDirectives      string
-
-	// loop
-	LoopScenarios      string
-	LoopScenarioLabels string
-}
-
-// UploadURLRequest ...
-type UploadURLRequest struct {
-	AppURL     string `json:"appUrl"`
-	TestAppURL string `json:"testAppUrl"`
-}
-
-func createConfigsModelFromEnvs() ConfigsModel {
-	return ConfigsModel{
-		// api
-		APIBaseURL: os.Getenv("api_base_url"),
-		BuildSlug:  os.Getenv("BITRISE_BUILD_SLUG"),
-		AppSlug:    os.Getenv("BITRISE_APP_SLUG"),
-		APIToken:   os.Getenv("api_token"),
-
-		// shared
-		ApkPath:              os.Getenv("apk_path"),
-		TestApkPath:          os.Getenv("test_apk_path"),
-		TestType:             os.Getenv("test_type"),
-		TestDevices:          os.Getenv("test_devices"),
-		AppPackageID:         os.Getenv("app_package_id"),
-		TestTimeout:          os.Getenv("test_timeout"),
-		DownloadTestResults:  os.Getenv("download_test_results"),
-		DirectoriesToPull:    os.Getenv("directories_to_pull"),
-		EnvironmentVariables: os.Getenv("environment_variables"),
-
-		// instrumentation
-		InstTestPackageID:   os.Getenv("inst_test_package_id"),
-		InstTestRunnerClass: os.Getenv("inst_test_runner_class"),
-		InstTestTargets:     os.Getenv("inst_test_targets"),
-		UseOrchestrator:     os.Getenv("inst_use_orchestrator"),
-
-		// robo
-		RoboInitialActivity: os.Getenv("robo_initial_activity"),
-		RoboMaxDepth:        os.Getenv("robo_max_depth"),
-		RoboMaxSteps:        os.Getenv("robo_max_steps"),
-		RoboDirectives:      os.Getenv("robo_directives"),
-
-		// loop
-		LoopScenarios:      os.Getenv("loop_scenarios"),
-		LoopScenarioLabels: os.Getenv("loop_scenario_labels"),
-	}
-}
-
-func (configs ConfigsModel) print() {
-	log.Infof("Configs:")
-	log.Printf("- ApkPath: %s", configs.ApkPath)
-
-	log.Printf("- TestTimeout: %s", configs.TestTimeout)
-	log.Printf("- DirectoriesToPull: %s", configs.DirectoriesToPull)
-	log.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariables)
-	log.Printf("- TestDevices:\n---")
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-	if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\t"); err != nil {
-		failf("Failed to write in tabwriter, error: %s", err)
-	}
-	scanner := bufio.NewScanner(strings.NewReader(configs.TestDevices))
-	for scanner.Scan() {
-		device := scanner.Text()
-		device = strings.TrimSpace(device)
-		if device == "" {
-			continue
-		}
-
-		deviceParams := strings.Split(device, ",")
-
-		if len(deviceParams) != 4 {
-			continue
-		}
-
-		if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", deviceParams[0], deviceParams[1], deviceParams[3], deviceParams[2])); err != nil {
-			failf("Failed to write in tabwriter, error: %s", err)
-		}
-	}
-	if err := w.Flush(); err != nil {
-		log.Errorf("Failed to flush writer, error: %s", err)
-	}
-	log.Printf("---")
-	log.Printf("- AppPackageID: %s", configs.AppPackageID)
-	log.Printf("- TestType: %s", configs.TestType)
-
-	// instruments
-	if configs.TestType == "instrumentation" {
-		log.Printf("- TestApkPath: %s", configs.TestApkPath)
-		log.Printf("- InstTestPackageID: %s", configs.InstTestPackageID)
-		log.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
-		log.Printf("- InstTestTargets: %s", configs.InstTestTargets)
-		log.Printf("- UseOrchestrator: %s", configs.UseOrchestrator)
-	}
-
-	//robo
-	if configs.TestType == "robo" {
-		log.Printf("- RoboInitialActivity: %s", configs.RoboInitialActivity)
-		log.Printf("- RoboMaxDepth: %s", configs.RoboMaxDepth)
-		log.Printf("- RoboMaxSteps: %s", configs.RoboMaxSteps)
-		log.Printf("- RoboDirectives: %s", configs.RoboDirectives)
-	}
-
-	if configs.TestType == "gameloop" {
-		// loop
-		log.Printf("- LoopScenarios: %s", configs.LoopScenarios)
-		log.Printf("- LoopScenarioLabels: %s", configs.LoopScenarioLabels)
-	}
-}
-
-func (configs ConfigsModel) validate() error {
-	if err := input.ValidateIfNotEmpty(configs.APIBaseURL); err != nil {
-		if _, set := os.LookupEnv("BITRISE_IO"); !set {
-			log.Warnf("Warning: please make sure that Virtual Device Testing add-on is turned on under your app's settings tab.")
-		}
-		return fmt.Errorf("Issue with APIBaseURL: %s", err)
-	}
-	if err := input.ValidateIfNotEmpty(configs.APIToken); err != nil {
-		return fmt.Errorf("Issue with APIToken: %s", err)
-	}
-	if err := input.ValidateIfNotEmpty(configs.BuildSlug); err != nil {
-		return fmt.Errorf("Issue with BuildSlug: %s", err)
-	}
-	if err := input.ValidateIfNotEmpty(configs.AppSlug); err != nil {
-		return fmt.Errorf("Issue with AppSlug: %s", err)
-	}
-	if err := input.ValidateIfNotEmpty(configs.TestType); err != nil {
-		return fmt.Errorf("Issue with TestType: %s", err)
-	}
-	if err := input.ValidateWithOptions(configs.TestType, "instrumentation", "robo", "gameloop"); err != nil {
-		return fmt.Errorf("Issue with TestType: %s", err)
-	}
-	if err := input.ValidateWithOptions(configs.UseOrchestrator, "false", "true"); err != nil {
-		return fmt.Errorf("Issue with UseOrchestrator: %s", err)
-	}
-	if err := input.ValidateIfNotEmpty(configs.ApkPath); err != nil {
-		return fmt.Errorf("Issue with ApkPath: %s", err)
-	}
-	if err := input.ValidateIfPathExists(configs.ApkPath); err != nil {
-		return fmt.Errorf("Issue with ApkPath: %s", err)
-	}
-	if configs.TestType == "instrumentation" {
-		if err := input.ValidateIfNotEmpty(configs.TestApkPath); err != nil {
-			return fmt.Errorf("Issue with TestApkPath: %s. Is it possible that you used gradle-runner step and forgot to set `assembleDebugAndroidTest` task?", err)
-		}
-		if err := input.ValidateIfPathExists(configs.TestApkPath); err != nil {
-			return fmt.Errorf("Issue with TestApkPath: %s. Is it possible that you used gradle-runner step and forgot to set `assembleDebugAndroidTest` task?", err)
-		}
-	}
-
-	return nil
-}
 
 func failf(f string, v ...interface{}) {
 	log.Errorf(f, v...)
@@ -219,259 +33,39 @@ func failf(f string, v ...interface{}) {
 }
 
 func main() {
-	configs := createConfigsModelFromEnvs()
-
-	fmt.Println()
-	configs.print()
+	var configs ConfigsModel
+	if err := stepconf.Parse(&configs); err != nil {
+		failf("Invalid input: %s", err)
+	}
 
 	if err := configs.validate(); err != nil {
+		log.Errorf("Failed to parse config:")
 		failf("%s", err)
 	}
 
 	fmt.Println()
+	configs.print()
 
-	successful := true
-
-	log.Infof("Upload APKs")
-	{
-		url := configs.APIBaseURL + "/assets/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
-
-		req, err := http.NewRequest("POST", url, nil)
-		if err != nil {
-			failf("Failed to create http request, error: %s", err)
-		}
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			failf("Failed to get http response, error: %s", err)
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				failf("Failed to read response body, error: %s", err)
-			}
-			failf("Failed to start test: %d, error: %s", resp.StatusCode, string(body))
-		}
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			failf("Failed to read response body, error: %s", err)
-		}
-
-		responseModel := &UploadURLRequest{}
-
-		err = json.Unmarshal(body, responseModel)
-		if err != nil {
-			failf("Failed to unmarshal response body, error: %s", err)
-		}
-
-		err = uploadFile(responseModel.AppURL, configs.ApkPath)
-		if err != nil {
-			failf("Failed to upload file(%s) to (%s), error: %s", configs.ApkPath, responseModel.AppURL, err)
-		}
-
-		if configs.TestType == "instrumentation" {
-			err = uploadFile(responseModel.TestAppURL, configs.TestApkPath)
-			if err != nil {
-				failf("Failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, responseModel.TestAppURL, err)
-			}
-		}
-
-		log.Donef("=> APKs uploaded")
-	}
+	log.SetEnableDebugLog(configs.VerboseLog)
 
 	fmt.Println()
-	log.Infof("Start test")
-	{
-		url := configs.APIBaseURL + "/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
+	successful := true
 
-		testModel := &testing.TestMatrix{}
-		testModel.EnvironmentMatrix = &testing.EnvironmentMatrix{AndroidDeviceList: &testing.AndroidDeviceList{}}
-		testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices = []*testing.AndroidDevice{}
+	log.Infof("Uploading app and test files")
 
-		scanner := bufio.NewScanner(strings.NewReader(configs.TestDevices))
-		for scanner.Scan() {
-			device := scanner.Text()
-			device = strings.TrimSpace(device)
-			if device == "" {
-				continue
-			}
-
-			deviceParams := strings.Split(device, ",")
-			if len(deviceParams) != 4 {
-				failf("Invalid test device configuration: %s", device)
-			}
-
-			newDevice := testing.AndroidDevice{
-				AndroidModelId:   deviceParams[0],
-				AndroidVersionId: deviceParams[1],
-				Locale:           deviceParams[2],
-				Orientation:      deviceParams[3],
-			}
-
-			testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices = append(testModel.EnvironmentMatrix.AndroidDeviceList.AndroidDevices, &newDevice)
-		}
-
-		// parse directories to pull
-		scanner = bufio.NewScanner(strings.NewReader(configs.DirectoriesToPull))
-		directoriesToPull := []string{}
-		for scanner.Scan() {
-			path := scanner.Text()
-			path = strings.TrimSpace(path)
-			if path == "" {
-				continue
-			}
-			directoriesToPull = append(directoriesToPull, path)
-		}
-
-		// parse environment variables
-		scanner = bufio.NewScanner(strings.NewReader(configs.EnvironmentVariables))
-		envs := []*testing.EnvironmentVariable{}
-		for scanner.Scan() {
-			envStr := scanner.Text()
-
-			if envStr == "" {
-				continue
-			}
-
-			if !strings.Contains(envStr, "=") {
-				continue
-			}
-
-			envStrSplit := strings.Split(envStr, "=")
-			envKey := envStrSplit[0]
-			envValue := strings.Join(envStrSplit[1:], "=")
-
-			envs = append(envs, &testing.EnvironmentVariable{Key: envKey, Value: envValue})
-		}
-
-		timeout := configs.TestTimeout
-		if val, err := strconv.ParseFloat(timeout, 64); err != nil {
-			failf("could not parse float from timeout value (%s): %s", timeout, err)
-		} else if val > float64(maxTimeoutSeconds) {
-			log.Warnf("timeout value (%f) is greater than available maximum (%f). Maximum will be used instead.", val, maxTimeoutSeconds)
-			timeout = strconv.Itoa(maxTimeoutSeconds)
-		}
-
-		testModel.TestSpecification = &testing.TestSpecification{
-			TestTimeout: fmt.Sprintf("%ss", timeout),
-			TestSetup: &testing.TestSetup{
-				EnvironmentVariables: envs,
-				DirectoriesToPull:    directoriesToPull,
-			},
-		}
-
-		switch configs.TestType {
-		case "instrumentation":
-			testModel.TestSpecification.AndroidInstrumentationTest = &testing.AndroidInstrumentationTest{}
-			if configs.AppPackageID != "" {
-				testModel.TestSpecification.AndroidInstrumentationTest.AppPackageId = configs.AppPackageID
-			}
-			if configs.InstTestPackageID != "" {
-				testModel.TestSpecification.AndroidInstrumentationTest.TestPackageId = configs.InstTestPackageID
-			}
-			if configs.InstTestRunnerClass != "" {
-				testModel.TestSpecification.AndroidInstrumentationTest.TestRunnerClass = configs.InstTestRunnerClass
-			}
-			if configs.InstTestTargets != "" {
-				targets := strings.Split(strings.TrimSpace(configs.InstTestTargets), ",")
-				testModel.TestSpecification.AndroidInstrumentationTest.TestTargets = targets
-			}
-			if configs.UseOrchestrator == "true" {
-				testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "USE_ORCHESTRATOR"
-			} else {
-				testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "DO_NOT_USE_ORCHESTRATOR"
-			}
-		case "robo":
-			testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
-			if configs.AppPackageID != "" {
-				testModel.TestSpecification.AndroidRoboTest.AppPackageId = configs.AppPackageID
-			}
-			if configs.RoboInitialActivity != "" {
-				testModel.TestSpecification.AndroidRoboTest.AppInitialActivity = configs.RoboInitialActivity
-			}
-			if configs.RoboMaxDepth != "" {
-				maxDepth, err := strconv.Atoi(configs.RoboMaxDepth)
-				if err != nil {
-					failf("Failed to parse string(%s) to integer, error: %s", configs.RoboMaxDepth, err)
-				}
-				testModel.TestSpecification.AndroidRoboTest.MaxDepth = int64(maxDepth)
-			}
-			if configs.RoboMaxSteps != "" {
-				maxSteps, err := strconv.Atoi(configs.RoboMaxSteps)
-				if err != nil {
-					failf("Failed to parse string(%s) to integer, error: %s", configs.RoboMaxSteps, err)
-				}
-				testModel.TestSpecification.AndroidRoboTest.MaxSteps = int64(maxSteps)
-			}
-			if configs.RoboDirectives != "" {
-				roboDirectives := []*testing.RoboDirective{}
-				scanner := bufio.NewScanner(strings.NewReader(configs.RoboDirectives))
-				for scanner.Scan() {
-					directive := scanner.Text()
-					directive = strings.TrimSpace(directive)
-					if directive == "" {
-						continue
-					}
-
-					directiveParams := strings.Split(directive, ",")
-					if len(directiveParams) != 3 {
-						failf("Invalid directive configuration: %s", directive)
-					}
-					roboDirectives = append(roboDirectives, &testing.RoboDirective{ResourceName: directiveParams[0], InputText: directiveParams[1], ActionType: directiveParams[2]})
-				}
-				testModel.TestSpecification.AndroidRoboTest.RoboDirectives = roboDirectives
-			}
-		case "gameloop":
-			testModel.TestSpecification.AndroidTestLoop = &testing.AndroidTestLoop{}
-			if configs.AppPackageID != "" {
-				testModel.TestSpecification.AndroidTestLoop.AppPackageId = configs.AppPackageID
-			}
-			if configs.LoopScenarios != "" {
-				loopScenarios := []int64{}
-				for _, scenarioStr := range strings.Split(strings.TrimSpace(configs.LoopScenarios), ",") {
-					scenario, err := strconv.Atoi(scenarioStr)
-					if err != nil {
-						failf("Failed to parse string(%s) to integer, error: %s", scenarioStr, err)
-					}
-					loopScenarios = append(loopScenarios, int64(scenario))
-				}
-				testModel.TestSpecification.AndroidTestLoop.Scenarios = loopScenarios
-			}
-			if configs.LoopScenarioLabels != "" {
-				scenarioLabels := strings.Split(strings.TrimSpace(configs.LoopScenarioLabels), ",")
-				testModel.TestSpecification.AndroidTestLoop.ScenarioLabels = scenarioLabels
-			}
-		}
-
-		jsonByte, err := json.Marshal(testModel)
-		if err != nil {
-			failf("Failed to marshal test model, error: %s", err)
-		}
-
-		req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonByte))
-		if err != nil {
-			failf("Failed to create http request, error: %s", err)
-		}
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			failf("Failed to get http response, error: %s", err)
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				failf("Failed to read response body, error: %s", err)
-			}
-			failf("Failed to start test: %d, error: %s", resp.StatusCode, string(body))
-		}
-
-		log.Donef("=> Test started")
+	testAssets, err := uploadTestAssets(configs)
+	if err != nil {
+		failf("Failed to upload test assets, error: %s", err)
 	}
+	log.Donef("=> Files uploaded")
+
+	fmt.Println()
+	log.Infof("Starting test")
+
+	if err = startTestRun(configs, testAssets); err != nil {
+		failf("Starting test run failed, error: %s", err)
+	}
+	log.Donef("=> Test started")
 
 	fmt.Println()
 	log.Infof("Waiting for test results")
@@ -615,7 +209,7 @@ func main() {
 		}
 	}
 
-	if configs.DownloadTestResults == "true" {
+	if configs.DownloadTestResults {
 		fmt.Println()
 		log.Infof("Downloading test assets")
 		{
