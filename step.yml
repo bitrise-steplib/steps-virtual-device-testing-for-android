@@ -30,23 +30,15 @@ toolkit:
   go:
     package_name: github.com/bitrise-steplib/steps-virtual-device-testing-for-android
 inputs:
-  - apk_path: ""
-    opts:
-      title: "APK path"
-      summary: |
-        Deprecated. Use 'App path' input instead of this one.
-
-        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
-      description: |
-        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
-      is_required: false
   - app_path: "$BITRISE_APK_PATH"
     opts:
       title: "App path"
       summary: |
-        The path to the app to test. Can specify an apk ($BITRISE_APK_PATH) or aab file as input ($BITRISE_AAB_PATH).
+        The path to the app (apk or aab) to test.
       description: |
         The path to the app to test. By default `android-build` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
+
+        Can specify an apk (`$BITRISE_APK_PATH`) or aab bundle as input (`$BITRISE_AAB_PATH`).
       is_required: true
   - test_devices: "NexusLowRes,24,en,portrait"
     opts:
@@ -120,36 +112,12 @@ inputs:
         - "instrumentation"
         - "robo"
         - "gameloop"
-  - app_package_id:
-    opts:
-      category: "Deprecated"
-      title: "App package ID"
-      summary: |
-        Deprecated: If not specified will be automatically extracted from the App manifest.
-
-        The Java package of the application under test.
-      description: |
-        Deprecated: If not specified will be automatically extracted from the App manifest.
-
-        The Java package of the application under test.
   - test_apk_path: "$BITRISE_TEST_APK_PATH"
     opts:
       category: "Instrumentation Test"
       title: "Test APK path"
       summary: The path to the APK that contains instrumentation tests
       description: The path to the APK that contains instrumentation tests
-  - inst_test_package_id:
-    opts:
-      category: "Deprecated"
-      title: "Test package ID"
-      summary: |
-        Deprecated: If not specified will be automatically extracted from the Test App manifest.
-
-        The Java package name of the instrumentation test.
-      description: |
-        Deprecated: If not specified will be automatically extracted from the Test App manifest.
-
-        The Java package name of the instrumentation test.
   - inst_test_runner_class:
     opts:
       category: "Instrumentation Test"
@@ -387,8 +355,46 @@ inputs:
       value_options:
         - "false"
         - "true"
+  - apk_path: ""
+    opts:
+      category: "Deprecated"
+      title: "APK path"
+      summary: |
+        Deprecated. Use 'App path' input instead of this one.
+
+        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
+      description: |
+        Deprecated. Use 'App path' input instead of this one.
+
+        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
+      is_required: false
+  - app_package_id:
+    opts:
+      category: "Deprecated"
+      title: "App package ID"
+      summary: |
+        Deprecated: If not specified will be automatically extracted from the App manifest.
+
+        The Java package of the application under test.
+      description: |
+        Deprecated: If not specified will be automatically extracted from the App manifest.
+
+        The Java package of the application under test.
+  - inst_test_package_id:
+    opts:
+      category: "Deprecated"
+      title: "Test package ID"
+      summary: |
+        Deprecated: If not specified will be automatically extracted from the Test App manifest.
+
+        The Java package name of the instrumentation test.
+      description: |
+        Deprecated: If not specified will be automatically extracted from the Test App manifest.
+
+        The Java package name of the instrumentation test.
   - api_base_url: "https://vdt.bitrise.io/test"
     opts:
+      category: "Debug"
       title: "Test API's base URL"
       summary: The URL where test API is accessible.
       description: |
@@ -397,6 +403,7 @@ inputs:
       is_dont_change_value: true
   - api_token: $ADDON_VDTESTING_API_TOKEN
     opts: 
+      category: "Debug"
       title: "API Token"
       summary: The token required to authenticate with the API.
       description: |
