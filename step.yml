@@ -264,7 +264,7 @@ inputs:
       summary: "Upload OBB files before tests will run"
       description: |
         A list of one or two Android OBB file names which will be copied to each test device before the tests will run (default: None).
-        Each OBB file name must conform to the format as specified by Android (e.g. [main|patch].0300110.com.example.android.obb) and will be installed into <shared-storage>/Android/obb/<package-name>/ on the test device.
+        Each OBB file name must conform to the format as specified by Android (e.g. [main|patch].0300110.com.example.android.obb) and will be installed into `[shared-storage]/Android/obb/[package-name]/` on the test device.
 
         Files should be seperated by newline.
         For example:
