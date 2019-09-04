@@ -80,34 +80,22 @@ func (configs *ConfigsModel) print() {
 	log.Printf("- AutoGoogleLogin: %t", configs.AutoGoogleLogin)
 	log.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariablesList)
 	log.Printf("- ObbFilesList: %s", configs.ObbFilesList)
+
 	log.Printf("- TestDevices:\n---")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 	if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\t"); err != nil {
 		failf("Failed to write in tabwriter, error: %s", err)
 	}
-	scanner := bufio.NewScanner(strings.NewReader(configs.TestDevicesList))
-	for scanner.Scan() {
-		device := scanner.Text()
-		device = strings.TrimSpace(device)
-		if device == "" {
-			continue
-		}
-
-		deviceParams := strings.Split(device, ",")
-
-		if len(deviceParams) != 4 {
-			continue
-		}
-
-		if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", deviceParams[0], deviceParams[1], deviceParams[3], deviceParams[2])); err != nil {
+	for _, testDevice := range configs.TestDevices {
+		if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", testDevice.AndroidModelId, testDevice.AndroidVersionId, testDevice.Locale, testDevice.Orientation)); err != nil {
 			failf("Failed to write in tabwriter, error: %s", err)
 		}
 	}
 	if err := w.Flush(); err != nil {
 		log.Errorf("Failed to flush writer, error: %s", err)
 	}
-
 	log.Printf("---")
+
 	log.Printf("- TestType: %s", configs.TestType)
 	// instruments
 	if configs.TestType == testTypeInstrumentation {
