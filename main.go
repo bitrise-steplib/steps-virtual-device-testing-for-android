@@ -38,13 +38,13 @@ func main() {
 		failf("Invalid input: %s", err)
 	}
 
-	fmt.Println()
-	configs.print()
-
 	if err := configs.validate(); err != nil {
 		log.Errorf("Failed to parse config:")
 		failf("%s", err)
 	}
+
+	fmt.Println()
+	configs.print()
 
 	log.SetEnableDebugLog(configs.VerboseLog)
 
