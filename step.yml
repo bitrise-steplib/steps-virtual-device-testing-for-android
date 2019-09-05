@@ -14,6 +14,10 @@ type_tags:
 is_always_run: false
 is_skippable: false
 run_if: ".IsCI"
+meta: 
+  bitrise.io: 
+    addons_required: 
+      - addons-testing
 
 toolkit:
   go:
