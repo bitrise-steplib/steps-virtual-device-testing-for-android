@@ -7,8 +7,6 @@ description: |-
 website: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
 source_code_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
 support_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android/issues
-host_os_tags:
-  - ubuntu
 project_type_tags:
   - android
 type_tags:
@@ -16,16 +14,11 @@ type_tags:
 is_always_run: false
 is_skippable: false
 run_if: ".IsCI"
-meta:
-  bitrise.io:
-    addons_required: [{addon_id:"addons-firebase-testlab"}]
+meta: 
+  bitrise.io: 
+    addons_required: 
+      - addons-testing
 
-deps:
-  brew:
-  - name: go
-  apt_get:
-  - name: golang
-    bin_name: go
 toolkit:
   go:
     package_name: github.com/bitrise-steplib/steps-virtual-device-testing-for-android
@@ -161,7 +154,7 @@ inputs:
       value_options:
         - "false"
         - "true"
-  - robo_initial_activity: 
+  - robo_initial_activity:
     opts:
       category: "Robo Test"
       title: "Initial activity"
@@ -402,7 +395,7 @@ inputs:
       is_required: true
       is_dont_change_value: true
   - api_token: $ADDON_VDTESTING_API_TOKEN
-    opts: 
+    opts:
       category: "Debug"
       title: "API Token"
       summary: The token required to authenticate with the API.
