@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	maxTimeoutSeconds       = 1800
+	maxTimeoutSeconds       = 3600
 	testTypeInstrumentation = "instrumentation"
 	testTypeRobo            = "robo"
 )
