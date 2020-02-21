@@ -35,7 +35,7 @@ type ConfigsModel struct {
 	ObbFiles                 []string
 
 	// shared debug
-	TestTimeout           float64 `env:"test_timeout,required"`
+	TestTimeout           float64 `env:"test_timeout,required,]0..3600]"`
 	FlakyTestAttempts     int     `env:"num_flaky_test_attempts,range[0..10]"`
 	DownloadTestResults   bool    `env:"download_test_results,opt[true,false]"`
 	DirectoriesToPullList string  `env:"directories_to_pull"`
@@ -154,11 +154,6 @@ func (configs *ConfigsModel) validate() error {
 		if _, err := os.Stat(configs.RoboScenarioFile); err != nil {
 			return fmt.Errorf("- RoboScenarioFile: failed to get file info, error: %s", err)
 		}
-	}
-
-	if configs.TestTimeout > float64(maxTimeoutSeconds) {
-		log.Warnf("timeout value (%f) is greater than available maximum (%f). Maximum will be used instead.", configs.TestTimeout, maxTimeoutSeconds)
-		configs.TestTimeout = maxTimeoutSeconds
 	}
 
 	var err error
