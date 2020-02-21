@@ -35,7 +35,7 @@ type ConfigsModel struct {
 	ObbFiles                 []string
 
 	// shared debug
-	TestTimeout           float64 `env:"test_timeout,required,]0..3600]"`
+	TestTimeout           float64 `env:"test_timeout,range]0..3600]"`
 	FlakyTestAttempts     int     `env:"num_flaky_test_attempts,range[0..10]"`
 	DownloadTestResults   bool    `env:"download_test_results,opt[true,false]"`
 	DirectoriesToPullList string  `env:"directories_to_pull"`
