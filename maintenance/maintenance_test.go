@@ -327,6 +327,7 @@ supportedVersionIds[2]: 25
 supportedVersionIds[3]: 26
 supportedVersionIds[4]: 27
 supportedVersionIds[5]: 28
+supportedVersionIds[6]: 29
 ---
 brand:                  Google
 codename:               Pixel2
@@ -349,4 +350,5 @@ supportedAbis[7]:       29:armeabi
 supportedAbis[8]:       29:armeabi-v7a
 supportedVersionIds[0]: 26
 supportedVersionIds[1]: 27
-supportedVersionIds[2]: 28`
+supportedVersionIds[2]: 28
+supportedVersionIds[3]: 29`
