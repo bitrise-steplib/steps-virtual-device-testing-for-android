@@ -1,9 +1,10 @@
 title: "[BETA] Virtual Device Testing for Android"
 summary: Run Android UI tests on virtual devices
 description: |-
-  Run Android UI tests on virtual devices. Available test types are instrumentation, robo, gameloop.
-  The minimal setup of this step would be to select test type. If you selected instrumentation, don't forget to set __Test APK path__
-  under the __Instrumentation Test__ group as well.
+  Run Android UI tests on virtual devices. This Step doesn't build anything, it collects the built APK from `$BITRISE_APK_PATH` (and in case of instrumentation tests, the test APK from `$BITRISE_TEST_APK_PATH`).
+  
+  Available test types are instrumentation, robo, gameloop. The minimal setup of this Step would be to select a test type. If you selected instrumentation, don't forget to set the __Test APK path__
+  under the __Instrumentation Test__ group as well. To create the two required APKs, you can run the [Build for UI testing](https://bitrise.io/integrations/steps/android-build-for-ui-testing) Step (before this Step).  
 website: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
 source_code_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
 support_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android/issues
@@ -27,11 +28,11 @@ inputs:
     opts:
       title: "App path"
       summary: |
-        The path to the app (apk or aab) to test.
+        The path to the app to test (APK or AAB).
       description: |
-        The path to the app to test. By default `android-build` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
+        The path to the app to test (APK or AAB). By default `android-build` and `android-build-for-ui-testing` Steps export the `BITRISE_APK_PATH` Env Var, so you won't need to change this input.
 
-        Can specify an apk (`$BITRISE_APK_PATH`) or aab bundle as input (`$BITRISE_AAB_PATH`).
+        Can specify an APK (`$BITRISE_APK_PATH`) or AAB (Android App Bundle) as input (`$BITRISE_AAB_PATH`).
       is_required: true
   - test_devices: "NexusLowRes,24,en,portrait"
     opts:
@@ -110,7 +111,7 @@ inputs:
       category: "Instrumentation Test"
       title: "Test APK path"
       summary: The path to the APK that contains instrumentation tests
-      description: The path to the APK that contains instrumentation tests
+      description: The path to the APK that contains instrumentation tests. To build this, you can run the [Build for UI testing](https://bitrise.io/integrations/steps/android-build-for-ui-testing) Step (before this Step).  
   - inst_test_runner_class:
     opts:
       category: "Instrumentation Test"
