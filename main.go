@@ -81,7 +81,7 @@ func main() {
 
 			client := &http.Client{}
 			resp, err := client.Do(req)
-			if resp.StatusCode != http.StatusOK || err != nil {
+			if err != nil || resp.StatusCode != http.StatusOK {
 				resp, err = client.Do(req)
 				if err != nil {
 					failf("Failed to get http response, error: %s", err)
