@@ -166,7 +166,7 @@ formFactor:             PHONE
 id:                     Nexus5X
 manufacturer:           LG
 name:                   Nexus 5X
-screenDensity:          423
+screenDensity:          420
 screenX:                1080
 screenY:                1920
 supportedAbis[0]:       x86
@@ -213,7 +213,7 @@ formFactor:             PHONE
 id:                     Nexus6P
 manufacturer:           Google
 name:                   Nexus 6P
-screenDensity:          518
+screenDensity:          560
 screenX:                1440
 screenY:                2560
 supportedAbis[0]:       x86
@@ -368,4 +368,18 @@ supportedVersionIds[1]: 27
 supportedVersionIds[2]: 28
 supportedVersionIds[3]: 29
 supportedVersionIds[4]: 30
+tags[0]:                beta=30
+---
+brand:                  google
+codename:               Pixel3
+form:                   VIRTUAL
+formFactor:             PHONE
+id:                     Pixel3
+manufacturer:           Google
+name:                   Pixel 3
+screenDensity:          440
+screenX:                1080
+screenY:                2160
+supportedAbis[0]:       30:x86
+supportedVersionIds[0]: 30
 tags[0]:                beta=30`
