@@ -337,7 +337,6 @@ supportedVersionIds[4]: 27
 supportedVersionIds[5]: 28
 supportedVersionIds[6]: 29
 supportedVersionIds[7]: 30
-tags[0]:                beta=30
 ---
 brand:                  Google
 codename:               Pixel2
@@ -368,7 +367,6 @@ supportedVersionIds[1]: 27
 supportedVersionIds[2]: 28
 supportedVersionIds[3]: 29
 supportedVersionIds[4]: 30
-tags[0]:                beta=30
 ---
 brand:                  google
 codename:               Pixel3
@@ -381,5 +379,4 @@ screenDensity:          440
 screenX:                1080
 screenY:                2160
 supportedAbis[0]:       30:x86
-supportedVersionIds[0]: 30
-tags[0]:                beta=30`
+supportedVersionIds[0]: 30`
