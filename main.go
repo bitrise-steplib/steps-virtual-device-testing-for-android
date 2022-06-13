@@ -13,11 +13,11 @@ import (
 	"time"
 
 	"github.com/bitrise-io/go-steputils/stepconf"
+	"github.com/bitrise-io/go-steputils/tools"
 	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
-	"github.com/bitrise-tools/go-steputils/tools"
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 )
 
