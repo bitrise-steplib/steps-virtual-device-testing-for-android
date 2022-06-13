@@ -111,6 +111,19 @@ func checkAccounts() (bool, error) {
 }
 
 const deviceList = `---
+brand:                  Generic
+codename:               AndroidTablet270dpi
+form:                   VIRTUAL
+formFactor:             TABLET
+id:                     AndroidTablet270dpi
+manufacturer:           Generic
+name:                   Generic 720x1600 Android tablet @ 270dpi
+screenDensity:          270
+screenX:                720
+screenY:                1600
+supportedAbis[0]:       x86
+supportedVersionIds[0]: 30
+---
 brand:                  Google
 codename:               Nexus10
 form:                   VIRTUAL
