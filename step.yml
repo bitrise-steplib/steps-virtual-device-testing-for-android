@@ -1,4 +1,4 @@
-title: "[BETA] Virtual Device Testing for Android"
+title: "Virtual Device Testing for Android"
 summary: Run Android UI tests on virtual devices
 description: |-
   Run Android UI tests on virtual devices. This Step collects the built APK/AAB file from the `$BITRISE_APK_PATH` and in case of instrumentation tests, the `$BITRISE_TEST_APK_PATH` Environment Variables and uses Firebase Test Lab to run UI tests on them.
