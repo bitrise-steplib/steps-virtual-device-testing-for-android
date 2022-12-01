@@ -111,6 +111,19 @@ func checkAccounts() (bool, error) {
 }
 
 const deviceList = `---
+brand:                  Google
+codename:               AmatiTvEmulator
+form:                   VIRTUAL
+id:                     AmatiTvEmulator
+manufacturer:           Google
+name:                   Google TV Amati
+screenDensity:          320
+screenX:                1920
+screenY:                1080
+supportedAbis[0]:       x86
+supportedVersionIds[0]: 29
+tags[0]:                beta=29
+---
 brand:                  Generic
 codename:               AndroidTablet270dpi
 form:                   VIRTUAL
@@ -123,6 +136,61 @@ screenX:                720
 screenY:                1600
 supportedAbis[0]:       x86
 supportedVersionIds[0]: 30
+---
+brand:                  Google
+codename:               GoogleTvEmulator
+form:                   VIRTUAL
+id:                     GoogleTvEmulator
+manufacturer:           Google
+name:                   Google TV
+screenDensity:          213
+screenX:                1280
+screenY:                720
+supportedAbis[0]:       x86
+supportedVersionIds[0]: 30
+tags[0]:                beta=30
+---
+brand:                  Google
+codename:               MediumPhone.arm
+form:                   VIRTUAL
+formFactor:             PHONE
+id:                     MediumPhone.arm
+manufacturer:           Generic
+name:                   MediumPhone (ARM)
+screenDensity:          420
+screenX:                1080
+screenY:                2400
+supportedAbis[0]:       arm64-v8a
+supportedVersionIds[0]: 26
+supportedVersionIds[1]: 27
+supportedVersionIds[2]: 28
+supportedVersionIds[3]: 29
+supportedVersionIds[4]: 30
+supportedVersionIds[5]: 32
+supportedVersionIds[6]: 33
+tags[0]:                preview=33
+tags[1]:                beta
+---
+brand:                  Google
+codename:               MediumTablet.arm
+form:                   VIRTUAL
+formFactor:             TABLET
+id:                     MediumTablet.arm
+manufacturer:           Generic
+name:                   MediumTablet (ARM)
+screenDensity:          320
+screenX:                1600
+screenY:                2560
+supportedAbis[0]:       arm64-v8a
+supportedVersionIds[0]: 26
+supportedVersionIds[1]: 27
+supportedVersionIds[2]: 28
+supportedVersionIds[3]: 29
+supportedVersionIds[4]: 30
+supportedVersionIds[5]: 32
+supportedVersionIds[6]: 33
+tags[0]:                preview=33
+tags[1]:                beta
 ---
 brand:                  Google
 codename:               Nexus10
@@ -138,6 +206,7 @@ supportedAbis[0]:       x86
 supportedVersionIds[0]: 19
 supportedVersionIds[1]: 21
 supportedVersionIds[2]: 22
+tags[0]:                deprecated=19
 ---
 brand:                  Google
 codename:               Nexus4
@@ -153,6 +222,7 @@ supportedAbis[0]:       x86
 supportedVersionIds[0]: 19
 supportedVersionIds[1]: 21
 supportedVersionIds[2]: 22
+tags[0]:                deprecated=19
 ---
 brand:                  Google
 codename:               Nexus5
@@ -171,6 +241,7 @@ supportedVersionIds[0]: 19
 supportedVersionIds[1]: 21
 supportedVersionIds[2]: 22
 supportedVersionIds[3]: 23
+tags[0]:                deprecated=19
 ---
 brand:                  Google
 codename:               Nexus5X
@@ -260,6 +331,7 @@ supportedAbis[0]:       x86
 supportedVersionIds[0]: 19
 supportedVersionIds[1]: 21
 supportedVersionIds[2]: 22
+tags[0]:                deprecated=19
 ---
 brand:                  Generic
 codename:               Nexus7_clone_16_9
@@ -381,6 +453,27 @@ supportedVersionIds[2]: 28
 supportedVersionIds[3]: 29
 supportedVersionIds[4]: 30
 ---
+brand:                  Google
+codename:               Pixel2.arm
+form:                   VIRTUAL
+formFactor:             PHONE
+id:                     Pixel2.arm
+manufacturer:           Google
+name:                   Pixel 2 (ARM)
+screenDensity:          420
+screenX:                1080
+screenY:                1920
+supportedAbis[0]:       arm64-v8a
+supportedVersionIds[0]: 26
+supportedVersionIds[1]: 27
+supportedVersionIds[2]: 28
+supportedVersionIds[3]: 29
+supportedVersionIds[4]: 30
+supportedVersionIds[5]: 32
+supportedVersionIds[6]: 33
+tags[0]:                preview=33
+tags[1]:                beta
+---
 brand:                  google
 codename:               Pixel3
 form:                   VIRTUAL
@@ -392,4 +485,25 @@ screenDensity:          440
 screenX:                1080
 screenY:                2160
 supportedAbis[0]:       30:x86
-supportedVersionIds[0]: 30`
+supportedVersionIds[0]: 30
+---
+brand:                  Android
+codename:               SmallPhone.arm
+form:                   VIRTUAL
+formFactor:             PHONE
+id:                     SmallPhone.arm
+manufacturer:           Generic
+name:                   SmallPhone (ARM)
+screenDensity:          320
+screenX:                720
+screenY:                1280
+supportedAbis[0]:       arm64-v8a
+supportedVersionIds[0]: 26
+supportedVersionIds[1]: 27
+supportedVersionIds[2]: 28
+supportedVersionIds[3]: 29
+supportedVersionIds[4]: 30
+supportedVersionIds[5]: 32
+supportedVersionIds[6]: 33
+tags[0]:                preview=33
+tags[1]:                beta`
