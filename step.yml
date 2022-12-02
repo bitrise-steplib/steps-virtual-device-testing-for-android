@@ -107,6 +107,7 @@ inputs:
         │ Pixel2              │ Google   │ Pixel 2                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30          │                  │
         │ Pixel2.arm          │ Google   │ Pixel 2 (ARM)                            │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,32,33    │ preview=33, beta │
         │ Pixel3              │ Google   │ Pixel 3                                  │ VIRTUAL │ 2160 x 1080 │ 30                      │                  │
+        │ Pixel6              │ Google   │ Pixel 6                                  │ VIRTUAL │ 2400 x 1080 │ 31,32,33                │                  │
         │ SmallPhone.arm      │ Generic  │ SmallPhone (ARM)                         │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,32,33    │ preview=33, beta │
         └─────────────────────┴──────────┴──────────────────────────────────────────┴─────────┴─────────────┴─────────────────────────┴──────────────────┘     
         ```
@@ -142,6 +143,7 @@ inputs:
         │ Pixel2              │ Google   │ Pixel 2                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30          │                  │
         │ Pixel2.arm          │ Google   │ Pixel 2 (ARM)                            │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,32,33    │ preview=33, beta │
         │ Pixel3              │ Google   │ Pixel 3                                  │ VIRTUAL │ 2160 x 1080 │ 30                      │                  │
+        │ Pixel6              │ Google   │ Pixel 6                                  │ VIRTUAL │ 2400 x 1080 │ 31,32,33                │                  │
         │ SmallPhone.arm      │ Generic  │ SmallPhone (ARM)                         │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,32,33    │ preview=33, beta │
         └─────────────────────┴──────────┴──────────────────────────────────────────┴─────────┴─────────────┴─────────────────────────┴──────────────────┘
         ```

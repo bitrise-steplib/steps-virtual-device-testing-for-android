@@ -506,4 +506,27 @@ supportedVersionIds[4]: 30
 supportedVersionIds[5]: 32
 supportedVersionIds[6]: 33
 tags[0]:                preview=33
-tags[1]:                beta`
+tags[1]:                beta
+---
+brand:                  google
+codename:               Pixel6
+form:                   VIRTUAL
+formFactor:             PHONE
+id:                     Pixel6
+manufacturer:           Google
+name:                   Pixel 6
+screenDensity:          420
+screenX:                1080
+screenY:                2400
+supportedAbis[0]:       31:armeabi
+supportedAbis[1]:       31:armeabi-v7a
+supportedAbis[2]:       31:x86
+supportedAbis[3]:       32:armeabi
+supportedAbis[4]:       32:armeabi-v7a
+supportedAbis[5]:       32:x86
+supportedAbis[6]:       33:armeabi
+supportedAbis[7]:       33:armeabi-v7a
+supportedAbis[8]:       33:x86
+supportedVersionIds[0]: 31
+supportedVersionIds[1]: 32
+supportedVersionIds[2]: 33`
