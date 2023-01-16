@@ -71,7 +71,8 @@ inputs:
       description: |
         The path to the app to test (APK or AAB). By default `android-build` and `android-build-for-ui-testing` Steps export the `BITRISE_APK_PATH` Env Var, so you won't need to change this input.
         Can specify an APK (`$BITRISE_APK_PATH`) or AAB (Android App Bundle) as input (`$BITRISE_AAB_PATH`).
-      is_required: true
+        
+        If nothing is specified then the Step will use a default empty Application APK. This will help the library instrumentation tests as it can be used as a shell where the tests will be running.
   - test_devices: "NexusLowRes,24,en,portrait"
     opts:
       title: "Test devices"

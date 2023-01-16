@@ -2,14 +2,23 @@ package main
 
 import (
 	"bufio"
+	_ "embed"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/tabwriter"
 
+	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/log"
+	"github.com/bitrise-io/go-utils/pathutil"
 	testing "google.golang.org/api/testing/v1"
 )
+
+// This embedded basic application was created based on the https://github.com/tothszabi/BasicApp repository.
+//
+//go:embed resources/simple-fallback-bitrise-app.apk
+var emptyAndroidApp []byte
 
 // ConfigsModel ...
 type ConfigsModel struct {
@@ -134,10 +143,18 @@ func (configs *ConfigsModel) validate() error {
 	}
 
 	if strings.TrimSpace(configs.AppPath) == "" {
-		return fmt.Errorf("- AppPath: required variable is not present")
-	}
-	if _, err := os.Stat(configs.AppPath); err != nil {
-		return fmt.Errorf("- AppPath: failed to get file info, error: %s", err)
+		log.Warnf("Warning: Using embedded Android application as AppPath value is empty")
+
+		path, err := pathutil.NormalizedOSTempDirPath("")
+		if err != nil {
+			return fmt.Errorf("- AppPath: failed to create temporary directory for embedded application")
+		}
+		appPath := filepath.Join(path, "app.apk")
+		if err = fileutil.WriteBytesToFile(appPath, emptyAndroidApp); err != nil {
+			return fmt.Errorf("- AppPath: failed to write embedded application to the temporary directory")
+		}
+
+		configs.AppPath = appPath
 	}
 
 	if configs.TestType == testTypeInstrumentation {
