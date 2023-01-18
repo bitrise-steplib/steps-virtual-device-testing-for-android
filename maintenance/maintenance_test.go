@@ -203,10 +203,8 @@ screenDensity:          320
 screenX:                1600
 screenY:                2560
 supportedAbis[0]:       x86
-supportedVersionIds[0]: 19
-supportedVersionIds[1]: 21
-supportedVersionIds[2]: 22
-tags[0]:                deprecated=19
+supportedVersionIds[0]: 21
+supportedVersionIds[1]: 22
 ---
 brand:                  Google
 codename:               Nexus4
@@ -219,10 +217,8 @@ screenDensity:          320
 screenX:                768
 screenY:                1280
 supportedAbis[0]:       x86
-supportedVersionIds[0]: 19
-supportedVersionIds[1]: 21
-supportedVersionIds[2]: 22
-tags[0]:                deprecated=19
+supportedVersionIds[0]: 21
+supportedVersionIds[1]: 22
 ---
 brand:                  Google
 codename:               Nexus5
@@ -237,11 +233,9 @@ screenY:                1920
 supportedAbis[0]:       x86
 supportedAbis[1]:       23:armeabi
 supportedAbis[2]:       23:armeabi-v7a
-supportedVersionIds[0]: 19
-supportedVersionIds[1]: 21
-supportedVersionIds[2]: 22
-supportedVersionIds[3]: 23
-tags[0]:                deprecated=19
+supportedVersionIds[0]: 21
+supportedVersionIds[1]: 22
+supportedVersionIds[2]: 23
 ---
 brand:                  Google
 codename:               Nexus5X
@@ -328,10 +322,8 @@ screenDensity:          213
 screenX:                800
 screenY:                1280
 supportedAbis[0]:       x86
-supportedVersionIds[0]: 19
-supportedVersionIds[1]: 21
-supportedVersionIds[2]: 22
-tags[0]:                deprecated=19
+supportedVersionIds[0]: 21
+supportedVersionIds[1]: 22
 ---
 brand:                  Generic
 codename:               Nexus7_clone_16_9
