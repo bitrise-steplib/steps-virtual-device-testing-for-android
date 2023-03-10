@@ -95,6 +95,7 @@ You can also run this step directly with [Bitrise CLI](https://github.com/bitris
 | Environment Variable | Description |
 | --- | --- |
 | `VDTESTING_DOWNLOADED_FILES_DIR` | The directory containing the downloaded files if you have set `directories_to_pull` and `download_test_results` inputs above. |
+| `VDTESTING_FAILURE_REASON` | A string containing the outcome and if the test failed. This can be any of these possible values: Crashed, NotInstalled, OtherNativeCrash, TimedOut, UnableToCrawl. Default value None if unable to triage the failure result. |
 </details>
 
 ## 🙋 Contributing
