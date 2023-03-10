@@ -149,23 +149,31 @@ func main() {
 						outcome = colorstring.Green(outcome)
 					case "failure":
 						successful = false
+						failureReason := "None"
+
 						if step.Outcome.FailureDetail != nil {
 							if step.Outcome.FailureDetail.Crashed {
-								outcome += "(Crashed)"
+								failureReason = "Crashed"
 							}
 							if step.Outcome.FailureDetail.NotInstalled {
-								outcome += "(NotInstalled)"
+								failureReason = "NotInstalled"
 							}
 							if step.Outcome.FailureDetail.OtherNativeCrash {
-								outcome += "(OtherNativeCrash)"
+								failureReason = "OtherNativeCrash"
 							}
 							if step.Outcome.FailureDetail.TimedOut {
-								outcome += "(TimedOut)"
+								failureReason = "TimedOut"
 							}
 							if step.Outcome.FailureDetail.UnableToCrawl {
-								outcome += "(UnableToCrawl)"
+								failureReason = "UnableToCrawl"
 							}
+							outcome += "(" + failureReason + ")"
 						}
+
+						if err := tools.ExportEnvironmentWithEnvman("VDTESTING_FAILURE_REASON", outcome); err != nil {
+							log.Warnf("Failed to export environment (VDTESTING_FAILURE_REASON), error: %s", err)
+						}
+
 						outcome = colorstring.Red(outcome)
 					case "inconclusive":
 						successful = false
