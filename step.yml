@@ -1,5 +1,5 @@
-title: "Virtual Device Testing for Android"
-summary: Run Android UI tests on virtual devices
+title: "Virtual Device Testing for Android (Shard)"
+summary: Run Android UI tests on virtual devices (Shard)
 description: |-
   Run Android UI tests on virtual devices. This Step collects the built APK/AAB file from the `$BITRISE_APK_PATH` and in case of instrumentation tests, the `$BITRISE_TEST_APK_PATH` Environment Variables and uses Firebase Test Lab to run UI tests on them.
   
@@ -40,9 +40,9 @@ description: |-
   - [Android Build for UI Testing](https://www.bitrise.io/integrations/steps/android-build-for-ui-testing)
   - [Deploy to Bitrise.io](https://www.bitrise.io/integrations/steps/deploy-to-bitrise-io)
 
-website: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
-source_code_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
-support_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android/issues
+website: https://github.com/FrancescoRigoni/steps-virtual-device-testing-for-android
+source_code_url: https://github.com/FrancescoRigoni/steps-virtual-device-testing-for-android
+support_url: https://github.com/FrancescoRigoni/steps-virtual-device-testing-for-android/issues
 project_type_tags:
   - android
   - cordova
@@ -61,7 +61,7 @@ meta:
 
 toolkit:
   go:
-    package_name: github.com/bitrise-steplib/steps-virtual-device-testing-for-android
+    package_name: github.com/FrancescoRigoni/steps-virtual-device-testing-for-android
 inputs:
   - app_path: "$BITRISE_APK_PATH"
     opts:
@@ -202,6 +202,14 @@ inputs:
       value_options:
         - "false"
         - "true"
+  - inst_num_uniform_shards:
+    opts:
+      title: "Uniform shards number"
+      summary: |
+        The number of shards across which to distribute test cases. The shards are run in parallel on separate devices. 
+      description: |
+        A value between 1 and 50. For example, if your test execution contains 20 test cases and you specify four shards, the instrumentation command passes arguments of `-e numShards 4` to `AndroidJUnitRunner` and each shard executes about five test cases. Based on the sharding mechanism `AndroidJUnitRunner` uses, there is no guarantee that test cases will be distributed with perfect uniformity.     
+        If zero is specified then no uniform sharding is applied and all test cases run on a single device.
   - robo_initial_activity:
     opts:
       category: "Robo Test"
