@@ -52,10 +52,11 @@ type ConfigsModel struct {
 	VerboseLog            bool `env:"use_verbose_log,opt[true,false]"`
 
 	// instrumentation
-	InstTestPackageID   string `env:"inst_test_package_id"`
-	InstTestRunnerClass string `env:"inst_test_runner_class"`
-	InstTestTargets     string `env:"inst_test_targets"`
-	UseOrchestrator     bool   `env:"inst_use_orchestrator,opt[true,false]"`
+	InstTestPackageID   	string `env:"inst_test_package_id"`
+	InstTestRunnerClass 	string `env:"inst_test_runner_class"`
+	InstTestTargets     	string `env:"inst_test_targets"`
+	UseOrchestrator     	bool   `env:"inst_use_orchestrator,opt[true,false]"`
+	NumberOfUniformShards 	int    `env:"inst_num_uniform_shards,range[0..50]"`
 
 	// robo
 	RoboInitialActivity string `env:"robo_initial_activity"`
@@ -113,6 +114,7 @@ func (configs *ConfigsModel) print() {
 		log.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
 		log.Printf("- InstTestTargets: %s", configs.InstTestTargets)
 		log.Printf("- UseOrchestrator: %t", configs.UseOrchestrator)
+		log.Printf("- NumberOfUniformShards: %d", configs.NumberOfUniformShards)
 	}
 
 	//robo
