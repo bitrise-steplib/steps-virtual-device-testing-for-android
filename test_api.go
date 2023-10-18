@@ -208,6 +208,12 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 		} else {
 			testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "DO_NOT_USE_ORCHESTRATOR"
 		}
+
+		if int64(configs.NumberOfUniformShards) > 0 {
+			testModel.TestSpecification.AndroidInstrumentationTest.ShardingOption = &testing.ShardingOption{}
+			testModel.TestSpecification.AndroidInstrumentationTest.ShardingOption.UniformSharding = &testing.UniformSharding{}
+			testModel.TestSpecification.AndroidInstrumentationTest.ShardingOption.UniformSharding.NumShards = int64(configs.NumberOfUniformShards)
+		}
 		log.Debugf("AndroidInstrumentationTest: %+v", testModel.TestSpecification.AndroidInstrumentationTest)
 	case testTypeRobo:
 		testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
