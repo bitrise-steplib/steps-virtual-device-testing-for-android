@@ -16,6 +16,11 @@ workflows:
     - path::./:
         inputs:
           - test_type: instrumentation
+          - download_test_results: "true"
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - is_compress: 'true'
+        - deploy_path: "$VDTESTING_DOWNLOADED_FILES_DIR"
 
   maintenance:
     steps:
