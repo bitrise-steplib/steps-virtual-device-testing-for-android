@@ -9,10 +9,14 @@ workflows:
     - go-list:
     - golint:
     - errcheck:
+    # Ignoring maintenance test as it needs gcloud binary
     - go-test:
+        inputs:
+        - packages: "."
     - path::./:
         inputs:
           - test_type: instrumentation
+
   maintenance:
     steps:
     - go-test:
