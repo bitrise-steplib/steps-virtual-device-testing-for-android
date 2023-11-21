@@ -68,203 +68,237 @@ func main() {
 
 	fmt.Println()
 	log.Infof("Waiting for test results")
-	{
-		finished := false
-		printedLogs := []string{}
-		for !finished {
-			url := configs.APIBaseURL + "/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
-			req, err := http.NewRequest("GET", url, nil)
-			if err != nil {
-				failf("Failed to create http request, error: %s", err)
-			}
-
-			client := &http.Client{}
-			resp, err := client.Do(req)
-			if err != nil || resp.StatusCode != http.StatusOK {
-				resp, err = client.Do(req)
-				if err != nil {
-					failf("Failed to get http response, error: %s", err)
-				}
-			}
-
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				failf("Failed to read response body, error: %s", err)
-			}
-
-			if resp.StatusCode != http.StatusOK {
-				failf("Failed to get test status, error: %s", string(body))
-			}
-
-			responseModel := &toolresults.ListStepsResponse{}
-
-			err = json.Unmarshal(body, responseModel)
-			if err != nil {
-				failf("Failed to unmarshal response body, error: %s, body: %s", err, string(body))
-			}
-
-			finished = true
-			testsRunning := 0
-			for _, step := range responseModel.Steps {
-				if step.State != "complete" {
-					finished = false
-					testsRunning++
-				}
-			}
-
-			msg := ""
-			if len(responseModel.Steps) == 0 {
-				finished = false
-				msg = fmt.Sprintf("- Validating")
-			} else {
-				msg = fmt.Sprintf("- (%d/%d) running", testsRunning, len(responseModel.Steps))
-			}
-
-			if !sliceutil.IsStringInSlice(msg, printedLogs) {
-				log.Printf(msg)
-				printedLogs = append(printedLogs, msg)
-			}
-
-			if finished {
-				log.Donef("=> Test finished")
-				fmt.Println()
-
-				log.Infof("Test results:")
-				w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-				if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\tOutcome\t"); err != nil {
-					failf("Failed to write in tabwriter, error: %s", err)
-				}
-
-				for _, step := range responseModel.Steps {
-					dimensions := map[string]string{}
-					for _, dimension := range step.DimensionValue {
-						dimensions[dimension.Key] = dimension.Value
-					}
-
-					outcome := step.Outcome.Summary
-
-					switch outcome {
-					case "success":
-						outcome = colorstring.Green(outcome)
-					case "failure":
-						successful = false
-						if step.Outcome.FailureDetail != nil {
-							if step.Outcome.FailureDetail.Crashed {
-								outcome += "(Crashed)"
-							}
-							if step.Outcome.FailureDetail.NotInstalled {
-								outcome += "(NotInstalled)"
-							}
-							if step.Outcome.FailureDetail.OtherNativeCrash {
-								outcome += "(OtherNativeCrash)"
-							}
-							if step.Outcome.FailureDetail.TimedOut {
-								outcome += "(TimedOut)"
-							}
-							if step.Outcome.FailureDetail.UnableToCrawl {
-								outcome += "(UnableToCrawl)"
-							}
-						}
-						outcome = colorstring.Red(outcome)
-					case "inconclusive":
-						successful = false
-						if step.Outcome.InconclusiveDetail != nil {
-							if step.Outcome.InconclusiveDetail.AbortedByUser {
-								outcome += "(AbortedByUser)"
-							}
-							if step.Outcome.InconclusiveDetail.InfrastructureFailure {
-								outcome += "(InfrastructureFailure)"
-							}
-						}
-						outcome = colorstring.Yellow(outcome)
-					case "skipped":
-						successful = false
-						if step.Outcome.SkippedDetail != nil {
-							if step.Outcome.SkippedDetail.IncompatibleAppVersion {
-								outcome += "(IncompatibleAppVersion)"
-							}
-							if step.Outcome.SkippedDetail.IncompatibleArchitecture {
-								outcome += "(IncompatibleArchitecture)"
-							}
-							if step.Outcome.SkippedDetail.IncompatibleDevice {
-								outcome += "(IncompatibleDevice)"
-							}
-						}
-						outcome = colorstring.Blue(outcome)
-					}
-
-					if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
-						failf("Failed to write in tabwriter, error: %s", err)
-					}
-				}
-				if err := w.Flush(); err != nil {
-					log.Errorf("Failed to flush writer, error: %s", err)
-				}
-			}
-			if !finished {
-				time.Sleep(5 * time.Second)
-			}
-		}
-	}
+	url := testResultsURL(configs.APIBaseURL, configs.AppSlug, configs.BuildSlug, configs.APIToken)
+	successful = waitForTestResults(url)
 
 	if configs.DownloadTestResults {
 		fmt.Println()
 		log.Infof("Downloading test assets")
-		{
-			url := configs.APIBaseURL + "/assets/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
-			req, err := http.NewRequest("GET", url, nil)
-			if err != nil {
-				failf("Failed to create http request, error: %s", err)
-			}
+		url := testAssetsDownloadURL(configs.APIBaseURL, configs.AppSlug, configs.BuildSlug, configs.APIToken)
+		assetsDir, err := downloadTestAssets(url)
+		if err != nil {
+			failf("%s", err)
+		}
 
-			client := &http.Client{}
-			resp, err := client.Do(req)
-			if err != nil {
-				failf("Failed to get http response, error: %s", err)
-			}
-
-			if resp.StatusCode != http.StatusOK {
-				failf("Failed to get http response, status code: %d", resp.StatusCode)
-			}
-
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				failf("Failed to read response body, error: %s", err)
-			}
-
-			responseModel := map[string]string{}
-
-			err = json.Unmarshal(body, &responseModel)
-			if err != nil {
-				failf("Failed to unmarshal response body, error: %s", err)
-			}
-
-			tempDir, err := pathutil.NormalizedOSTempDirPath("vdtesting_test_assets")
-			if err != nil {
-				failf("Failed to create temp dir, error: %s", err)
-			}
-
-			for fileName, fileURL := range responseModel {
-				err := downloadFile(fileURL, filepath.Join(tempDir, fileName))
-				if err != nil {
-					failf("Failed to download file, error: %s", err)
-				}
-			}
-
-			log.Donef("=> Assets downloaded")
-			if err := tools.ExportEnvironmentWithEnvman("VDTESTING_DOWNLOADED_FILES_DIR", tempDir); err != nil {
-				log.Warnf("Failed to export environment (VDTESTING_DOWNLOADED_FILES_DIR), error: %s", err)
-			} else {
-				log.Printf("The downloaded test assets path (%s) is exported to the VDTESTING_DOWNLOADED_FILES_DIR environment variable.", tempDir)
-			}
+		log.Donef("=> Assets downloaded")
+		if err := tools.ExportEnvironmentWithEnvman("VDTESTING_DOWNLOADED_FILES_DIR", assetsDir); err != nil {
+			log.Warnf("Failed to export environment (VDTESTING_DOWNLOADED_FILES_DIR), error: %s", err)
+		} else {
+			log.Printf("The downloaded test assets path (%s) is exported to the VDTESTING_DOWNLOADED_FILES_DIR environment variable.", assetsDir)
 		}
 	}
 
 	if !successful {
 		os.Exit(1)
 	}
+}
+
+func testResultsURL(apiBaseURL, appSlug, buildSlug, apiToken string) string {
+	return apiBaseURL + "/" + appSlug + "/" + buildSlug + "/" + apiToken
+}
+
+func fetchTestResults(url string, printedLogs []string) (bool, bool, []string) {
+	finished := false
+	successful := false
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		failf("Failed to create http request, error: %s", err)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		resp, err = client.Do(req)
+		if err != nil {
+			failf("Failed to get http response, error: %s", err)
+		}
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		failf("Failed to read response body, error: %s", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		failf("Failed to get test status, error: %s", string(body))
+	}
+
+	responseModel := &toolresults.ListStepsResponse{}
+
+	err = json.Unmarshal(body, responseModel)
+	if err != nil {
+		failf("Failed to unmarshal response body, error: %s, body: %s", err, string(body))
+	}
+
+	finished = true
+	testsRunning := 0
+	for _, step := range responseModel.Steps {
+		if step.State != "complete" {
+			finished = false
+			testsRunning++
+		}
+	}
+
+	msg := ""
+	if len(responseModel.Steps) == 0 {
+		finished = false
+		msg = fmt.Sprintf("- Validating")
+	} else {
+		msg = fmt.Sprintf("- (%d/%d) running", testsRunning, len(responseModel.Steps))
+	}
+
+	if !sliceutil.IsStringInSlice(msg, printedLogs) {
+		log.Printf(msg)
+		printedLogs = append(printedLogs, msg)
+	}
+
+	if finished {
+		log.Donef("=> Test finished")
+		fmt.Println()
+
+		log.Infof("Test results:")
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
+		if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\tOutcome\t"); err != nil {
+			failf("Failed to write in tabwriter, error: %s", err)
+		}
+
+		for _, step := range responseModel.Steps {
+			dimensions := map[string]string{}
+			for _, dimension := range step.DimensionValue {
+				dimensions[dimension.Key] = dimension.Value
+			}
+
+			outcome := step.Outcome.Summary
+
+			switch outcome {
+			case "success":
+				outcome = colorstring.Green(outcome)
+			case "failure":
+				successful = false
+				if step.Outcome.FailureDetail != nil {
+					if step.Outcome.FailureDetail.Crashed {
+						outcome += "(Crashed)"
+					}
+					if step.Outcome.FailureDetail.NotInstalled {
+						outcome += "(NotInstalled)"
+					}
+					if step.Outcome.FailureDetail.OtherNativeCrash {
+						outcome += "(OtherNativeCrash)"
+					}
+					if step.Outcome.FailureDetail.TimedOut {
+						outcome += "(TimedOut)"
+					}
+					if step.Outcome.FailureDetail.UnableToCrawl {
+						outcome += "(UnableToCrawl)"
+					}
+				}
+				outcome = colorstring.Red(outcome)
+			case "inconclusive":
+				successful = false
+				if step.Outcome.InconclusiveDetail != nil {
+					if step.Outcome.InconclusiveDetail.AbortedByUser {
+						outcome += "(AbortedByUser)"
+					}
+					if step.Outcome.InconclusiveDetail.InfrastructureFailure {
+						outcome += "(InfrastructureFailure)"
+					}
+				}
+				outcome = colorstring.Yellow(outcome)
+			case "skipped":
+				successful = false
+				if step.Outcome.SkippedDetail != nil {
+					if step.Outcome.SkippedDetail.IncompatibleAppVersion {
+						outcome += "(IncompatibleAppVersion)"
+					}
+					if step.Outcome.SkippedDetail.IncompatibleArchitecture {
+						outcome += "(IncompatibleArchitecture)"
+					}
+					if step.Outcome.SkippedDetail.IncompatibleDevice {
+						outcome += "(IncompatibleDevice)"
+					}
+				}
+				outcome = colorstring.Blue(outcome)
+			}
+
+			if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
+				failf("Failed to write in tabwriter, error: %s", err)
+			}
+		}
+		if err := w.Flush(); err != nil {
+			log.Errorf("Failed to flush writer, error: %s", err)
+		}
+	}
+
+	return finished, successful, printedLogs
+}
+
+func waitForTestResults(url string) bool {
+	successful := false
+	finished := false
+	var printedLogs []string
+
+	for !finished {
+		finished, successful, printedLogs = fetchTestResults(url, printedLogs)
+		if !finished {
+			time.Sleep(5 * time.Second)
+		}
+	}
+
+	return successful
+}
+
+func testAssetsDownloadURL(base, appSlug, buildSlug, token string) string {
+	return base + "/assets/" + appSlug + "/" + buildSlug + "/" + token
+}
+
+func downloadTestAssets(url string) (string, error) {
+	fmt.Println()
+	log.Infof("Downloading test assets")
+	//url := configs.APIBaseURL + "/assets/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", fmt.Errorf("failed to create http request: %s", err)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to get http response: %s", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("failed to get http response, status code: %d", resp.StatusCode)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("failed to read response body, error: %s", err)
+	}
+
+	responseModel := map[string]string{}
+
+	err = json.Unmarshal(body, &responseModel)
+	if err != nil {
+		return "", fmt.Errorf("failed to unmarshal response body: %s", err)
+	}
+
+	tempDir, err := pathutil.NormalizedOSTempDirPath("vdtesting_test_assets")
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp dir: %s", err)
+	}
+
+	for fileName, fileURL := range responseModel {
+		err := downloadFile(fileURL, filepath.Join(tempDir, fileName))
+		if err != nil {
+			return "", fmt.Errorf("failed to download file: %s", err)
+		}
+	}
+
+	return tempDir, nil
 }
 
 func downloadFile(url string, localPath string) error {
