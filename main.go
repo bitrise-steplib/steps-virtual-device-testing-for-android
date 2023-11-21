@@ -1,23 +1,13 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
 	"os"
-	"path/filepath"
-	"strconv"
-	"text/tabwriter"
 	"time"
 
 	"github.com/bitrise-io/go-steputils/stepconf"
 	"github.com/bitrise-io/go-steputils/tools"
-	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
-	"github.com/bitrise-io/go-utils/pathutil"
-	"github.com/bitrise-io/go-utils/sliceutil"
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 )
 
@@ -25,11 +15,6 @@ const (
 	testTypeInstrumentation = "instrumentation"
 	testTypeRobo            = "robo"
 )
-
-func failf(f string, v ...interface{}) {
-	log.Errorf(f, v...)
-	os.Exit(1)
-}
 
 func main() {
 	var configs ConfigsModel
@@ -48,29 +33,41 @@ func main() {
 	log.SetEnableDebugLog(configs.VerboseLog)
 
 	fmt.Println()
-	successful := true
-
-	log.Infof("Uploading app and test files")
+	log.TInfof("Uploading app and test files")
 
 	testAssets, err := uploadTestAssets(configs)
 	if err != nil {
 		failf("Failed to upload test assets, error: %s", err)
 	}
-	log.Donef("=> Files uploaded")
+	log.TDonef("=> Files uploaded")
 
 	fmt.Println()
-	log.Infof("Starting test")
+	log.TInfof("Starting test")
 
 	if err = startTestRun(configs, testAssets); err != nil {
 		failf("Starting test run failed, error: %s", err)
 	}
-	log.Donef("=> Test started")
+	log.TDonef("=> Test started")
 
 	fmt.Println()
-	log.Infof("Waiting for test results")
+	log.TInfof("Waiting for test results")
 
 	url := testResultsURL(configs.APIBaseURL, configs.AppSlug, configs.BuildSlug, configs.APIToken)
-	successful = waitForTestResults(url)
+
+	finished := false
+	var steps []*toolresults.Step
+	var printedLogs []string
+
+	for !finished {
+		steps, printedLogs = fetchTestResults(url, printedLogs)
+		if steps == nil {
+			time.Sleep(5 * time.Second)
+		} else {
+			finished = true
+		}
+	}
+
+	successful := printTestResult(steps)
 
 	if configs.DownloadTestResults {
 		fmt.Println()
@@ -95,293 +92,7 @@ func main() {
 	}
 }
 
-func testResultsURL(apiBaseURL, appSlug, buildSlug, apiToken string) string {
-	return apiBaseURL + "/" + appSlug + "/" + buildSlug + "/" + apiToken
-}
-
-func fetchTestResults(url string, printedLogs []string) (bool, bool, []string) {
-	finished := false
-	successful := false
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		failf("Failed to create http request, error: %s", err)
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil || resp.StatusCode != http.StatusOK {
-		resp, err = client.Do(req)
-		if err != nil {
-			failf("Failed to get http response, error: %s", err)
-		}
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		failf("Failed to read response body, error: %s", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		failf("Failed to get test status, error: %s", string(body))
-	}
-
-	responseModel := &toolresults.ListStepsResponse{}
-
-	err = json.Unmarshal(body, responseModel)
-	if err != nil {
-		failf("Failed to unmarshal response body, error: %s, body: %s", err, string(body))
-	}
-
-	finished = true
-	testsRunning := 0
-	for _, step := range responseModel.Steps {
-		if step.State != "complete" {
-			finished = false
-			testsRunning++
-		}
-	}
-
-	msg := ""
-	if len(responseModel.Steps) == 0 {
-		finished = false
-		msg = fmt.Sprintf("- Validating")
-	} else {
-		msg = fmt.Sprintf("- (%d/%d) running", testsRunning, len(responseModel.Steps))
-	}
-
-	if !sliceutil.IsStringInSlice(msg, printedLogs) {
-		log.Printf(msg)
-		printedLogs = append(printedLogs, msg)
-	}
-
-	if finished {
-		log.Donef("=> Test finished")
-		fmt.Println()
-
-		log.Infof("Test results:")
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
-		if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\tOutcome\t"); err != nil {
-			failf("Failed to write in tabwriter, error: %s", err)
-		}
-
-		for _, step := range responseModel.Steps {
-			dimensions := map[string]string{}
-			for _, dimension := range step.DimensionValue {
-				dimensions[dimension.Key] = dimension.Value
-			}
-
-			outcome := step.Outcome.Summary
-
-			switch outcome {
-			case "success":
-				outcome = colorstring.Green(outcome)
-			case "failure":
-				successful = false
-				if step.Outcome.FailureDetail != nil {
-					if step.Outcome.FailureDetail.Crashed {
-						outcome += "(Crashed)"
-					}
-					if step.Outcome.FailureDetail.NotInstalled {
-						outcome += "(NotInstalled)"
-					}
-					if step.Outcome.FailureDetail.OtherNativeCrash {
-						outcome += "(OtherNativeCrash)"
-					}
-					if step.Outcome.FailureDetail.TimedOut {
-						outcome += "(TimedOut)"
-					}
-					if step.Outcome.FailureDetail.UnableToCrawl {
-						outcome += "(UnableToCrawl)"
-					}
-				}
-				outcome = colorstring.Red(outcome)
-			case "inconclusive":
-				successful = false
-				if step.Outcome.InconclusiveDetail != nil {
-					if step.Outcome.InconclusiveDetail.AbortedByUser {
-						outcome += "(AbortedByUser)"
-					}
-					if step.Outcome.InconclusiveDetail.InfrastructureFailure {
-						outcome += "(InfrastructureFailure)"
-					}
-				}
-				outcome = colorstring.Yellow(outcome)
-			case "skipped":
-				successful = false
-				if step.Outcome.SkippedDetail != nil {
-					if step.Outcome.SkippedDetail.IncompatibleAppVersion {
-						outcome += "(IncompatibleAppVersion)"
-					}
-					if step.Outcome.SkippedDetail.IncompatibleArchitecture {
-						outcome += "(IncompatibleArchitecture)"
-					}
-					if step.Outcome.SkippedDetail.IncompatibleDevice {
-						outcome += "(IncompatibleDevice)"
-					}
-				}
-				outcome = colorstring.Blue(outcome)
-			}
-
-			if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
-				failf("Failed to write in tabwriter, error: %s", err)
-			}
-		}
-		if err := w.Flush(); err != nil {
-			log.Errorf("Failed to flush writer, error: %s", err)
-		}
-	}
-
-	return finished, successful, printedLogs
-}
-
-func waitForTestResults(url string) bool {
-	successful := false
-	finished := false
-	var printedLogs []string
-
-	for !finished {
-		finished, successful, printedLogs = fetchTestResults(url, printedLogs)
-		if !finished {
-			time.Sleep(5 * time.Second)
-		}
-	}
-
-	return successful
-}
-
-func testAssetsDownloadURL(base, appSlug, buildSlug, token string) string {
-	return base + "/assets/" + appSlug + "/" + buildSlug + "/" + token
-}
-
-func downloadTestAssets(url string) (string, error) {
-	fmt.Println()
-	log.Infof("Downloading test assets")
-	//url := configs.APIBaseURL + "/assets/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return "", fmt.Errorf("failed to create http request: %s", err)
-	}
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("failed to get http response: %s", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("failed to get http response, status code: %d", resp.StatusCode)
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read response body, error: %s", err)
-	}
-
-	responseModel := map[string]string{}
-
-	err = json.Unmarshal(body, &responseModel)
-	if err != nil {
-		return "", fmt.Errorf("failed to unmarshal response body: %s", err)
-	}
-
-	tempDir, err := pathutil.NormalizedOSTempDirPath("vdtesting_test_assets")
-	if err != nil {
-		return "", fmt.Errorf("failed to create temp dir: %s", err)
-	}
-
-	for fileName, fileURL := range responseModel {
-		err := downloadFile(fileURL, filepath.Join(tempDir, fileName))
-		if err != nil {
-			return "", fmt.Errorf("failed to download file: %s", err)
-		}
-	}
-
-	return tempDir, nil
-}
-
-func downloadFile(url string, localPath string) error {
-	out, err := os.Create(localPath)
-	if err != nil {
-		return fmt.Errorf("Failed to open the local cache file for write: %s", err)
-	}
-	defer func() {
-		if err := out.Close(); err != nil {
-			log.Printf("Failed to close Archive download file (%s): %s", localPath, err)
-		}
-	}()
-
-	resp, err := http.Get(url)
-	if err != nil {
-		return fmt.Errorf("Failed to create cache download request: %s", err)
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			log.Printf("Failed to close Archive download response body: %s", err)
-		}
-	}()
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to download archive - non success response code: %d", resp.StatusCode)
-	}
-
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return fmt.Errorf("Failed to save cache content into file: %s", err)
-	}
-
-	return nil
-}
-
-func uploadFile(uploadURL string, archiveFilePath string) error {
-	archFile, err := os.Open(archiveFilePath)
-	if err != nil {
-		return fmt.Errorf("Failed to open archive file for upload (%s): %s", archiveFilePath, err)
-	}
-	isFileCloseRequired := true
-	defer func() {
-		if !isFileCloseRequired {
-			return
-		}
-		if err := archFile.Close(); err != nil {
-			log.Printf(" (!) Failed to close archive file (%s): %s", archiveFilePath, err)
-		}
-	}()
-
-	fileInfo, err := archFile.Stat()
-	if err != nil {
-		return fmt.Errorf("Failed to get File Stats of the Archive file (%s): %s", archiveFilePath, err)
-	}
-	fileSize := fileInfo.Size()
-
-	req, err := http.NewRequest("PUT", uploadURL, archFile)
-	if err != nil {
-		return fmt.Errorf("Failed to create upload request: %s", err)
-	}
-
-	req.Header.Add("Content-Length", strconv.FormatInt(fileSize, 10))
-	req.ContentLength = fileSize
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("Failed to upload: %s", err)
-	}
-	isFileCloseRequired = false
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			log.Printf(" [!] Failed to close response body: %s", err)
-		}
-	}()
-
-	_, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("Failed to read response: %s", err)
-	}
-
-	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to upload file, response code was: %d", resp.StatusCode)
-	}
-
-	return nil
+func failf(f string, v ...interface{}) {
+	log.Errorf(f, v...)
+	os.Exit(1)
 }
