@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"text/tabwriter"
 	"time"
@@ -136,62 +137,16 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
-				for _, step := range responseModel.Steps {
+				sortedSteps := makeSortedCopyOfSteps(responseModel.Steps)
+				doesRetriesForFlakiness := configs.FlakyTestAttempts > 0
+				for index, step := range sortedSteps {
+					isLastStep := index == len(responseModel.Steps)-1
+					isStepSuccessful, outcome := processStepResult(step)
+					successful = getNewSuccessValue(successful, isStepSuccessful, isLastStep, doesRetriesForFlakiness)
+
 					dimensions := map[string]string{}
 					for _, dimension := range step.DimensionValue {
 						dimensions[dimension.Key] = dimension.Value
-					}
-
-					outcome := step.Outcome.Summary
-
-					switch outcome {
-					case "success":
-						outcome = colorstring.Green(outcome)
-					case "failure":
-						successful = false
-						if step.Outcome.FailureDetail != nil {
-							if step.Outcome.FailureDetail.Crashed {
-								outcome += "(Crashed)"
-							}
-							if step.Outcome.FailureDetail.NotInstalled {
-								outcome += "(NotInstalled)"
-							}
-							if step.Outcome.FailureDetail.OtherNativeCrash {
-								outcome += "(OtherNativeCrash)"
-							}
-							if step.Outcome.FailureDetail.TimedOut {
-								outcome += "(TimedOut)"
-							}
-							if step.Outcome.FailureDetail.UnableToCrawl {
-								outcome += "(UnableToCrawl)"
-							}
-						}
-						outcome = colorstring.Red(outcome)
-					case "inconclusive":
-						successful = false
-						if step.Outcome.InconclusiveDetail != nil {
-							if step.Outcome.InconclusiveDetail.AbortedByUser {
-								outcome += "(AbortedByUser)"
-							}
-							if step.Outcome.InconclusiveDetail.InfrastructureFailure {
-								outcome += "(InfrastructureFailure)"
-							}
-						}
-						outcome = colorstring.Yellow(outcome)
-					case "skipped":
-						successful = false
-						if step.Outcome.SkippedDetail != nil {
-							if step.Outcome.SkippedDetail.IncompatibleAppVersion {
-								outcome += "(IncompatibleAppVersion)"
-							}
-							if step.Outcome.SkippedDetail.IncompatibleArchitecture {
-								outcome += "(IncompatibleArchitecture)"
-							}
-							if step.Outcome.SkippedDetail.IncompatibleDevice {
-								outcome += "(IncompatibleDevice)"
-							}
-						}
-						outcome = colorstring.Blue(outcome)
 					}
 
 					if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
@@ -350,4 +305,95 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 	}
 
 	return nil
+}
+
+func getNewSuccessValue(currentOverallSuccess bool, stepWasSuccessful bool, wasLastStep bool, includedFlakyRetries bool) bool {
+	// Being overly cautious, by only setting success to true if it's the last try and flaky tests were enabled
+	// Doing this simply because there could be unaccounted for scenarios where it's not desirable to set successful to true
+	if !stepWasSuccessful {
+		return false
+	}
+	if stepWasSuccessful && wasLastStep && includedFlakyRetries {
+		return true
+	}
+	return currentOverallSuccess
+}
+
+func processStepResult(step *toolresults.Step) (bool, string) {
+	isSuccess := false
+	outcome := step.Outcome.Summary
+
+	switch outcome {
+	case "success":
+		isSuccess = true
+		outcome = colorstring.Green(outcome)
+	case "failure":
+		isSuccess = false
+		if step.Outcome.FailureDetail != nil {
+			if step.Outcome.FailureDetail.Crashed {
+				outcome += "(Crashed)"
+			}
+			if step.Outcome.FailureDetail.NotInstalled {
+				outcome += "(NotInstalled)"
+			}
+			if step.Outcome.FailureDetail.OtherNativeCrash {
+				outcome += "(OtherNativeCrash)"
+			}
+			if step.Outcome.FailureDetail.TimedOut {
+				outcome += "(TimedOut)"
+			}
+			if step.Outcome.FailureDetail.UnableToCrawl {
+				outcome += "(UnableToCrawl)"
+			}
+		}
+		outcome = colorstring.Red(outcome)
+	case "inconclusive":
+		isSuccess = false
+		if step.Outcome.InconclusiveDetail != nil {
+			if step.Outcome.InconclusiveDetail.AbortedByUser {
+				outcome += "(AbortedByUser)"
+			}
+			if step.Outcome.InconclusiveDetail.InfrastructureFailure {
+				outcome += "(InfrastructureFailure)"
+			}
+		}
+		outcome = colorstring.Yellow(outcome)
+	case "skipped":
+		isSuccess = false
+		if step.Outcome.SkippedDetail != nil {
+			if step.Outcome.SkippedDetail.IncompatibleAppVersion {
+				outcome += "(IncompatibleAppVersion)"
+			}
+			if step.Outcome.SkippedDetail.IncompatibleArchitecture {
+				outcome += "(IncompatibleArchitecture)"
+			}
+			if step.Outcome.SkippedDetail.IncompatibleDevice {
+				outcome += "(IncompatibleDevice)"
+			}
+		}
+		outcome = colorstring.Blue(outcome)
+	}
+	return isSuccess, outcome
+}
+
+// Sort steps by completion time so that the last completed is the last in the array
+func makeSortedCopyOfSteps(steps []*toolresults.Step) []*toolresults.Step {
+	// Make a copy of the original slice
+	stepsCopy := make([]*toolresults.Step, len(steps))
+	copy(stepsCopy, steps)
+
+	sort.Slice(stepsCopy, func(i, j int) bool {
+		iCompletionTime := stepsCopy[i].CompletionTime
+		jCompletionTime := stepsCopy[j].CompletionTime
+
+		if iCompletionTime == nil {
+			return true
+		}
+
+		if jCompletionTime == nil {
+			return false
+		}
+		return iCompletionTime.Seconds < jCompletionTime.Seconds
+	})
+	return stepsCopy
 }
