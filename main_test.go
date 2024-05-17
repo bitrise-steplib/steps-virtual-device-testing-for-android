@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"reflect"
 	"testing"
 
 	toolresults "google.golang.org/api/toolresults/v1beta3"
@@ -34,57 +36,40 @@ func TestGetNewSuccessValue_NonFinalSuccessfulStep(t *testing.T) {
 	}
 }
 
-func TestMakeSortedCopyOfSteps_SortedOrder(t *testing.T) {
-	steps := []*toolresults.Step{
-		{CompletionTime: &toolresults.Timestamp{Seconds: 2}},
-		{CompletionTime: &toolresults.Timestamp{Seconds: 3}},
-		{CompletionTime: &toolresults.Timestamp{Seconds: 1}},
+func TestGroupedSortedSteps(t *testing.T) {
+	// Mock steps with dimension values and completion times.
+
+	android1 := toolresults.Step{
+		DimensionValue: []*toolresults.StepDimensionValueEntry{{Key: "os", Value: "android"}},
+		CompletionTime: &toolresults.Timestamp{Seconds: 1},
 	}
 
-	sortedSteps := makeSortedCopyOfSteps(steps)
-
-	if sortedSteps[2].CompletionTime.Seconds != 3 ||
-		sortedSteps[1].CompletionTime.Seconds != 2 ||
-		sortedSteps[0].CompletionTime.Seconds != 1 {
-		t.Errorf("Steps are not sorted in the correct order")
-	}
-}
-
-func TestMakeSortedCopyOfSteps_WithNilCompletionTimes(t *testing.T) {
-	// Define a slice of steps where some have nil completion times
-	steps := []*toolresults.Step{
-		{CompletionTime: nil},
-		{CompletionTime: &toolresults.Timestamp{Seconds: 1}},
-		{CompletionTime: nil},
+	android2 := toolresults.Step{
+		DimensionValue: []*toolresults.StepDimensionValueEntry{{Key: "os", Value: "android"}},
+		CompletionTime: &toolresults.Timestamp{Seconds: 2},
 	}
 
-	// Call the function to make a sorted copy
-	sortedSteps := makeSortedCopyOfSteps(steps)
-
-	// Check if the steps with nil completion times are at the end of the slice
-	if sortedSteps[0].CompletionTime != nil || sortedSteps[1].CompletionTime != nil {
-		t.Errorf("Steps with nil completion times are not sorted correctly")
-	}
-}
-
-func TestMakeSortedCopyOfSteps_OriginalSliceUnmodified(t *testing.T) {
-	// Define a slice of steps
-	steps := []*toolresults.Step{
-		{CompletionTime: &toolresults.Timestamp{Seconds: 2}},
-		{CompletionTime: &toolresults.Timestamp{Seconds: 1}},
+	android3 := toolresults.Step{
+		DimensionValue: []*toolresults.StepDimensionValueEntry{{Key: "os", Value: "android"}},
+		CompletionTime: &toolresults.Timestamp{Seconds: 3},
 	}
 
-	// Make a copy of the original slice for comparison
-	originalSteps := make([]*toolresults.Step, len(steps))
-	copy(originalSteps, steps)
+	iOS1 := toolresults.Step{
+		DimensionValue: []*toolresults.StepDimensionValueEntry{{Key: "os", Value: "ios"}},
+		CompletionTime: &toolresults.Timestamp{Seconds: 1},
+	}
 
-	// Call the function to make a sorted copy
-	_ = makeSortedCopyOfSteps(steps)
+	steps := []*toolresults.Step{&android3, &android1, &iOS1, &android2}
 
-	// Check if the original slice is unmodified
-	for i, step := range steps {
-		if step != originalSteps[i] {
-			t.Errorf("The original slice has been modified")
-		}
+	expected := make(map[string][]*toolresults.Step)
+	androidKey, _ := json.Marshal(android1.DimensionValue)
+	iosKey, _ := json.Marshal(iOS1.DimensionValue)
+	expected[string(androidKey)] = []*toolresults.Step{&android1, &android2, &android3}
+	expected[string(iosKey)] = []*toolresults.Step{&iOS1}
+
+	actual := groupedSortedSteps(steps)
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("groupedSortedSteps() = %v, want %v", actual, expected)
 	}
 }

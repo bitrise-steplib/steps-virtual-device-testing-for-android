@@ -137,22 +137,35 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
-				sortedSteps := makeSortedCopyOfSteps(responseModel.Steps)
 				doesRetriesForFlakiness := configs.FlakyTestAttempts > 0
-				for index, step := range sortedSteps {
-					isLastStep := index == len(responseModel.Steps)-1
-					isStepSuccessful, outcome := processStepResult(step)
-					successful = getNewSuccessValue(successful, isStepSuccessful, isLastStep, doesRetriesForFlakiness)
+				dimensionSuccesses := make(map[string]bool)
+				sortedSteps := groupedSortedSteps(responseModel.Steps)
+				for dimensionStr, steps := range sortedSteps {
+					dimensionSuccesses[dimensionStr] = true
 
-					dimensions := map[string]string{}
-					for _, dimension := range step.DimensionValue {
-						dimensions[dimension.Key] = dimension.Value
-					}
+					for index, step := range steps {
+						isLastStep := index == len(responseModel.Steps)-1
+						isStepSuccessful, outcome := processStepResult(step)
+						dimensionSuccesses[dimensionStr] = getNewSuccessValue(dimensionSuccesses[dimensionStr], isStepSuccessful, isLastStep, doesRetriesForFlakiness)
 
-					if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
-						failf("Failed to write in tabwriter, error: %s", err)
+						dimensions := map[string]string{}
+						for _, dimension := range step.DimensionValue {
+							dimensions[dimension.Key] = dimension.Value
+						}
+
+						if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
+							failf("Failed to write in tabwriter, error: %s", err)
+						}
 					}
 				}
+
+				for _, dimSuccess := range dimensionSuccesses {
+					if !dimSuccess {
+						successful = false
+						break
+					}
+				}
+
 				if err := w.Flush(); err != nil {
 					log.Errorf("Failed to flush writer, error: %s", err)
 				}
@@ -376,24 +389,21 @@ func processStepResult(step *toolresults.Step) (bool, string) {
 	return isSuccess, outcome
 }
 
-// Sort steps by completion time so that the last completed is the last in the array
-func makeSortedCopyOfSteps(steps []*toolresults.Step) []*toolresults.Step {
-	// Make a copy of the original slice
-	stepsCopy := make([]*toolresults.Step, len(steps))
-	copy(stepsCopy, steps)
-
-	sort.Slice(stepsCopy, func(i, j int) bool {
-		iCompletionTime := stepsCopy[i].CompletionTime
-		jCompletionTime := stepsCopy[j].CompletionTime
-
-		if iCompletionTime == nil {
-			return true
+func groupedSortedSteps(steps []*toolresults.Step) map[string][]*toolresults.Step {
+	groupedByDimension := make(map[string][]*toolresults.Step)
+	for _, step := range steps {
+		key, _ := json.Marshal(step.DimensionValue)
+		if key != nil {
+			dimensionStr := string(key)
+			groupedByDimension[dimensionStr] = append(groupedByDimension[dimensionStr], step)
 		}
+	}
 
-		if jCompletionTime == nil {
-			return false
-		}
-		return iCompletionTime.Seconds < jCompletionTime.Seconds
-	})
-	return stepsCopy
+	for _, stepsSlice := range groupedByDimension {
+		sort.SliceStable(stepsSlice, func(i, j int) bool {
+			return stepsSlice[i].CompletionTime.Seconds < stepsSlice[j].CompletionTime.Seconds
+		})
+	}
+
+	return groupedByDimension
 }
