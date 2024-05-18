@@ -392,15 +392,22 @@ func processStepResult(step *toolresults.Step) (bool, string) {
 func groupedSortedSteps(steps []*toolresults.Step) map[string][]*toolresults.Step {
 	groupedByDimension := make(map[string][]*toolresults.Step)
 	for _, step := range steps {
-		key, _ := json.Marshal(step.DimensionValue)
+		key, err := json.Marshal(step.DimensionValue)
+		if err != nil {
+			failf("No dimension info from step %s", step.Name)
+		}
 		if key != nil {
 			dimensionStr := string(key)
+			log.Debugf("Found step with dimension: %s", dimensionStr)
 			groupedByDimension[dimensionStr] = append(groupedByDimension[dimensionStr], step)
 		}
 	}
 
 	for _, stepsSlice := range groupedByDimension {
 		sort.SliceStable(stepsSlice, func(i, j int) bool {
+			if stepsSlice[i].CompletionTime == nil || stepsSlice[j].CompletionTime == nil {
+				return false
+			}
 			return stepsSlice[i].CompletionTime.Seconds < stepsSlice[j].CompletionTime.Seconds
 		})
 	}
