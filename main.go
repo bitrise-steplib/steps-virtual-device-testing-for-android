@@ -141,12 +141,14 @@ func main() {
 				dimensionSuccesses := make(map[string]bool)
 				sortedSteps := groupedSortedSteps(responseModel.Steps)
 				for dimensionStr, steps := range sortedSteps {
+					log.Debugf("Parsing results for %s", dimensionStr)
 					dimensionSuccesses[dimensionStr] = true
 
 					for index, step := range steps {
 						isLastStep := index == len(responseModel.Steps)-1
 						isStepSuccessful, outcome := processStepResult(step)
 						dimensionSuccesses[dimensionStr] = getNewSuccessValue(dimensionSuccesses[dimensionStr], isStepSuccessful, isLastStep, doesRetriesForFlakiness)
+						log.Debugf("Was %s dimension success? %b", dimensionStr, dimensionSuccesses[dimensionStr])
 
 						dimensions := map[string]string{}
 						for _, dimension := range step.DimensionValue {
@@ -165,6 +167,7 @@ func main() {
 						break
 					}
 				}
+				log.Debugf("Overall success: %b", successful)
 
 				if err := w.Flush(); err != nil {
 					log.Errorf("Failed to flush writer, error: %s", err)
