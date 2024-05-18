@@ -73,7 +73,7 @@ inputs:
         Can specify an APK (`$BITRISE_APK_PATH`) or AAB (Android App Bundle) as input (`$BITRISE_AAB_PATH`).
         
         If nothing is specified then the Step will use a default empty Application APK. This will help the library instrumentation tests as it can be used as a shell where the tests will be running.
-  - test_devices: "NexusLowRes,24,en,portrait"
+  - test_devices: "MediumPhone.arm,34,en,portrait"
     opts:
       title: "Test devices"
       description: |
@@ -81,9 +81,9 @@ inputs:
         One device configuration per line and the parameters are separated with `,` in the order of: `deviceID,version,language,orientation`
         
         For example:
-        `NexusLowRes,24,en,portrait`
+        `MediumPhone.arm,34,en,portrait`
         
-        `NexusLowRes,24,en,landscape`
+        `MediumTablet.arm,34,en,landscape`
         
         Available devices and its versions:
         ```
@@ -112,9 +112,9 @@ inputs:
         One device configuration per line and the parameters are separated with `,` in the order of: `deviceID,version,language,orientation`
         
         For example:
-        `NexusLowRes,24,en,portrait`
+        `MediumPhone.arm,34,en,portrait`
         
-        `NexusLowRes,24,en,landscape`
+        `MediumTablet.arm,34,en,landscape`
         
         Available devices and its versions:
         ```
