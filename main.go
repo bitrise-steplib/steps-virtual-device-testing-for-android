@@ -141,14 +141,12 @@ func main() {
 				dimensionSuccesses := make(map[string]bool)
 				sortedSteps := groupedSortedSteps(responseModel.Steps)
 				for dimensionStr, steps := range sortedSteps {
-					log.Debugf("Parsing results for %s", dimensionStr)
 					dimensionSuccesses[dimensionStr] = true
 
 					for index, step := range steps {
 						isLastStep := index == len(steps)-1
 						isStepSuccessful, outcome := processStepResult(step)
 						dimensionSuccesses[dimensionStr] = getNewSuccessValue(dimensionSuccesses[dimensionStr], isStepSuccessful, isLastStep, doesRetriesForFlakiness)
-						log.Debugf("Was %s dimension success? %b", dimensionStr, dimensionSuccesses[dimensionStr])
 
 						dimensions := map[string]string{}
 						for _, dimension := range step.DimensionValue {
@@ -167,7 +165,6 @@ func main() {
 						break
 					}
 				}
-				log.Debugf("Overall success: %b", successful)
 
 				if err := w.Flush(); err != nil {
 					log.Errorf("Failed to flush writer, error: %s", err)
@@ -327,17 +324,11 @@ func getNewSuccessValue(currentOverallSuccess bool, stepWasSuccessful bool, wasL
 	// Being overly cautious, by only setting success to true if it's the last try and flaky tests were enabled
 	// Doing this simply because there could be unaccounted for scenarios where it's not desirable to set successful to true
 	if !stepWasSuccessful {
-		log.Debugf("Step failed. Success = false")
 		return false
 	}
-	log.Debugf("Step successful? %b", stepWasSuccessful)
-	log.Debugf("Was Last Step? %b", wasLastStep)
-	log.Debugf("Included flaky retries? %b", includedFlakyRetries)
 	if stepWasSuccessful && wasLastStep && includedFlakyRetries {
-		log.Debugf("All above are true, set success to true")
 		return true
 	}
-	log.Debugf("Conditions not met, use current overall success: %b", currentOverallSuccess)
 	return currentOverallSuccess
 }
 
