@@ -145,7 +145,7 @@ func main() {
 					dimensionSuccesses[dimensionStr] = true
 
 					for index, step := range steps {
-						isLastStep := index == len(responseModel.Steps)-1
+						isLastStep := index == len(steps)-1
 						isStepSuccessful, outcome := processStepResult(step)
 						dimensionSuccesses[dimensionStr] = getNewSuccessValue(dimensionSuccesses[dimensionStr], isStepSuccessful, isLastStep, doesRetriesForFlakiness)
 						log.Debugf("Was %s dimension success? %b", dimensionStr, dimensionSuccesses[dimensionStr])
