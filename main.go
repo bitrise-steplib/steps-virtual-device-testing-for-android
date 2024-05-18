@@ -398,7 +398,6 @@ func groupedSortedSteps(steps []*toolresults.Step) map[string][]*toolresults.Ste
 		}
 		if key != nil {
 			dimensionStr := string(key)
-			log.Debugf("Found step with dimension: %s", dimensionStr)
 			groupedByDimension[dimensionStr] = append(groupedByDimension[dimensionStr], step)
 		}
 	}
