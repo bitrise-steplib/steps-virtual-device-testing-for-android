@@ -412,6 +412,11 @@ func getLastCompletedStepByDimension(steps []*toolresults.Step) (map[string]*too
 			dimensionStr := string(key)
 
 			if step.CompletionTime == nil {
+				jsonData, err := json.MarshalIndent(step, "", "  ")
+				if err != nil {
+					fmt.Println("Error occurred during marshaling. Error: %s", err.Error())
+				}
+				fmt.Println(string(jsonData))
 				return nil, &StepError{
 					Step:    step,
 					Message: "Missing CompletionTime",
