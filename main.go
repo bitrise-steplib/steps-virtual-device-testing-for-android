@@ -26,15 +26,6 @@ const (
 	testTypeRobo            = "robo"
 )
 
-type StepError struct {
-	Step    *toolresults.Step
-	Message string
-}
-
-func (e *StepError) Error() string {
-	return fmt.Sprintf("error in step %s: %s", e.Step.Description, e.Message)
-}
-
 func failf(f string, v ...interface{}) {
 	log.Errorf(f, v...)
 	os.Exit(1)
@@ -145,8 +136,7 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
-				retriesEnabled := configs.FlakyTestAttempts > 0
-				successful, err = GetSuccessOfExecution(responseModel.Steps, retriesEnabled)
+				successful, err = GetSuccessOfExecution(responseModel.Steps)
 				if err != nil {
 					failf("Failed to process results, error: %s", err)
 				}
@@ -370,70 +360,35 @@ func processStepResult(step *toolresults.Step) string {
 	return outcome
 }
 
-func GetSuccessOfExecution(steps []*toolresults.Step, retriesEnabled bool) (bool, error) {
-	if retriesEnabled {
-		return getSuccessOfExecutionWithRetries(steps)
-	} else {
-		return getSuccessOfExecutionNoRetries(steps)
-	}
-}
-
-func getSuccessOfExecutionWithRetries(steps []*toolresults.Step) (bool, error) {
-	lastStepByDimension, err := getLastCompletedStepByDimension(steps)
+func GetSuccessOfExecution(steps []*toolresults.Step) (bool, error) {
+	outcomeByDimension, err := getOutcomeByDimension(steps)
 	if err != nil {
 		return false, err
 	}
 
-	for _, lastStep := range lastStepByDimension {
-		if lastStep.Outcome.Summary != "success" {
+	for _, outcome := range outcomeByDimension {
+		if outcome.Summary != "success" {
 			return false, nil
 		}
 	}
+
 	return true, nil
 }
 
-func getSuccessOfExecutionNoRetries(steps []*toolresults.Step) (bool, error) {
+func getOutcomeByDimension(steps []*toolresults.Step) (map[string]*toolresults.Outcome, error) {
+	groupedByDimension := make(map[string]*toolresults.Outcome)
 	for _, step := range steps {
-		printStep(step)
-		if step.Outcome.Summary != "success" {
-			return false, nil
-		}
-	}
-	return true, nil
-}
-
-func getLastCompletedStepByDimension(steps []*toolresults.Step) (map[string]*toolresults.Step, error) {
-	groupedByDimension := make(map[string]*toolresults.Step)
-	for _, step := range steps {
-		printStep(step)
 		key, err := json.Marshal(step.DimensionValue)
 		if err != nil {
 			return nil, err
 		}
 		if key != nil {
 			dimensionStr := string(key)
-
-			if step.CompletionTime == nil {
-
-				return nil, &StepError{
-					Step:    step,
-					Message: "Missing CompletionTime",
-				}
-			}
-
-			if groupedByDimension[dimensionStr] == nil || groupedByDimension[dimensionStr].CompletionTime.Seconds < step.CompletionTime.Seconds {
-				groupedByDimension[dimensionStr] = step
+			if groupedByDimension[dimensionStr] == nil || groupedByDimension[dimensionStr].Summary != "success" {
+				groupedByDimension[dimensionStr] = step.Outcome
 			}
 		}
 	}
 
 	return groupedByDimension, nil
-}
-
-func printStep(step *toolresults.Step) {
-	jsonData, err := json.MarshalIndent(step, "", "  ")
-	if err != nil {
-		fmt.Println("Error occurred during marshaling. Error: %s", err.Error())
-	}
-	fmt.Println(string(jsonData))
 }
