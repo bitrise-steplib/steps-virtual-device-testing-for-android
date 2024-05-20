@@ -371,7 +371,7 @@ func processStepResult(step *toolresults.Step) string {
 }
 
 func GetSuccessOfExecution(steps []*toolresults.Step, retriesEnabled bool) (bool, error) {
-	if retriesEnabled == true {
+	if retriesEnabled {
 		return getSuccessOfExecutionWithRetries(steps)
 	} else {
 		return getSuccessOfExecutionNoRetries(steps)
@@ -394,6 +394,7 @@ func getSuccessOfExecutionWithRetries(steps []*toolresults.Step) (bool, error) {
 
 func getSuccessOfExecutionNoRetries(steps []*toolresults.Step) (bool, error) {
 	for _, step := range steps {
+		printStep(step)
 		if step.Outcome.Summary != "success" {
 			return false, nil
 		}
@@ -404,6 +405,7 @@ func getSuccessOfExecutionNoRetries(steps []*toolresults.Step) (bool, error) {
 func getLastCompletedStepByDimension(steps []*toolresults.Step) (map[string]*toolresults.Step, error) {
 	groupedByDimension := make(map[string]*toolresults.Step)
 	for _, step := range steps {
+		printStep(step)
 		key, err := json.Marshal(step.DimensionValue)
 		if err != nil {
 			return nil, err
@@ -412,11 +414,7 @@ func getLastCompletedStepByDimension(steps []*toolresults.Step) (map[string]*too
 			dimensionStr := string(key)
 
 			if step.CompletionTime == nil {
-				jsonData, err := json.MarshalIndent(step, "", "  ")
-				if err != nil {
-					fmt.Println("Error occurred during marshaling. Error: %s", err.Error())
-				}
-				fmt.Println(string(jsonData))
+
 				return nil, &StepError{
 					Step:    step,
 					Message: "Missing CompletionTime",
@@ -430,4 +428,12 @@ func getLastCompletedStepByDimension(steps []*toolresults.Step) (map[string]*too
 	}
 
 	return groupedByDimension, nil
+}
+
+func printStep(step *toolresults.Step) {
+	jsonData, err := json.MarshalIndent(step, "", "  ")
+	if err != nil {
+		fmt.Println("Error occurred during marshaling. Error: %s", err.Error())
+	}
+	fmt.Println(string(jsonData))
 }
