@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"text/tabwriter"
 	"time"
@@ -26,6 +25,15 @@ const (
 	testTypeInstrumentation = "instrumentation"
 	testTypeRobo            = "robo"
 )
+
+type StepError struct {
+	Step    *toolresults.Step
+	Message string
+}
+
+func (e *StepError) Error() string {
+	return fmt.Sprintf("error in step %s: %s", e.Step.Description, e.Message)
+}
 
 func failf(f string, v ...interface{}) {
 	log.Errorf(f, v...)
@@ -137,32 +145,22 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
-				doesRetriesForFlakiness := configs.FlakyTestAttempts > 0
-				dimensionSuccesses := make(map[string]bool)
-				sortedSteps := groupedSortedSteps(responseModel.Steps)
-				for dimensionStr, steps := range sortedSteps {
-					dimensionSuccesses[dimensionStr] = true
-
-					for index, step := range steps {
-						isLastStep := index == len(steps)-1
-						isStepSuccessful, outcome := processStepResult(step)
-						dimensionSuccesses[dimensionStr] = getNewSuccessValue(dimensionSuccesses[dimensionStr], isStepSuccessful, isLastStep, doesRetriesForFlakiness)
-
-						dimensions := map[string]string{}
-						for _, dimension := range step.DimensionValue {
-							dimensions[dimension.Key] = dimension.Value
-						}
-
-						if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
-							failf("Failed to write in tabwriter, error: %s", err)
-						}
-					}
+				retriesEnabled := configs.FlakyTestAttempts > 0
+				successful, err = GetSuccessOfExecution(responseModel.Steps, retriesEnabled)
+				if err != nil {
+					failf("Failed to process results, error: %s", err)
 				}
 
-				for _, dimSuccess := range dimensionSuccesses {
-					if !dimSuccess {
-						successful = false
-						break
+				for _, step := range responseModel.Steps {
+					dimensions := map[string]string{}
+					for _, dimension := range step.DimensionValue {
+						dimensions[dimension.Key] = dimension.Value
+					}
+
+					outcome := processStepResult(step)
+
+					if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
+						failf("Failed to write in tabwriter, error: %s", err)
 					}
 				}
 
@@ -320,28 +318,13 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 	return nil
 }
 
-func getNewSuccessValue(currentOverallSuccess bool, stepWasSuccessful bool, wasLastStep bool, includedFlakyRetries bool) bool {
-	// Being overly cautious, by only setting success to true if it's the last try and flaky tests were enabled
-	// Doing this simply because there could be unaccounted for scenarios where it's not desirable to set successful to true
-	if !stepWasSuccessful {
-		return false
-	}
-	if stepWasSuccessful && wasLastStep && includedFlakyRetries {
-		return true
-	}
-	return currentOverallSuccess
-}
-
-func processStepResult(step *toolresults.Step) (bool, string) {
-	isSuccess := false
+func processStepResult(step *toolresults.Step) string {
 	outcome := step.Outcome.Summary
 
 	switch outcome {
 	case "success":
-		isSuccess = true
 		outcome = colorstring.Green(outcome)
 	case "failure":
-		isSuccess = false
 		if step.Outcome.FailureDetail != nil {
 			if step.Outcome.FailureDetail.Crashed {
 				outcome += "(Crashed)"
@@ -361,7 +344,6 @@ func processStepResult(step *toolresults.Step) (bool, string) {
 		}
 		outcome = colorstring.Red(outcome)
 	case "inconclusive":
-		isSuccess = false
 		if step.Outcome.InconclusiveDetail != nil {
 			if step.Outcome.InconclusiveDetail.AbortedByUser {
 				outcome += "(AbortedByUser)"
@@ -372,7 +354,6 @@ func processStepResult(step *toolresults.Step) (bool, string) {
 		}
 		outcome = colorstring.Yellow(outcome)
 	case "skipped":
-		isSuccess = false
 		if step.Outcome.SkippedDetail != nil {
 			if step.Outcome.SkippedDetail.IncompatibleAppVersion {
 				outcome += "(IncompatibleAppVersion)"
@@ -386,30 +367,62 @@ func processStepResult(step *toolresults.Step) (bool, string) {
 		}
 		outcome = colorstring.Blue(outcome)
 	}
-	return isSuccess, outcome
+	return outcome
 }
 
-func groupedSortedSteps(steps []*toolresults.Step) map[string][]*toolresults.Step {
-	groupedByDimension := make(map[string][]*toolresults.Step)
+func GetSuccessOfExecution(steps []*toolresults.Step, retriesEnabled bool) (bool, error) {
+	if retriesEnabled == true {
+		return getSuccessOfExecutionWithRetries(steps)
+	} else {
+		return getSuccessOfExecutionNoRetries(steps)
+	}
+}
+
+func getSuccessOfExecutionWithRetries(steps []*toolresults.Step) (bool, error) {
+	lastStepByDimension, err := getLastCompletedStepByDimension(steps)
+	if err != nil {
+		return false, err
+	}
+
+	for _, lastStep := range lastStepByDimension {
+		if lastStep.Outcome.Summary != "success" {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func getSuccessOfExecutionNoRetries(steps []*toolresults.Step) (bool, error) {
+	for _, step := range steps {
+		if step.Outcome.Summary != "success" {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func getLastCompletedStepByDimension(steps []*toolresults.Step) (map[string]*toolresults.Step, error) {
+	groupedByDimension := make(map[string]*toolresults.Step)
 	for _, step := range steps {
 		key, err := json.Marshal(step.DimensionValue)
 		if err != nil {
-			failf("No dimension info from step %s", step.Name)
+			return nil, err
 		}
 		if key != nil {
 			dimensionStr := string(key)
-			groupedByDimension[dimensionStr] = append(groupedByDimension[dimensionStr], step)
+
+			if step.CompletionTime == nil {
+				return nil, &StepError{
+					Step:    step,
+					Message: "Missing CompletionTime",
+				}
+			}
+
+			if groupedByDimension[dimensionStr] == nil || groupedByDimension[dimensionStr].CompletionTime.Seconds < step.CompletionTime.Seconds {
+				groupedByDimension[dimensionStr] = step
+			}
 		}
 	}
 
-	for _, stepsSlice := range groupedByDimension {
-		sort.SliceStable(stepsSlice, func(i, j int) bool {
-			if stepsSlice[i].CompletionTime == nil || stepsSlice[j].CompletionTime == nil {
-				return false
-			}
-			return stepsSlice[i].CompletionTime.Seconds < stepsSlice[j].CompletionTime.Seconds
-		})
-	}
-
-	return groupedByDimension
+	return groupedByDimension, nil
 }
