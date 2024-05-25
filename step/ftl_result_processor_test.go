@@ -3,6 +3,7 @@ package step
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 )
 
@@ -19,15 +20,8 @@ func TestGetSuccessOfExecution_AllSucceed(t *testing.T) {
 	}
 
 	isSuccess, err := GetSuccessOfExecution(steps)
-
-	expected := true
-	if err != nil {
-		t.Errorf("Expected no errors. Go %s", err)
-	}
-
-	if isSuccess != expected {
-		t.Errorf("Expected success to be %v, got %v", expected, isSuccess)
-	}
+	require.NoError(t, err)
+	require.True(t, isSuccess)
 }
 
 func TestGetSuccessOfExecution_FirstFailThenSucceed(t *testing.T) {
@@ -47,12 +41,8 @@ func TestGetSuccessOfExecution_FirstFailThenSucceed(t *testing.T) {
 	}
 
 	isSuccess, err := GetSuccessOfExecution(steps)
-	if err != nil {
-		t.Errorf("Expected no errors. Got %s", err)
-	}
-	if !isSuccess {
-		t.Errorf("Expected success to be true, got false")
-	}
+	require.NoError(t, err)
+	require.True(t, isSuccess)
 }
 
 func TestGetSuccessOfExecution_FailDifferentDimension(t *testing.T) {
@@ -72,12 +62,8 @@ func TestGetSuccessOfExecution_FailDifferentDimension(t *testing.T) {
 	}
 
 	isSuccess, err := GetSuccessOfExecution(steps)
-	if err != nil {
-		t.Errorf("Expected no errors. Got %s", err)
-	}
-	if isSuccess {
-		t.Errorf("Expected success to be false, got true")
-	}
+	require.NoError(t, err)
+	require.False(t, isSuccess)
 }
 
 func TestGetSuccessOfExecution_FailForDimension(t *testing.T) {
@@ -95,12 +81,8 @@ func TestGetSuccessOfExecution_FailForDimension(t *testing.T) {
 	}
 
 	isSuccess, err := GetSuccessOfExecution(steps)
-	if err != nil {
-		t.Errorf("Expected no errors. Got %s", err)
-	}
-	if isSuccess {
-		t.Errorf("Expected success to be false, got true")
-	}
+	require.NoError(t, err)
+	require.False(t, isSuccess)
 }
 
 func TestGetSuccessOfExecution_FailBothDimensions(t *testing.T) {
@@ -116,10 +98,6 @@ func TestGetSuccessOfExecution_FailBothDimensions(t *testing.T) {
 	}
 
 	isSuccess, err := GetSuccessOfExecution(steps)
-	if err != nil {
-		t.Errorf("Expected no errors. Got %s", err)
-	}
-	if isSuccess {
-		t.Errorf("Expected success to be false, got true")
-	}
+	require.NoError(t, err)
+	require.False(t, isSuccess)
 }
