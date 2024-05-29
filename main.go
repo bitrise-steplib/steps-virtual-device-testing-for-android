@@ -18,7 +18,7 @@ import (
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
-	"github.com/bitrise-steplib/steps-virtual-device-testing-for-android/step"
+	"github.com/bitrise-steplib/steps-virtual-device-testing-for-android/resultprocessing"
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 )
 
@@ -137,7 +137,7 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
-				successful, err = step.GetSuccessOfExecution(responseModel.Steps)
+				successful, err = resultprocessing.GetSuccessOfExecution(responseModel.Steps)
 				if err != nil {
 					failf("Failed to process results, error: %s", err)
 				}

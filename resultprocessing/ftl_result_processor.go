@@ -1,4 +1,4 @@
-package step
+package resultprocessing
 
 import (
 	"encoding/json"
@@ -6,6 +6,10 @@ import (
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 )
 
+// GetSuccessOfExecution ...
+// Given multiple steps, return whether we can consider the overall execution successful
+// To do this, step executions are grouped by dimension (aka what device they ran on)
+// and each dimension must have a successful execution
 func GetSuccessOfExecution(steps []*toolresults.Step) (bool, error) {
 	outcomeByDimension, err := getOutcomeByDimension(steps)
 	if err != nil {

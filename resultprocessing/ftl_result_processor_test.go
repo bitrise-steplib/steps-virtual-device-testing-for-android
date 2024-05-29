@@ -1,4 +1,4 @@
-package step
+package resultprocessing
 
 import (
 	"testing"
