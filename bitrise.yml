@@ -14,7 +14,7 @@ workflows:
         inputs:
         - packages: |-
             .
-            ./re
+            ./resultprocessing
     - path::./:
         inputs:
           - test_type: instrumentation
