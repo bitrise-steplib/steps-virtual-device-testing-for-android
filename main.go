@@ -18,6 +18,7 @@ import (
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
+	"github.com/bitrise-steplib/steps-virtual-device-testing-for-android/resultprocessing"
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 )
 
@@ -136,68 +137,24 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
+				successful, err = resultprocessing.GetSuccessOfExecution(responseModel.Steps)
+				if err != nil {
+					failf("Failed to process results, error: %s", err)
+				}
+
 				for _, step := range responseModel.Steps {
 					dimensions := map[string]string{}
 					for _, dimension := range step.DimensionValue {
 						dimensions[dimension.Key] = dimension.Value
 					}
 
-					outcome := step.Outcome.Summary
-
-					switch outcome {
-					case "success":
-						outcome = colorstring.Green(outcome)
-					case "failure":
-						successful = false
-						if step.Outcome.FailureDetail != nil {
-							if step.Outcome.FailureDetail.Crashed {
-								outcome += "(Crashed)"
-							}
-							if step.Outcome.FailureDetail.NotInstalled {
-								outcome += "(NotInstalled)"
-							}
-							if step.Outcome.FailureDetail.OtherNativeCrash {
-								outcome += "(OtherNativeCrash)"
-							}
-							if step.Outcome.FailureDetail.TimedOut {
-								outcome += "(TimedOut)"
-							}
-							if step.Outcome.FailureDetail.UnableToCrawl {
-								outcome += "(UnableToCrawl)"
-							}
-						}
-						outcome = colorstring.Red(outcome)
-					case "inconclusive":
-						successful = false
-						if step.Outcome.InconclusiveDetail != nil {
-							if step.Outcome.InconclusiveDetail.AbortedByUser {
-								outcome += "(AbortedByUser)"
-							}
-							if step.Outcome.InconclusiveDetail.InfrastructureFailure {
-								outcome += "(InfrastructureFailure)"
-							}
-						}
-						outcome = colorstring.Yellow(outcome)
-					case "skipped":
-						successful = false
-						if step.Outcome.SkippedDetail != nil {
-							if step.Outcome.SkippedDetail.IncompatibleAppVersion {
-								outcome += "(IncompatibleAppVersion)"
-							}
-							if step.Outcome.SkippedDetail.IncompatibleArchitecture {
-								outcome += "(IncompatibleArchitecture)"
-							}
-							if step.Outcome.SkippedDetail.IncompatibleDevice {
-								outcome += "(IncompatibleDevice)"
-							}
-						}
-						outcome = colorstring.Blue(outcome)
-					}
+					outcome := processStepResult(step)
 
 					if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
 						failf("Failed to write in tabwriter, error: %s", err)
 					}
 				}
+
 				if err := w.Flush(); err != nil {
 					log.Errorf("Failed to flush writer, error: %s", err)
 				}
@@ -350,4 +307,56 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 	}
 
 	return nil
+}
+
+func processStepResult(step *toolresults.Step) string {
+	outcome := step.Outcome.Summary
+
+	switch outcome {
+	case "success":
+		outcome = colorstring.Green(outcome)
+	case "failure":
+		if step.Outcome.FailureDetail != nil {
+			if step.Outcome.FailureDetail.Crashed {
+				outcome += "(Crashed)"
+			}
+			if step.Outcome.FailureDetail.NotInstalled {
+				outcome += "(NotInstalled)"
+			}
+			if step.Outcome.FailureDetail.OtherNativeCrash {
+				outcome += "(OtherNativeCrash)"
+			}
+			if step.Outcome.FailureDetail.TimedOut {
+				outcome += "(TimedOut)"
+			}
+			if step.Outcome.FailureDetail.UnableToCrawl {
+				outcome += "(UnableToCrawl)"
+			}
+		}
+		outcome = colorstring.Red(outcome)
+	case "inconclusive":
+		if step.Outcome.InconclusiveDetail != nil {
+			if step.Outcome.InconclusiveDetail.AbortedByUser {
+				outcome += "(AbortedByUser)"
+			}
+			if step.Outcome.InconclusiveDetail.InfrastructureFailure {
+				outcome += "(InfrastructureFailure)"
+			}
+		}
+		outcome = colorstring.Yellow(outcome)
+	case "skipped":
+		if step.Outcome.SkippedDetail != nil {
+			if step.Outcome.SkippedDetail.IncompatibleAppVersion {
+				outcome += "(IncompatibleAppVersion)"
+			}
+			if step.Outcome.SkippedDetail.IncompatibleArchitecture {
+				outcome += "(IncompatibleArchitecture)"
+			}
+			if step.Outcome.SkippedDetail.IncompatibleDevice {
+				outcome += "(IncompatibleDevice)"
+			}
+		}
+		outcome = colorstring.Blue(outcome)
+	}
+	return outcome
 }

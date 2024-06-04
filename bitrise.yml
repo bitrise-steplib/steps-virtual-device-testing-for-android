@@ -12,7 +12,9 @@ workflows:
     # Ignoring maintenance test as it needs gcloud binary
     - go-test:
         inputs:
-        - packages: "."
+        - packages: |-
+            .
+            ./resultprocessing
     - path::./:
         inputs:
           - test_type: instrumentation
