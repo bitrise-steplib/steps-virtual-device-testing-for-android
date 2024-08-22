@@ -67,6 +67,7 @@ You can also run this step directly with [Bitrise CLI](https://github.com/bitris
 | `inst_test_runner_class` | The fully-qualified Java class name of the instrumentation test runner (leave empty to use the last name extracted from the APK manifest). |  |  |
 | `inst_test_targets` | A list of one or more instrumentation test targets to be run (default: all targets). Each target must be fully qualified with the package name or class name, in one of these formats: - `package package_name` - `class package_name.class_name` - `class package_name.class_name#method_name` For example: `class com.my.company.app.MyTargetClass,class com.my.company.app.MyOtherTargetClass`  |  |  |
 | `inst_use_orchestrator` | The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not.  | required | `false` |
+| `inst_num_uniform_shards` | The number of uniform shards across which to distribute test cases. The shards are run in parallel on separate devices, a value between 1 and 50. | | |
 | `robo_initial_activity` | The initial activity used to start the app during a robo test. (leave empty to get it extracted from the APK manifest) |  |  |
 | `robo_max_depth` | The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(leave empty to use the default value: `50`)  |  |  |
 | `robo_max_steps` | The maximum number of steps/actions a robo test can execute(leave empty to use the default value: `no limit`).  |  |  |
