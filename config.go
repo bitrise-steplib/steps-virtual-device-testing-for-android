@@ -9,10 +9,11 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	testing "google.golang.org/api/testing/v1"
+
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
-	testing "google.golang.org/api/testing/v1"
 )
 
 // This embedded basic application was created based on the https://github.com/tothszabi/BasicApp repository.
@@ -96,7 +97,7 @@ func (configs *ConfigsModel) print() {
 		failf("Failed to write in tabwriter, error: %s", err)
 	}
 	for _, testDevice := range configs.TestDevices {
-		if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t", testDevice.AndroidModelId, testDevice.AndroidVersionId, testDevice.Locale, testDevice.Orientation)); err != nil {
+		if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t\n", testDevice.AndroidModelId, testDevice.AndroidVersionId, testDevice.Locale, testDevice.Orientation); err != nil {
 			failf("Failed to write in tabwriter, error: %s", err)
 		}
 	}

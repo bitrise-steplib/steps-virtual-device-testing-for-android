@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"text/tabwriter"
 	"time"
+
+	toolresults "google.golang.org/api/toolresults/v1beta3"
 
 	"github.com/bitrise-io/go-steputils/stepconf"
 	"github.com/bitrise-io/go-steputils/tools"
@@ -19,7 +20,6 @@ import (
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
 	"github.com/bitrise-steplib/steps-virtual-device-testing-for-android/resultprocessing"
-	toolresults "google.golang.org/api/toolresults/v1beta3"
 )
 
 const (
@@ -89,7 +89,7 @@ func main() {
 				}
 			}
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				failf("Failed to read response body, error: %s", err)
 			}
@@ -117,7 +117,7 @@ func main() {
 			msg := ""
 			if len(responseModel.Steps) == 0 {
 				finished = false
-				msg = fmt.Sprintf("- Validating")
+				msg = "- Validating"
 			} else {
 				msg = fmt.Sprintf("- (%d/%d) running", testsRunning, len(responseModel.Steps))
 			}
@@ -150,7 +150,7 @@ func main() {
 
 					outcome := processStepResult(step)
 
-					if _, err := fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome)); err != nil {
+					if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome); err != nil {
 						failf("Failed to write in tabwriter, error: %s", err)
 					}
 				}
@@ -186,7 +186,7 @@ func main() {
 				failf("Failed to get http response, status code: %d", resp.StatusCode)
 			}
 
-			body, err := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				failf("Failed to read response body, error: %s", err)
 			}
@@ -297,7 +297,7 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 		}
 	}()
 
-	_, err = ioutil.ReadAll(resp.Body)
+	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("Failed to read response: %s", err)
 	}
