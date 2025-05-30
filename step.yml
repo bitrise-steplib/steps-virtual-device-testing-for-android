@@ -1,40 +1,39 @@
-title: "Virtual Device Testing for Android"
+title: Virtual Device Testing for Android
 summary: Run Android UI tests on virtual devices
 description: |-
   Run Android UI tests on virtual devices. This Step collects the built APK/AAB file from the `$BITRISE_APK_PATH` and in case of instrumentation tests, the `$BITRISE_TEST_APK_PATH` Environment Variables and uses Firebase Test Lab to run UI tests on them.
-  
-  The available test types are instrumentation, robo, gameloop. 
 
-  ### Configuring the Step 
+  The available test types are instrumentation, robo, gameloop.
 
-  You can read [our detailed guide about using the Step](https://devcenter.bitrise.io/en/testing/device-testing-for-android.html) with other Bitrise Steps. Here we'll go over the configuration options of the Step. 
+  ### Configuring the Step
 
-  1. Make sure the **App path** input points to the path of the APK or AAB file of your app. If you use our **Android Build** or **Android Build for UI Testing** Steps, you don't need to change the default value. 
-  1. Add the devices you want the tests to run on in the **Test devices** input. 
+  You can read [our detailed guide about using the Step](https://devcenter.bitrise.io/en/testing/device-testing-for-android.html) with other Bitrise Steps. Here we'll go over the configuration options of the Step.
+
+  1. Make sure the **App path** input points to the path of the APK or AAB file of your app. If you use our **Android Build** or **Android Build for UI Testing** Steps, you don't need to change the default value.
+  1. Add the devices you want the tests to run on in the **Test devices** input.
 
      You need to set the device ID, the version, the orientation, and the language. Read the input description for more information and available devices.
-  1. Choose a test type. 
-     
+  1. Choose a test type.
+
      The available options are:
      - instrumentation
      - robo
      - gameloop
 
-  For detailed configuration options related to the different test types, please check out the [full guide](https://devcenter.bitrise.io/en/testing/device-testing-for-android.html). 
+  For detailed configuration options related to the different test types, please check out the [full guide](https://devcenter.bitrise.io/en/testing/device-testing-for-android.html).
 
   You can also export the results of the Step to the Test reports add-on. All you need to do is to add a **Deploy to Bitrise.io** Step to the end of your Workflow.
 
   ### Troubleshooting
 
-  If you get the **Build already exists** error, it is because you have more than one instance of the Step in your Workflow. This doesn't work as Bitrise sends the build slug to Firebase and having the Step more than once in the same Workflow results in sending the same build slug multiple times. 
-
+  If you get the **Build already exists** error, it is because you have more than one instance of the Step in your Workflow. This doesn't work as Bitrise sends the build slug to Firebase and having the Step more than once in the same Workflow results in sending the same build slug multiple times.
 
   ### Useful links
 
   - [Device testing for Android](https://devcenter.bitrise.io/en/testing/device-testing-for-android.html)
   - [Test reports](https://devcenter.bitrise.io/en/testing/test-reports.html)
 
-  ### Related Steps 
+  ### Related Steps
 
   - [Android Build](https://www.bitrise.io/integrations/steps/android-build)
   - [Android Build for UI Testing](https://www.bitrise.io/integrations/steps/android-build-for-ui-testing)
@@ -43,390 +42,394 @@ description: |-
 website: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
 source_code_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android
 support_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android/issues
+
 project_type_tags:
-  - android
-  - cordova
-  - ionic
-  - react-native
-  - flutter
+- android
+- cordova
+- ionic
+- react-native
+- flutter
 type_tags:
-  - test
+- test
+
 is_always_run: false
 is_skippable: false
-run_if: ".IsCI"
-meta: 
-  bitrise.io: 
-    addons_required: 
-      - addons-testing
+run_if: .IsCI
+
+meta:
+  bitrise.io:
+    addons_required:
+    - addons-testing
 
 toolkit:
   go:
     package_name: github.com/bitrise-steplib/steps-virtual-device-testing-for-android
+
 inputs:
-  - app_path: "$BITRISE_APK_PATH"
-    opts:
-      title: "App path"
-      summary: |
-        The path to the app to test (APK or AAB).
-      description: |
-        The path to the app to test (APK or AAB). By default `android-build` and `android-build-for-ui-testing` Steps export the `BITRISE_APK_PATH` Env Var, so you won't need to change this input.
-        Can specify an APK (`$BITRISE_APK_PATH`) or AAB (Android App Bundle) as input (`$BITRISE_AAB_PATH`).
-        
-        If nothing is specified then the Step will use a default empty Application APK. This will help the library instrumentation tests as it can be used as a shell where the tests will be running.
-  - test_devices: "NexusLowRes,24,en,portrait"
-    opts:
-      title: "Test devices"
-      description: |
-        Format:
-        One device configuration per line and the parameters are separated with `,` in the order of: `deviceID,version,language,orientation`
-        
-        For example:
-        `NexusLowRes,24,en,portrait`
-        
-        `NexusLowRes,24,en,landscape`
-        
-        Available devices and its versions:
-        ```
-        ┌─────────────────────┬──────────┬──────────────────────────────────────────┬─────────┬─────────────┬────────────────────────────┬─────────┐
-        │       MODEL_ID      │   MAKE   │                MODEL_NAME                │   FORM  │  RESOLUTION │       OS_VERSION_IDS       │   TAGS  │
-        ├─────────────────────┼──────────┼──────────────────────────────────────────┼─────────┼─────────────┼────────────────────────────┼─────────┤
-        │ AmatiTvEmulator     │ Google   │ Google TV Amati                          │ VIRTUAL │ 1080 x 1920 │ 29                         │ beta=29 │
-        │ AndroidTablet270dpi │ Generic  │ Generic 720x1600 Android tablet @ 270dpi │ VIRTUAL │ 1600 x 720  │ 30                         │         │
-        │ GoogleTvEmulator    │ Google   │ Google TV                                │ VIRTUAL │  720 x 1280 │ 30                         │ beta=30 │
-        │ MediumPhone.arm     │ Generic  │ Medium Phone, 6.4in/16cm (Arm)           │ VIRTUAL │ 2400 x 1080 │ 26,27,28,29,30,31,32,33,34 │         │
-        │ MediumTablet.arm    │ Generic  │ Medium Tablet, 10in/25cm (Arm)           │ VIRTUAL │ 2560 x 1600 │ 26,27,28,29,30,31,32,33,34 │         │
-        │ Nexus5X             │ LG       │ Nexus 5X                                 │ VIRTUAL │ 1920 x 1080 │ 24,25,26                   │         │
-        │ Nexus6              │ Motorola │ Nexus 6                                  │ VIRTUAL │ 2560 x 1440 │ 24,25                      │         │
-        │ Nexus6P             │ Google   │ Nexus 6P                                 │ VIRTUAL │ 2560 x 1440 │ 24,25,26,27                │         │
-        │ Nexus7_clone_16_9   │ Generic  │ Nexus7 clone, DVD 16:9 aspect ratio      │ VIRTUAL │ 1280 x 720  │ 24,25,26                   │ beta    │
-        │ Nexus9              │ HTC      │ Nexus 9                                  │ VIRTUAL │ 2048 x 1536 │ 24,25                      │         │
-        │ NexusLowRes         │ Generic  │ Low-resolution MDPI phone                │ VIRTUAL │  640 x 360  │ 24,25,26,27,28,29,30       │         │
-        │ Pixel2              │ Google   │ Pixel 2                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30             │         │
-        │ Pixel2.arm          │ Google   │ Pixel 2 (Arm)                            │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,31,32,33    │         │
-        │ Pixel3              │ Google   │ Pixel 3                                  │ VIRTUAL │ 2160 x 1080 │ 30                         │         │
-        │ SmallPhone.arm      │ Generic  │ Small Phone, 4.7in/12cm (Arm)            │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,31,32,33,34 │         │
-        └─────────────────────┴──────────┴──────────────────────────────────────────┴─────────┴─────────────┴────────────────────────────┴─────────┘    
-        ```
-      summary: |
-        Format:
-        One device configuration per line and the parameters are separated with `,` in the order of: `deviceID,version,language,orientation`
-        
-        For example:
-        `NexusLowRes,24,en,portrait`
-        
-        `NexusLowRes,24,en,landscape`
-        
-        Available devices and its versions:
-        ```
-        ┌─────────────────────┬──────────┬──────────────────────────────────────────┬─────────┬─────────────┬────────────────────────────┬─────────┐
-        │       MODEL_ID      │   MAKE   │                MODEL_NAME                │   FORM  │  RESOLUTION │       OS_VERSION_IDS       │   TAGS  │
-        ├─────────────────────┼──────────┼──────────────────────────────────────────┼─────────┼─────────────┼────────────────────────────┼─────────┤
-        │ AmatiTvEmulator     │ Google   │ Google TV Amati                          │ VIRTUAL │ 1080 x 1920 │ 29                         │ beta=29 │
-        │ AndroidTablet270dpi │ Generic  │ Generic 720x1600 Android tablet @ 270dpi │ VIRTUAL │ 1600 x 720  │ 30                         │         │
-        │ GoogleTvEmulator    │ Google   │ Google TV                                │ VIRTUAL │  720 x 1280 │ 30                         │ beta=30 │
-        │ MediumPhone.arm     │ Generic  │ Medium Phone, 6.4in/16cm (Arm)           │ VIRTUAL │ 2400 x 1080 │ 26,27,28,29,30,31,32,33,34 │         │
-        │ MediumTablet.arm    │ Generic  │ Medium Tablet, 10in/25cm (Arm)           │ VIRTUAL │ 2560 x 1600 │ 26,27,28,29,30,31,32,33,34 │         │
-        │ Nexus5X             │ LG       │ Nexus 5X                                 │ VIRTUAL │ 1920 x 1080 │ 24,25,26                   │         │
-        │ Nexus6              │ Motorola │ Nexus 6                                  │ VIRTUAL │ 2560 x 1440 │ 24,25                      │         │
-        │ Nexus6P             │ Google   │ Nexus 6P                                 │ VIRTUAL │ 2560 x 1440 │ 24,25,26,27                │         │
-        │ Nexus7_clone_16_9   │ Generic  │ Nexus7 clone, DVD 16:9 aspect ratio      │ VIRTUAL │ 1280 x 720  │ 24,25,26                   │ beta    │
-        │ Nexus9              │ HTC      │ Nexus 9                                  │ VIRTUAL │ 2048 x 1536 │ 24,25                      │         │
-        │ NexusLowRes         │ Generic  │ Low-resolution MDPI phone                │ VIRTUAL │  640 x 360  │ 24,25,26,27,28,29,30       │         │
-        │ Pixel2              │ Google   │ Pixel 2                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30             │         │
-        │ Pixel2.arm          │ Google   │ Pixel 2 (Arm)                            │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,31,32,33    │         │
-        │ Pixel3              │ Google   │ Pixel 3                                  │ VIRTUAL │ 2160 x 1080 │ 30                         │         │
-        │ SmallPhone.arm      │ Generic  │ Small Phone, 4.7in/12cm (Arm)            │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,31,32,33,34 │         │
-        └─────────────────────┴──────────┴──────────────────────────────────────────┴─────────┴─────────────┴────────────────────────────┴─────────┘   
-        ```
-      is_required: true
-  - test_type: "robo"
-    opts:
-      title: "Test type"
-      summary: |
-        The type of your test you want to run on the devices. Find more properties below in the selected test type's group.
-      description: |
-        The type of your test you want to run on the devices. Find more properties below in the selected test type's group.
-      is_required: true
-      value_options:
-        - "instrumentation"
-        - "robo"
-        - "gameloop"
-  - test_apk_path: "$BITRISE_TEST_APK_PATH"
-    opts:
-      category: "Instrumentation Test"
-      title: "Test APK path"
-      summary: The path to the APK that contains instrumentation tests
-      description: The path to the APK that contains instrumentation tests. To build this, you can run the [Build for UI testing](https://bitrise.io/integrations/steps/android-build-for-ui-testing) Step (before this Step).  
-  - inst_test_runner_class:
-    opts:
-      category: "Instrumentation Test"
-      title: "Test runner class"
-      summary: The fully-qualified Java class name of the instrumentation test runner (leave empty to use the last name extracted from the APK manifest).
-      description: The fully-qualified Java class name of the instrumentation test runner (leave empty to use the last name extracted from the APK manifest).
-  - inst_test_targets:
-    opts:
-      category: "Instrumentation Test"
-      title: |
-        Test targets, seperated with the "," character.
-      summary: |
-        A list of one or more instrumentation test targets to be run (default: all targets). Each target must be fully qualified with the package name or class name, in one of these formats:
-        - `package package_name`
-        - `class package_name.class_name`
-        - `class package_name.class_name#method_name`
-        For example:
-        `class com.my.company.app.MyTargetClass,class com.my.company.app.MyOtherTargetClass`
-      description: |
-        A list of one or more instrumentation test targets to be run (default: all targets). Each target must be fully qualified with the package name or class name, in one of these formats:
-        - `package package_name`
-        - `class package_name.class_name`
-        - `class package_name.class_name#method_name`
-        For example:
-        `class com.my.company.app.MyTargetClass,class com.my.company.app.MyOtherTargetClass`
-  - inst_use_orchestrator: "false"
-    opts:
-      category: "Instrumentation Test"
-      title: "Use Orchestrator"
-      summary: |
-        The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not.
-      description: |
-        The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not.
-      is_required: true
-      value_options:
-        - "false"
-        - "true"
-  - robo_initial_activity:
-    opts:
-      category: "Robo Test"
-      title: "Initial activity"
-      summary: The initial activity used to start the app during a robo test. (leave empty to get it extracted from the APK manifest)
-      description: The initial activity used to start the app during a robo test. (leave empty to get it extracted from the APK manifest)
-  - robo_max_depth:
-    opts:
-      category: "Robo Test"
-      title: "Max depth"
-      summary: |
-        The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(leave empty to use the default value: `50`)
-      description: |
-        The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(leave empty to use the default value: `50`)
-  - robo_max_steps:
-    opts:
-      category: "Robo Test"
-      title: "Max steps"
-      summary: |
-        The maximum number of steps/actions a robo test can execute(leave empty to use the default value: `no limit`).
-      description: |
-        The maximum number of steps/actions a robo test can execute(leave empty to use the default value: `no limit`).
-  - robo_directives:
-    opts:
-      category: "Robo Test"
-      title: "Robo directives"
-      summary: |
-        To complete text fields in your app, use robo-directives and provide a comma-separated list of key-value pairs, where the key is the Android resource name of the target UI element, and the value is the text string. EditText fields are supported but not text fields in WebView UI elements.
-        For example, you could use the following parameter for custom login:
-        ```
-        username_resource,username,ENTER_TEXT
-        password_resource,password,ENTER_TEXT
-        loginbtn_resource,,SINGLE_CLICK
-        ```
-        One directive per line, the parameters are separated with `,` character. For example: `ResourceName,InputText,ActionType`
-      description: |
-        To complete text fields in your app, use robo-directives and provide a comma-separated list of key-value pairs, where the key is the Android resource name of the target UI element, and the value is the text string. EditText fields are supported but not text fields in WebView UI elements.
-        For example, you could use the following parameter for custom login:
-        ```
-        username_resource,username,ENTER_TEXT
-        password_resource,password,ENTER_TEXT
-        loginbtn_resource,,SINGLE_CLICK
-        ```
-        One directive per line, the parameters are separated with `,` character. For example: `ResourceName,InputText,ActionType`
-  - robo_scenario_file:
-    opts:
-      category: "Robo Test"
-      title: "Robo scenario file path"
-      summary: "A path to a JSON file with a sequence of recorded actions Robo should perform before the Robo crawl."
-      description:
-  - loop_scenarios:
-    opts:
-      category: "Game Loop Test"
-      title: "Loop scenarios"
-      description: |
-        A list of game-loop scenario numbers which will be run as part of the test (default: all scenarios).
-        A maximum of 1024 scenarios may be specified in one test matrix.
-        Format: int,[int,...]
-        For example:
-        ```
-        1,2
-        ```
-  - loop_scenario_labels:
-    opts:
-      category: "Game Loop Test"
-      title: "Loop scenario labels"
-      description: |
-        A list of game-loop scenario labels (default: None).
-        Each game-loop scenario may be labeled in the APK manifest file with one or more arbitrary strings, creating logical groupings (e.g. GPU_COMPATIBILITY_TESTS).
-  - test_timeout: 900
-    opts:
-      category: "Debug"
-      title: "Test timeout"
-      summary: |
-        Max time a test execution is allowed to run before it is automatically canceled. The default value is 900 (15 min), the maximum is 3600 (60 min).  Duration in seconds with up to nine fractional digits. Example: "3.5".
-      description: |
-        Max time a test execution is allowed to run before it is automatically canceled. The default value is 900 (15 min), the maximum is 3600 (60 min).  Duration in seconds with up to nine fractional digits. Example: "3.5".
-      is_required: true
-  - num_flaky_test_attempts: 0
-    opts:
-      category: "Debug"
-      title: "Number of times a test execution is reattempted"
-      summary: ""
-      description: |
-        Specifies the number of times a test execution should be reattempted if one or more of its test cases fail for any reason. An execution that
-        initially fails but succeeds on any reattempt is reported as FLAKY.
-        The maximum number of reruns allowed is 10. (Default: 0, which implies no reruns.)
-      is_required: true
-  - obb_files_list: ""
-    opts:
-      category: "Test setup"
-      title: "OBB files"
-      summary: "Upload OBB files before tests will run"
-      description: |
-        A list of one or two Android OBB file names which will be copied to each test device before the tests will run (default: None).
-        Each OBB file name must conform to the format as specified by Android (e.g. [main|patch].0300110.com.example.android.obb) and will be installed into `[shared-storage]/Android/obb/[package-name]/` on the test device.
-        Files should be seperated by newline.
-        For example:
-        ```
-        main.0300110.com.example.android.obb
-        patch.0300110.com.example.android.obb
-        ```
-  - auto_google_login: "false"
-    opts:
-      category: "Test setup"
-      title: "Add preconfigured Google account"
-      summary: "Add preconfigured Google account before tests will run"
-      description: |-
-        Automatically log into the test device using a preconfigured Google
-        account before beginning the test.
-      is_required: true
-      value_options:
-      - "false"
-      - "true"
-  - environment_variables:
-    opts:
-      category: "Test setup"
-      title: Environment Variables
-      summary: |
-        One variable per line, key and value seperated by `=`
-        For example:
-        ```
-        coverage=true
-        coverageFile=/sdcard/tempDir/coverage.ec
-        ```
-      description: |
-        One variable per line, key and value seperated by `=`
-        For example:
-        ```
-        coverage=true
-        coverageFile=/sdcard/tempDir/coverage.ec
-        ```
-  - directories_to_pull:
-    opts:
-      category: "Debug"
-      title: "Directories to pull"
-      summary: |
-        A list of paths that will be downloaded from the device's storage after the test is complete. 
-        
-        For example
-        
-        ```
-        /sdcard/tempDir1
-        /data/tempDir2
-        ```
-        
-        If `download_test_results` input is set to `false` then these files will be downloaded to the dashboard only. To have them downloaded set that input to `true` as well.
-      description: |
-        A list of paths that will be downloaded from the device's storage after the test is complete. 
-        
-        For example
-        
-        ```
-        /sdcard/tempDir1
-        /data/tempDir2
-        ```
-        
-        If `download_test_results` input is set to `false` then these files will be available on the dashboard only. To have them downloaded set that input to `true` as well.
-  - download_test_results: "false"
-    opts:
-      category: "Debug"
-      title: "Download files"
-      summary: |
-        If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded. 
-      description: |
-        If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded.
-      is_required: true
-      value_options:
-        - "false"
-        - "true"
-  - use_verbose_log: "false"
-    opts:
-      category: "Debug"
-      title: "Verbose log"
-      summary: |
-        If set to `true` will enable verbose level logging.
-      is_required: true
-      value_options:
-        - "false"
-        - "true"
-  - apk_path: ""
-    opts:
-      category: "Deprecated"
-      title: "APK path"
-      summary: |
-        Deprecated. Use 'App path' input instead of this one.
-        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
-      description: |
-        Deprecated. Use 'App path' input instead of this one.
-        The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
-      is_required: false
-  - app_package_id:
-    opts:
-      category: "Deprecated"
-      title: "App package ID"
-      summary: |
-        Deprecated: If not specified will be automatically extracted from the App manifest.
-        The Java package of the application under test.
-      description: |
-        Deprecated: If not specified will be automatically extracted from the App manifest.
-        The Java package of the application under test.
-  - inst_test_package_id:
-    opts:
-      category: "Deprecated"
-      title: "Test package ID"
-      summary: |
-        Deprecated: If not specified will be automatically extracted from the Test App manifest.
-        The Java package name of the instrumentation test.
-      description: |
-        Deprecated: If not specified will be automatically extracted from the Test App manifest.
-        The Java package name of the instrumentation test.
-  - api_base_url: "https://vdt.bitrise.io/test"
-    opts:
-      category: "Debug"
-      title: "Test API's base URL"
-      summary: The URL where test API is accessible.
-      description: |
-        The URL where test API is accessible.
-      is_required: true
-      is_dont_change_value: true
-  - api_token: $ADDON_VDTESTING_API_TOKEN
-    opts:
-      category: "Debug"
-      title: "API Token"
-      summary: The token required to authenticate with the API.
-      description: |
-        The token required to authenticate with the API.
-      is_required: true
-      is_dont_change_value: true
-      is_sensitive: true
+- app_path: $BITRISE_APK_PATH
+  opts:
+    title: App path
+    summary: |
+      The path to the app to test (APK or AAB).
+    description: |
+      The path to the app to test (APK or AAB). By default `android-build` and `android-build-for-ui-testing` Steps export the `BITRISE_APK_PATH` Env Var, so you won't need to change this input.
+      Can specify an APK (`$BITRISE_APK_PATH`) or AAB (Android App Bundle) as input (`$BITRISE_AAB_PATH`).
+
+      If nothing is specified then the Step will use a default empty Application APK. This will help the library instrumentation tests as it can be used as a shell where the tests will be running.
+- test_devices: NexusLowRes,24,en,portrait
+  opts:
+    title: Test devices
+    description: |
+      Format:
+      One device configuration per line and the parameters are separated with `,` in the order of: `deviceID,version,language,orientation`
+
+      For example:
+      `NexusLowRes,24,en,portrait`
+
+      `NexusLowRes,24,en,landscape`
+
+      Available devices and its versions:
+      ```
+      ┌─────────────────────┬──────────┬──────────────────────────────────────────┬─────────┬─────────────┬────────────────────────────┬─────────┐
+      │       MODEL_ID      │   MAKE   │                MODEL_NAME                │   FORM  │  RESOLUTION │       OS_VERSION_IDS       │   TAGS  │
+      ├─────────────────────┼──────────┼──────────────────────────────────────────┼─────────┼─────────────┼────────────────────────────┼─────────┤
+      │ AmatiTvEmulator     │ Google   │ Google TV Amati                          │ VIRTUAL │ 1080 x 1920 │ 29                         │ beta=29 │
+      │ AndroidTablet270dpi │ Generic  │ Generic 720x1600 Android tablet @ 270dpi │ VIRTUAL │ 1600 x 720  │ 30                         │         │
+      │ GoogleTvEmulator    │ Google   │ Google TV                                │ VIRTUAL │  720 x 1280 │ 30                         │ beta=30 │
+      │ MediumPhone.arm     │ Generic  │ Medium Phone, 6.4in/16cm (Arm)           │ VIRTUAL │ 2400 x 1080 │ 26,27,28,29,30,31,32,33,34 │         │
+      │ MediumTablet.arm    │ Generic  │ Medium Tablet, 10in/25cm (Arm)           │ VIRTUAL │ 2560 x 1600 │ 26,27,28,29,30,31,32,33,34 │         │
+      │ Nexus5X             │ LG       │ Nexus 5X                                 │ VIRTUAL │ 1920 x 1080 │ 24,25,26                   │         │
+      │ Nexus6              │ Motorola │ Nexus 6                                  │ VIRTUAL │ 2560 x 1440 │ 24,25                      │         │
+      │ Nexus6P             │ Google   │ Nexus 6P                                 │ VIRTUAL │ 2560 x 1440 │ 24,25,26,27                │         │
+      │ Nexus7_clone_16_9   │ Generic  │ Nexus7 clone, DVD 16:9 aspect ratio      │ VIRTUAL │ 1280 x 720  │ 24,25,26                   │ beta    │
+      │ Nexus9              │ HTC      │ Nexus 9                                  │ VIRTUAL │ 2048 x 1536 │ 24,25                      │         │
+      │ NexusLowRes         │ Generic  │ Low-resolution MDPI phone                │ VIRTUAL │  640 x 360  │ 24,25,26,27,28,29,30       │         │
+      │ Pixel2              │ Google   │ Pixel 2                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30             │         │
+      │ Pixel2.arm          │ Google   │ Pixel 2 (Arm)                            │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,31,32,33    │         │
+      │ Pixel3              │ Google   │ Pixel 3                                  │ VIRTUAL │ 2160 x 1080 │ 30                         │         │
+      │ SmallPhone.arm      │ Generic  │ Small Phone, 4.7in/12cm (Arm)            │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,31,32,33,34 │         │
+      └─────────────────────┴──────────┴──────────────────────────────────────────┴─────────┴─────────────┴────────────────────────────┴─────────┘
+      ```
+    summary: |
+      Format:
+      One device configuration per line and the parameters are separated with `,` in the order of: `deviceID,version,language,orientation`
+
+      For example:
+      `NexusLowRes,24,en,portrait`
+
+      `NexusLowRes,24,en,landscape`
+
+      Available devices and its versions:
+      ```
+      ┌─────────────────────┬──────────┬──────────────────────────────────────────┬─────────┬─────────────┬────────────────────────────┬─────────┐
+      │       MODEL_ID      │   MAKE   │                MODEL_NAME                │   FORM  │  RESOLUTION │       OS_VERSION_IDS       │   TAGS  │
+      ├─────────────────────┼──────────┼──────────────────────────────────────────┼─────────┼─────────────┼────────────────────────────┼─────────┤
+      │ AmatiTvEmulator     │ Google   │ Google TV Amati                          │ VIRTUAL │ 1080 x 1920 │ 29                         │ beta=29 │
+      │ AndroidTablet270dpi │ Generic  │ Generic 720x1600 Android tablet @ 270dpi │ VIRTUAL │ 1600 x 720  │ 30                         │         │
+      │ GoogleTvEmulator    │ Google   │ Google TV                                │ VIRTUAL │  720 x 1280 │ 30                         │ beta=30 │
+      │ MediumPhone.arm     │ Generic  │ Medium Phone, 6.4in/16cm (Arm)           │ VIRTUAL │ 2400 x 1080 │ 26,27,28,29,30,31,32,33,34 │         │
+      │ MediumTablet.arm    │ Generic  │ Medium Tablet, 10in/25cm (Arm)           │ VIRTUAL │ 2560 x 1600 │ 26,27,28,29,30,31,32,33,34 │         │
+      │ Nexus5X             │ LG       │ Nexus 5X                                 │ VIRTUAL │ 1920 x 1080 │ 24,25,26                   │         │
+      │ Nexus6              │ Motorola │ Nexus 6                                  │ VIRTUAL │ 2560 x 1440 │ 24,25                      │         │
+      │ Nexus6P             │ Google   │ Nexus 6P                                 │ VIRTUAL │ 2560 x 1440 │ 24,25,26,27                │         │
+      │ Nexus7_clone_16_9   │ Generic  │ Nexus7 clone, DVD 16:9 aspect ratio      │ VIRTUAL │ 1280 x 720  │ 24,25,26                   │ beta    │
+      │ Nexus9              │ HTC      │ Nexus 9                                  │ VIRTUAL │ 2048 x 1536 │ 24,25                      │         │
+      │ NexusLowRes         │ Generic  │ Low-resolution MDPI phone                │ VIRTUAL │  640 x 360  │ 24,25,26,27,28,29,30       │         │
+      │ Pixel2              │ Google   │ Pixel 2                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30             │         │
+      │ Pixel2.arm          │ Google   │ Pixel 2 (Arm)                            │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,31,32,33    │         │
+      │ Pixel3              │ Google   │ Pixel 3                                  │ VIRTUAL │ 2160 x 1080 │ 30                         │         │
+      │ SmallPhone.arm      │ Generic  │ Small Phone, 4.7in/12cm (Arm)            │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,31,32,33,34 │         │
+      └─────────────────────┴──────────┴──────────────────────────────────────────┴─────────┴─────────────┴────────────────────────────┴─────────┘
+      ```
+    is_required: true
+- test_type: robo
+  opts:
+    title: Test type
+    summary: |
+      The type of your test you want to run on the devices. Find more properties below in the selected test type's group.
+    description: |
+      The type of your test you want to run on the devices. Find more properties below in the selected test type's group.
+    is_required: true
+    value_options:
+    - instrumentation
+    - robo
+    - gameloop
+- test_apk_path: $BITRISE_TEST_APK_PATH
+  opts:
+    category: Instrumentation Test
+    title: Test APK path
+    summary: The path to the APK that contains instrumentation tests
+    description: The path to the APK that contains instrumentation tests. To build this, you can run the [Build for UI testing](https://bitrise.io/integrations/steps/android-build-for-ui-testing) Step (before this Step).
+- inst_test_runner_class:
+  opts:
+    category: Instrumentation Test
+    title: Test runner class
+    summary: The fully-qualified Java class name of the instrumentation test runner (leave empty to use the last name extracted from the APK manifest).
+    description: The fully-qualified Java class name of the instrumentation test runner (leave empty to use the last name extracted from the APK manifest).
+- inst_test_targets:
+  opts:
+    category: Instrumentation Test
+    title: |
+      Test targets, seperated with the "," character.
+    summary: |
+      A list of one or more instrumentation test targets to be run (default: all targets). Each target must be fully qualified with the package name or class name, in one of these formats:
+      - `package package_name`
+      - `class package_name.class_name`
+      - `class package_name.class_name#method_name`
+      For example:
+      `class com.my.company.app.MyTargetClass,class com.my.company.app.MyOtherTargetClass`
+    description: |
+      A list of one or more instrumentation test targets to be run (default: all targets). Each target must be fully qualified with the package name or class name, in one of these formats:
+      - `package package_name`
+      - `class package_name.class_name`
+      - `class package_name.class_name#method_name`
+      For example:
+      `class com.my.company.app.MyTargetClass,class com.my.company.app.MyOtherTargetClass`
+- inst_use_orchestrator: "false"
+  opts:
+    category: Instrumentation Test
+    title: Use Orchestrator
+    summary: |
+      The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not.
+    description: |
+      The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not.
+    is_required: true
+    value_options:
+    - "false"
+    - "true"
+- robo_initial_activity:
+  opts:
+    category: Robo Test
+    title: Initial activity
+    summary: The initial activity used to start the app during a robo test. (leave empty to get it extracted from the APK manifest)
+    description: The initial activity used to start the app during a robo test. (leave empty to get it extracted from the APK manifest)
+- robo_max_depth:
+  opts:
+    category: Robo Test
+    title: Max depth
+    summary: |
+      The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(leave empty to use the default value: `50`)
+    description: |
+      The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(leave empty to use the default value: `50`)
+- robo_max_steps:
+  opts:
+    category: Robo Test
+    title: Max steps
+    summary: |
+      The maximum number of steps/actions a robo test can execute(leave empty to use the default value: `no limit`).
+    description: |
+      The maximum number of steps/actions a robo test can execute(leave empty to use the default value: `no limit`).
+- robo_directives:
+  opts:
+    category: Robo Test
+    title: Robo directives
+    summary: |
+      To complete text fields in your app, use robo-directives and provide a comma-separated list of key-value pairs, where the key is the Android resource name of the target UI element, and the value is the text string. EditText fields are supported but not text fields in WebView UI elements.
+      For example, you could use the following parameter for custom login:
+      ```
+      username_resource,username,ENTER_TEXT
+      password_resource,password,ENTER_TEXT
+      loginbtn_resource,,SINGLE_CLICK
+      ```
+      One directive per line, the parameters are separated with `,` character. For example: `ResourceName,InputText,ActionType`
+    description: |
+      To complete text fields in your app, use robo-directives and provide a comma-separated list of key-value pairs, where the key is the Android resource name of the target UI element, and the value is the text string. EditText fields are supported but not text fields in WebView UI elements.
+      For example, you could use the following parameter for custom login:
+      ```
+      username_resource,username,ENTER_TEXT
+      password_resource,password,ENTER_TEXT
+      loginbtn_resource,,SINGLE_CLICK
+      ```
+      One directive per line, the parameters are separated with `,` character. For example: `ResourceName,InputText,ActionType`
+- robo_scenario_file:
+  opts:
+    category: Robo Test
+    title: Robo scenario file path
+    summary: A path to a JSON file with a sequence of recorded actions Robo should perform before the Robo crawl.
+- loop_scenarios:
+  opts:
+    category: Game Loop Test
+    title: Loop scenarios
+    summary: "A list of game-loop scenario numbers which will be run as part of the test (default: all scenarios)."
+    description: |
+      A list of game-loop scenario numbers which will be run as part of the test (default: all scenarios).
+      A maximum of 1024 scenarios may be specified in one test matrix.
+      Format: int,[int,...]
+      For example:
+      ```
+      1,2
+      ```
+- loop_scenario_labels:
+  opts:
+    category: Game Loop Test
+    title: Loop scenario labels
+    summary: "A list of game-loop scenario labels (default: None)."
+    description: |
+      A list of game-loop scenario labels (default: None).
+      Each game-loop scenario may be labeled in the APK manifest file with one or more arbitrary strings, creating logical groupings (e.g. GPU_COMPATIBILITY_TESTS).
+- test_timeout: "900"
+  opts:
+    category: Debug
+    title: Test timeout
+    summary: |
+      Max time a test execution is allowed to run before it is automatically canceled. The default value is 900 (15 min), the maximum is 3600 (60 min).  Duration in seconds with up to nine fractional digits. Example: "3.5".
+    description: |
+      Max time a test execution is allowed to run before it is automatically canceled. The default value is 900 (15 min), the maximum is 3600 (60 min).  Duration in seconds with up to nine fractional digits. Example: "3.5".
+    is_required: true
+- num_flaky_test_attempts: "0"
+  opts:
+    category: Debug
+    title: Number of times a test execution is reattempted
+    summary: Specifies the number of times a test execution should be reattempted if one or more of its test cases fail for any reason.
+    description: |-
+      Specifies the number of times a test execution should be reattempted if one or more of its test cases fail for any reason. An execution that
+      initially fails but succeeds on any reattempt is reported as FLAKY.
+      The maximum number of reruns allowed is 10. (Default: 0, which implies no reruns.)
+    is_required: true
+- obb_files_list:
+  opts:
+    category: Test setup
+    title: OBB files
+    summary: Upload OBB files before tests will run
+    description: |
+      A list of one or two Android OBB file names which will be copied to each test device before the tests will run (default: None).
+      Each OBB file name must conform to the format as specified by Android (e.g. [main|patch].0300110.com.example.android.obb) and will be installed into `[shared-storage]/Android/obb/[package-name]/` on the test device.
+      Files should be seperated by newline.
+      For example:
+      ```
+      main.0300110.com.example.android.obb
+      patch.0300110.com.example.android.obb
+      ```
+- auto_google_login: "false"
+  opts:
+    category: Test setup
+    title: Add preconfigured Google account
+    summary: Add preconfigured Google account before tests will run
+    description: |-
+      Automatically log into the test device using a preconfigured Google
+      account before beginning the test.
+    is_required: true
+    value_options:
+    - "false"
+    - "true"
+- environment_variables:
+  opts:
+    category: Test setup
+    title: Environment Variables
+    summary: |
+      One variable per line, key and value seperated by `=`
+      For example:
+      ```
+      coverage=true
+      coverageFile=/sdcard/tempDir/coverage.ec
+      ```
+    description: |
+      One variable per line, key and value seperated by `=`
+      For example:
+      ```
+      coverage=true
+      coverageFile=/sdcard/tempDir/coverage.ec
+      ```
+- directories_to_pull:
+  opts:
+    category: Debug
+    title: Directories to pull
+    summary: |
+      A list of paths that will be downloaded from the device's storage after the test is complete.
+
+      For example
+
+      ```
+      /sdcard/tempDir1
+      /data/tempDir2
+      ```
+
+      If `download_test_results` input is set to `false` then these files will be downloaded to the dashboard only. To have them downloaded set that input to `true` as well.
+    description: |
+      A list of paths that will be downloaded from the device's storage after the test is complete.
+
+      For example
+
+      ```
+      /sdcard/tempDir1
+      /data/tempDir2
+      ```
+
+      If `download_test_results` input is set to `false` then these files will be available on the dashboard only. To have them downloaded set that input to `true` as well.
+- download_test_results: "false"
+  opts:
+    category: Debug
+    title: Download files
+    summary: |
+      If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded.
+    description: |
+      If this input is set to `true` all files generated in the test run and the files you downloaded from the device (if you have set `directories_to_pull` input as well) will be downloaded. Otherwise, no any file will be downloaded.
+    is_required: true
+    value_options:
+    - "false"
+    - "true"
+- use_verbose_log: "false"
+  opts:
+    category: Debug
+    title: Verbose log
+    summary: |
+      If set to `true` will enable verbose level logging.
+    is_required: true
+    value_options:
+    - "false"
+    - "true"
+- apk_path:
+  opts:
+    category: Deprecated
+    title: APK path
+    summary: |
+      Deprecated. Use 'App path' input instead of this one.
+      The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
+    description: |
+      Deprecated. Use 'App path' input instead of this one.
+      The path to the APK you want the tests run with. By default `gradle-runner` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
+    is_required: false
+- app_package_id:
+  opts:
+    category: Deprecated
+    title: App package ID
+    summary: |
+      Deprecated: If not specified will be automatically extracted from the App manifest.
+      The Java package of the application under test.
+    description: |
+      Deprecated: If not specified will be automatically extracted from the App manifest.
+      The Java package of the application under test.
+- inst_test_package_id:
+  opts:
+    category: Deprecated
+    title: Test package ID
+    summary: |
+      Deprecated: If not specified will be automatically extracted from the Test App manifest.
+      The Java package name of the instrumentation test.
+    description: |
+      Deprecated: If not specified will be automatically extracted from the Test App manifest.
+      The Java package name of the instrumentation test.
+- api_base_url: https://vdt.bitrise.io/test
+  opts:
+    category: Debug
+    title: Test API's base URL
+    summary: The URL where test API is accessible.
+    description: |
+      The URL where test API is accessible.
+    is_required: true
+    is_dont_change_value: true
+- api_token: $ADDON_VDTESTING_API_TOKEN
+  opts:
+    category: Debug
+    title: API Token
+    summary: The token required to authenticate with the API.
+    description: |
+      The token required to authenticate with the API.
+    is_required: true
+    is_dont_change_value: true
+    is_sensitive: true
 outputs:
-  - VDTESTING_DOWNLOADED_FILES_DIR:
-    opts:
-      title: "Downloaded files directory"
-      description: "The directory containing the downloaded files if you have set `directories_to_pull` and `download_test_results` inputs above."
-      summary: "The directory containing the downloaded files if you have set `directories_to_pull` and `download_test_results` inputs above."
+- VDTESTING_DOWNLOADED_FILES_DIR: ""
+  opts:
+    title: Downloaded files directory
+    summary: The directory containing the downloaded files if you have set `directories_to_pull` and `download_test_results` inputs above.
