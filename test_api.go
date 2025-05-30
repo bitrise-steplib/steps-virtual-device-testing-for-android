@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -88,7 +88,7 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 		return TestAssetsAndroid{}, fmt.Errorf("failed to get http response, error: %s", err)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return TestAssetsAndroid{}, fmt.Errorf("failed to read response body (status code: %d), error: %s", resp.StatusCode, err)
 	}
@@ -313,7 +313,7 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read response body, error: %s", err)
 		}
