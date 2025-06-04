@@ -123,18 +123,19 @@ screenY:                1080
 supportedAbis[0]:       x86
 supportedVersionIds[0]: 29
 tags[0]:                beta=29
+tags[1]:                deprecated=29
 ---
 brand:                  Generic
-codename:               AndroidTablet270dpi
+codename:               AndroidTablet270dpi.arm
 form:                   VIRTUAL
 formFactor:             TABLET
-id:                     AndroidTablet270dpi
+id:                     AndroidTablet270dpi.arm
 manufacturer:           Generic
-name:                   Generic 720x1600 Android tablet @ 270dpi
+name:                   Generic 720x1600 Android tablet @ 270dpi (Arm)
 screenDensity:          270
 screenX:                720
 screenY:                1600
-supportedAbis[0]:       x86
+supportedAbis[0]:       arm64-v8a
 supportedVersionIds[0]: 30
 ---
 brand:                  Google
@@ -149,8 +150,9 @@ screenY:                720
 supportedAbis[0]:       x86
 supportedVersionIds[0]: 30
 tags[0]:                beta=30
+tags[1]:                deprecated=30
 ---
-brand:                  Google
+brand:                  Generic
 codename:               MediumPhone.arm
 form:                   VIRTUAL
 formFactor:             PHONE
@@ -170,14 +172,15 @@ supportedVersionIds[5]: 31
 supportedVersionIds[6]: 32
 supportedVersionIds[7]: 33
 supportedVersionIds[8]: 34
+supportedVersionIds[9]: 35
 ---
-brand:                  Google
+brand:                  Generic
 codename:               MediumTablet.arm
 form:                   VIRTUAL
 formFactor:             TABLET
 id:                     MediumTablet.arm
 manufacturer:           Generic
-name:                   Medium Tablet, 10in/25cm (Arm)
+name:                   Medium Tablet, 10.05in/25cm (Arm)
 screenDensity:          320
 screenX:                1600
 screenY:                2560
@@ -191,177 +194,7 @@ supportedVersionIds[5]: 31
 supportedVersionIds[6]: 32
 supportedVersionIds[7]: 33
 supportedVersionIds[8]: 34
----
-brand:                  Google
-codename:               Nexus5X
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     Nexus5X
-manufacturer:           LG
-name:                   Nexus 5X
-screenDensity:          420
-screenX:                1080
-screenY:                1920
-supportedAbis[0]:       x86
-supportedAbis[1]:       23:armeabi
-supportedAbis[2]:       23:armeabi-v7a
-supportedAbis[3]:       24:armeabi
-supportedAbis[4]:       24:armeabi-v7a
-supportedAbis[5]:       25:armeabi
-supportedAbis[6]:       25:armeabi-v7a
-supportedAbis[7]:       26:armeabi
-supportedAbis[8]:       26:armeabi-v7a
-supportedVersionIds[0]: 24
-supportedVersionIds[1]: 25
-supportedVersionIds[2]: 26
----
-brand:                  Google
-codename:               Nexus6
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     Nexus6
-manufacturer:           Motorola
-name:                   Nexus 6
-screenDensity:          560
-screenX:                1440
-screenY:                2560
-supportedAbis[0]:       x86
-supportedAbis[1]:       23:armeabi
-supportedAbis[2]:       23:armeabi-v7a
-supportedAbis[3]:       24:armeabi
-supportedAbis[4]:       24:armeabi-v7a
-supportedAbis[5]:       25:armeabi
-supportedAbis[6]:       25:armeabi-v7a
-supportedVersionIds[0]: 24
-supportedVersionIds[1]: 25
----
-brand:                  Google
-codename:               Nexus6P
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     Nexus6P
-manufacturer:           Google
-name:                   Nexus 6P
-screenDensity:          560
-screenX:                1440
-screenY:                2560
-supportedAbis[0]:       x86
-supportedAbis[1]:       23:armeabi
-supportedAbis[2]:       23:armeabi-v7a
-supportedAbis[3]:       24:armeabi
-supportedAbis[4]:       24:armeabi-v7a
-supportedAbis[5]:       25:armeabi
-supportedAbis[6]:       25:armeabi-v7a
-supportedAbis[7]:       26:armeabi
-supportedAbis[8]:       26:armeabi-v7a
-supportedAbis[9]:       27:armeabi
-supportedAbis[10]:      27:armeabi-v7a
-supportedVersionIds[0]: 24
-supportedVersionIds[1]: 25
-supportedVersionIds[2]: 26
-supportedVersionIds[3]: 27
----
-brand:                  Generic
-codename:               Nexus7_clone_16_9
-form:                   VIRTUAL
-formFactor:             TABLET
-id:                     Nexus7_clone_16_9
-manufacturer:           Generic
-name:                   Nexus7 clone, DVD 16:9 aspect ratio
-screenDensity:          160
-screenX:                720
-screenY:                1280
-supportedAbis[0]:       x86
-supportedAbis[1]:       23:armeabi
-supportedAbis[2]:       23:armeabi-v7a
-supportedAbis[3]:       24:armeabi
-supportedAbis[4]:       24:armeabi-v7a
-supportedAbis[5]:       25:armeabi
-supportedAbis[6]:       25:armeabi-v7a
-supportedAbis[7]:       26:armeabi
-supportedAbis[8]:       26:armeabi-v7a
-supportedVersionIds[0]: 24
-supportedVersionIds[1]: 25
-supportedVersionIds[2]: 26
-tags[0]:                beta
----
-brand:                  Google
-codename:               Nexus9
-form:                   VIRTUAL
-formFactor:             TABLET
-id:                     Nexus9
-manufacturer:           HTC
-name:                   Nexus 9
-screenDensity:          320
-screenX:                1536
-screenY:                2048
-supportedAbis[0]:       x86
-supportedAbis[1]:       23:armeabi
-supportedAbis[2]:       23:armeabi-v7a
-supportedAbis[3]:       24:armeabi
-supportedAbis[4]:       24:armeabi-v7a
-supportedAbis[5]:       25:armeabi
-supportedAbis[6]:       25:armeabi-v7a
-supportedVersionIds[0]: 24
-supportedVersionIds[1]: 25
----
-brand:                  Generic
-codename:               NexusLowRes
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     NexusLowRes
-manufacturer:           Generic
-name:                   Low-resolution MDPI phone
-screenDensity:          160
-screenX:                360
-screenY:                640
-supportedAbis[0]:       x86
-supportedAbis[1]:       23:armeabi
-supportedAbis[2]:       23:armeabi-v7a
-supportedAbis[3]:       24:armeabi
-supportedAbis[4]:       24:armeabi-v7a
-supportedAbis[5]:       25:armeabi
-supportedAbis[6]:       25:armeabi-v7a
-supportedAbis[7]:       26:armeabi
-supportedAbis[8]:       26:armeabi-v7a
-supportedAbis[9]:       27:armeabi
-supportedAbis[10]:      27:armeabi-v7a
-supportedAbis[11]:      28:armeabi
-supportedAbis[12]:      28:armeabi-v7a
-supportedAbis[13]:      29:armeabi
-supportedAbis[14]:      29:armeabi-v7a
-supportedVersionIds[0]: 24
-supportedVersionIds[1]: 25
-supportedVersionIds[2]: 26
-supportedVersionIds[3]: 27
-supportedVersionIds[4]: 28
-supportedVersionIds[5]: 29
-supportedVersionIds[6]: 30
----
-brand:                  Google
-codename:               Pixel2
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     Pixel2
-manufacturer:           Google
-name:                   Pixel 2
-screenDensity:          441
-screenX:                1080
-screenY:                1920
-supportedAbis[0]:       x86
-supportedAbis[1]:       26:armeabi
-supportedAbis[2]:       26:armeabi-v7a
-supportedAbis[3]:       27:armeabi
-supportedAbis[4]:       27:armeabi-v7a
-supportedAbis[5]:       28:armeabi
-supportedAbis[6]:       28:armeabi-v7a
-supportedAbis[7]:       29:armeabi
-supportedAbis[8]:       29:armeabi-v7a
-supportedVersionIds[0]: 26
-supportedVersionIds[1]: 27
-supportedVersionIds[2]: 28
-supportedVersionIds[3]: 29
-supportedVersionIds[4]: 30
+supportedVersionIds[9]: 35
 ---
 brand:                  Google
 codename:               Pixel2.arm
@@ -383,26 +216,13 @@ supportedVersionIds[5]: 31
 supportedVersionIds[6]: 32
 supportedVersionIds[7]: 33
 ---
-brand:                  google
-codename:               Pixel3
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     Pixel3
-manufacturer:           Google
-name:                   Pixel 3
-screenDensity:          440
-screenX:                1080
-screenY:                2160
-supportedAbis[0]:       30:x86
-supportedVersionIds[0]: 30
----
-brand:                  Android
+brand:                  Generic
 codename:               SmallPhone.arm
 form:                   VIRTUAL
 formFactor:             PHONE
 id:                     SmallPhone.arm
 manufacturer:           Generic
-name:                   Small Phone, 4.7in/12cm (Arm)
+name:                   Small Phone, 4.65in/12cm (Arm)
 screenDensity:          320
 screenX:                720
 screenY:                1280
@@ -415,4 +235,5 @@ supportedVersionIds[4]: 30
 supportedVersionIds[5]: 31
 supportedVersionIds[6]: 32
 supportedVersionIds[7]: 33
-supportedVersionIds[8]: 34`
+supportedVersionIds[8]: 34
+supportedVersionIds[9]: 35`

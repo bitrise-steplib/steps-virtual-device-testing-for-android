@@ -3,58 +3,22 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 workflows:
   test:
-    before_run:
-    - audit-this-step
     steps:
-    - go-list:
-    - golint:
-    - errcheck:
-    # Ignoring maintenance test as it needs gcloud binary
-    - go-test:
-        inputs:
-        - packages: |-
-            .
-            ./resultprocessing
+    - git::https://github.com/bitrise-steplib/steps-check.git: { }
     - path::./:
         inputs:
-          - test_type: instrumentation
-          - download_test_results: "true"
+        - test_type: instrumentation
+        - download_test_results: "true"
     - deploy-to-bitrise-io@2:
         inputs:
-        - is_compress: 'true'
-        - deploy_path: "$VDTESTING_DOWNLOADED_FILES_DIR"
+        - is_compress: "true"
+        - deploy_path: $VDTESTING_DOWNLOADED_FILES_DIR
 
   maintenance:
     steps:
     - go-test:
         inputs:
-          - packages: ./maintenance
-
-  # ----------------------------------------------------------------
-  # --- Utility workflows
-  dep-update:
-    title: Godeps update
-    description: |
-      Used for updating bitrise dependencies with godep
-    steps:
-    - script:
-        title: Dependency update
-        inputs:
-        - content: |
-            #!/bin/bash
-            set -ex
-            dep ensure -update
-
-  # ----------------------------------------------------------------
-  # --- workflows to Share this step into a Step Library
-  audit-this-step:
-    steps:
-    - script:
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -ex
-            stepman audit --step-yml ./step.yml
+        - packages: ./maintenance
 
   generate_readme:
     steps:

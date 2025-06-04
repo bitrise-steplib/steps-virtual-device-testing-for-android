@@ -5,14 +5,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"path/filepath"
 	"strconv"
 	"strings"
 
-	"github.com/bitrise-io/go-utils/log"
 	testing "google.golang.org/api/testing/v1"
+
+	"github.com/bitrise-io/go-utils/log"
 )
 
 // TestAsset describes a requested test asset
@@ -27,7 +28,7 @@ type TestAssetsAndroid struct {
 	isBundle   bool
 	testApp    *TestAsset
 	Apk        TestAsset   `json:"apk,omitempty"`
-	Aab        TestAsset   `json:"aab,omitmepty"`
+	Aab        TestAsset   `json:"aab,omitempty"`
 	TestApk    TestAsset   `json:"testApk,omitempty"`
 	RoboScript TestAsset   `json:"roboScript,omitempty"`
 	ObbFiles   []TestAsset `json:"obbFiles,omitempty"`
@@ -87,7 +88,7 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 		return TestAssetsAndroid{}, fmt.Errorf("failed to get http response, error: %s", err)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return TestAssetsAndroid{}, fmt.Errorf("failed to read response body (status code: %d), error: %s", resp.StatusCode, err)
 	}
@@ -312,7 +313,7 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read response body, error: %s", err)
 		}
