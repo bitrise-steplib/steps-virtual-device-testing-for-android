@@ -8,18 +8,25 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"text/tabwriter"
 	"time"
 
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 
 	"github.com/bitrise-io/go-steputils/stepconf"
-	"github.com/bitrise-io/go-steputils/tools"
+	"github.com/bitrise-io/go-steputils/v2/export"
 	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
+	"github.com/bitrise-io/go-utils/v2/command"
+	"github.com/bitrise-io/go-utils/v2/env"
+	logv2 "github.com/bitrise-io/go-utils/v2/log"
+	"github.com/bitrise-steplib/steps-deploy-to-bitrise-io/test/converters/junitxml"
+	"github.com/bitrise-steplib/steps-virtual-device-testing-for-android/output"
 	"github.com/bitrise-steplib/steps-virtual-device-testing-for-android/resultprocessing"
+	"github.com/ryanuber/go-glob"
 )
 
 const (
@@ -33,6 +40,13 @@ func failf(f string, v ...interface{}) {
 }
 
 func main() {
+	envRepository := env.NewRepository()
+	cmdFactory := command.NewFactory(envRepository)
+	exporter := export.NewExporter(cmdFactory)
+	converter := junitxml.Converter{}
+	logger := logv2.NewLogger()
+	outputExporter := output.NewExporter(exporter, converter, logger)
+
 	var configs ConfigsModel
 	if err := stepconf.Parse(&configs); err != nil {
 		failf("Invalid input: %s", err)
@@ -203,18 +217,46 @@ func main() {
 				failf("Failed to create temp dir, error: %s", err)
 			}
 
+			mergedTestResultXmlPth := ""
+			singleTestResultXmlPth := ""
 			for fileName, fileURL := range responseModel {
-				err := downloadFile(fileURL, filepath.Join(tempDir, fileName))
+				pth := filepath.Join(tempDir, fileName)
+				err := downloadFile(fileURL, pth)
 				if err != nil {
 					failf("Failed to download file, error: %s", err)
 				}
+
+				// per test run results: MediumPhone.arm-33-en-portrait_test_result_1.xml
+				if glob.Glob("*test_result_*.xml", pth) {
+					singleTestResultXmlPth = pth
+				}
+
+				// merged result: MediumPhone.arm-33-en-portrait_test_results_merged.xml
+				if strings.HasPrefix(fileName, "test_results_merged.xml") {
+					if mergedTestResultXmlPth != "" {
+						log.Warnf("Multiple merged test results XML files found, using the last one: %s", pth)
+					} else {
+						log.Printf("Merged test results XML found: %s", pth)
+					}
+					mergedTestResultXmlPth = pth
+				}
 			}
 
-			log.Donef("=> Assets downloaded")
-			if err := tools.ExportEnvironmentWithEnvman("VDTESTING_DOWNLOADED_FILES_DIR", tempDir); err != nil {
-				log.Warnf("Failed to export environment (VDTESTING_DOWNLOADED_FILES_DIR), error: %s", err)
+			testResultXmlPth := mergedTestResultXmlPth
+			if testResultXmlPth == "" && singleTestResultXmlPth != "" {
+				log.Warnf("No merged test results XML found, using the latest single test result XML: %s", singleTestResultXmlPth)
+				testResultXmlPth = singleTestResultXmlPth
+			}
+
+			log.Printf("Test results XML: %s", testResultXmlPth)
+			log.TDonef("=> %d Test Assets downloaded", len(responseModel))
+
+			if err := outputExporter.ExportTestResultsDir(tempDir); err != nil {
+				log.Warnf("Failed to export test assets: %s", err)
 			} else {
-				log.Printf("The downloaded test assets path (%s) is exported to the VDTESTING_DOWNLOADED_FILES_DIR environment variable.", tempDir)
+				if err := outputExporter.ExportFlakyTestsEnvVar(testResultXmlPth); err != nil {
+					log.Warnf("Failed to export flaky tests env var: %s", err)
+				}
 			}
 		}
 	}

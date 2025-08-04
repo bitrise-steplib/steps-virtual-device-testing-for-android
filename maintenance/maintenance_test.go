@@ -11,7 +11,6 @@ import (
 	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/pathutil"
-	"github.com/pkg/errors"
 )
 
 func TestDeviceList(t *testing.T) {
@@ -37,7 +36,7 @@ func checkDeviceList() error {
 	cmd := command.New("gcloud", "firebase", "test", "android", "models", "list", "--format", "text", "--filter=VIRTUAL")
 	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
-		return errors.Wrap(err, out)
+		return fmt.Errorf("out: %s, err: %w", out, err)
 	}
 
 	if out == deviceList {
@@ -47,7 +46,7 @@ func checkDeviceList() error {
 	cmd = command.New("gcloud", "firebase", "test", "android", "models", "list", "--filter=VIRTUAL")
 	outFormatted, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
-		return errors.Wrap(err, out)
+		return fmt.Errorf("out: %s, err: %w", out, err)
 	}
 
 	fmt.Println("Fresh devices list to use in this integration test:")
@@ -92,7 +91,11 @@ func signIn() error {
 		"--project", servAcc.ProjectID)
 
 	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
-	return errors.Wrap(err, out)
+	if err != nil {
+		return fmt.Errorf("out: %s, err: %w", out, err)
+	}
+
+	return nil
 }
 
 func checkAccounts() (bool, error) {
