@@ -114,6 +114,7 @@ const deviceList = `---
 brand:                  Google
 codename:               AmatiTvEmulator
 form:                   VIRTUAL
+formFactor:             TV
 id:                     AmatiTvEmulator
 manufacturer:           Google
 name:                   Google TV Amati
@@ -141,6 +142,7 @@ supportedVersionIds[0]: 30
 brand:                  Google
 codename:               GoogleTvEmulator
 form:                   VIRTUAL
+formFactor:             TV
 id:                     GoogleTvEmulator
 manufacturer:           Google
 name:                   Google TV
@@ -152,27 +154,30 @@ supportedVersionIds[0]: 30
 tags[0]:                beta=30
 tags[1]:                deprecated=30
 ---
-brand:                  Generic
-codename:               MediumPhone.arm
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     MediumPhone.arm
-manufacturer:           Generic
-name:                   Medium Phone, 6.4in/16cm (Arm)
-screenDensity:          420
-screenX:                1080
-screenY:                2400
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 26
-supportedVersionIds[1]: 27
-supportedVersionIds[2]: 28
-supportedVersionIds[3]: 29
-supportedVersionIds[4]: 30
-supportedVersionIds[5]: 31
-supportedVersionIds[6]: 32
-supportedVersionIds[7]: 33
-supportedVersionIds[8]: 34
-supportedVersionIds[9]: 35
+brand:                                                           Generic
+codename:                                                        MediumPhone.arm
+form:                                                            VIRTUAL
+formFactor:                                                      PHONE
+id:                                                              MediumPhone.arm
+manufacturer:                                                    Generic
+name:                                                            Medium Phone, 6.4in/16cm (Arm)
+perVersionInfo[0].deviceCapacity:                                DEVICE_CAPACITY_HIGH
+perVersionInfo[0].directAccessVersionInfo.directAccessSupported: True
+perVersionInfo[0].versionId:                                     34
+screenDensity:                                                   420
+screenX:                                                         1080
+screenY:                                                         2400
+supportedAbis[0]:                                                arm64-v8a
+supportedVersionIds[0]:                                          26
+supportedVersionIds[1]:                                          27
+supportedVersionIds[2]:                                          28
+supportedVersionIds[3]:                                          29
+supportedVersionIds[4]:                                          30
+supportedVersionIds[5]:                                          31
+supportedVersionIds[6]:                                          32
+supportedVersionIds[7]:                                          33
+supportedVersionIds[8]:                                          35
+supportedVersionIds[9]:                                          34
 ---
 brand:                  Generic
 codename:               MediumTablet.arm
