@@ -94,7 +94,7 @@ You can also run this step directly with [Bitrise CLI](https://github.com/bitris
 | Environment Variable | Description |
 | --- | --- |
 | `VDTESTING_DOWNLOADED_FILES_DIR` | The directory containing the downloaded files if you have set `directories_to_pull` and `download_test_results` inputs above. |
-| `BITRISE_FLAKY_TEST_CASES` | A test case is considered flaky if it has failed at least once, but passed at least once as well.  The list contains the test cases in the following format: ``` - TestSuit_1.TestClass_1.TestName_1 - TestSuit_1.TestClass_1.TestName_2 - TestSuit_1.TestClass_2.TestName_1 - TestSuit_2.TestClass_1.TestName_1 ... ``` |
+| `BITRISE_FLAKY_TEST_CASES` | A list of flaky test cases. A test case is considered flaky if it has failed at least once, but passed at least once as well.  The list contains the test cases in the following format: ``` - TestSuit_1.TestClass_1.TestName_1 - TestSuit_1.TestClass_1.TestName_2 - TestSuit_1.TestClass_2.TestName_1 - TestSuit_2.TestClass_1.TestName_1 ... ```  To export `BITRISE_FLAKY_TEST_CASES` Step Output `download_test_results` Step Input should be set to `true`. |
 </details>
 
 ## 🙋 Contributing
