@@ -248,15 +248,15 @@ func main() {
 		}
 	}
 
-	testRunSuccessful := true
-	for _, isSuccess := range dimensionToStatus {
+	var failedTestRuns []string
+	for dimension, isSuccess := range dimensionToStatus {
 		if !isSuccess {
-			testRunSuccessful = false
-			break
+			failedTestRuns = append(failedTestRuns, dimension)
 		}
 	}
 
-	if !testRunSuccessful {
+	if len(failedTestRuns) > 0 {
+		log.Errorf("%d test run(s) failed", len(failedTestRuns))
 		os.Exit(1)
 	}
 }
