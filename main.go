@@ -25,7 +25,6 @@ import (
 	logv2 "github.com/bitrise-io/go-utils/v2/log"
 	"github.com/bitrise-steplib/steps-deploy-to-bitrise-io/test/converters/junitxml"
 	"github.com/bitrise-steplib/steps-virtual-device-testing-for-android/output"
-	"github.com/bitrise-steplib/steps-virtual-device-testing-for-android/resultprocessing"
 	"github.com/ryanuber/go-glob"
 )
 
@@ -63,7 +62,6 @@ func main() {
 	log.SetEnableDebugLog(configs.VerboseLog)
 
 	fmt.Println()
-	successful := true
 
 	log.Infof("Uploading app and test files")
 
@@ -83,9 +81,12 @@ func main() {
 
 	fmt.Println()
 	log.Infof("Waiting for test results")
+
+	dimensionToStatus := map[string]bool{}
 	{
 		finished := false
 		printedLogs := []string{}
+
 		for !finished {
 			url := configs.APIBaseURL + "/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
@@ -151,15 +152,26 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
-				successful, err = resultprocessing.GetSuccessOfExecution(responseModel.Steps)
-				if err != nil {
-					failf("Failed to process results, error: %s", err)
-				}
-
 				for _, step := range responseModel.Steps {
 					dimensions := map[string]string{}
 					for _, dimension := range step.DimensionValue {
 						dimensions[dimension.Key] = dimension.Value
+					}
+
+					dimensionID := fmt.Sprintf("%s.%s.%s.%s", dimensions["Model"], dimensions["Version"], dimensions["Orientation"], dimensions["Locale"])
+					isSuccess := true
+					if step.Outcome.Summary == "failure" || step.Outcome.Summary == "inconclusive" || step.Outcome.Summary == "skipped" {
+						isSuccess = false
+					}
+
+					_, exists := dimensionToStatus[dimensionID]
+					if exists {
+						if isSuccess {
+							// Mark the dimension as successful if at least one step (test run) was successful.
+							dimensionToStatus[dimensionID] = true
+						}
+					} else {
+						dimensionToStatus[dimensionID] = isSuccess
 					}
 
 					outcome := processStepResult(step)
@@ -261,7 +273,15 @@ func main() {
 		}
 	}
 
-	if !successful {
+	testRunSuccessful := true
+	for _, isSuccess := range dimensionToStatus {
+		if !isSuccess {
+			testRunSuccessful = false
+			break
+		}
+	}
+
+	if !testRunSuccessful {
 		os.Exit(1)
 	}
 }
