@@ -90,17 +90,18 @@ inputs:
 
       Available devices and its versions:
       ```
-      ┌─────────────────────────┬─────────┬────────────────────────────────────────────────┬─────────┬─────────────┬───────────────────────────────┬────────────────────────┐
-      │         MODEL_ID        │   MAKE  │                   MODEL_NAME                   │   FORM  │  RESOLUTION │         OS_VERSION_IDS        │          TAGS          │
-      ├─────────────────────────┼─────────┼────────────────────────────────────────────────┼─────────┼─────────────┼───────────────────────────────┼────────────────────────┤
-      │ AmatiTvEmulator         │ Google  │ Google TV Amati                                │ VIRTUAL │ 1080 x 1920 │ 29                            │ beta=29, deprecated=29 │
-      │ AndroidTablet270dpi.arm │ Generic │ Generic 720x1600 Android tablet @ 270dpi (Arm) │ VIRTUAL │ 1600 x 720  │ 30                            │                        │
-      │ GoogleTvEmulator        │ Google  │ Google TV                                      │ VIRTUAL │  720 x 1280 │ 30                            │ beta=30, deprecated=30 │
-      │ MediumPhone.arm         │ Generic │ Medium Phone, 6.4in/16cm (Arm)                 │ VIRTUAL │ 2400 x 1080 │ 26,27,28,29,30,31,32,33,35,34 │                        │
-      │ MediumTablet.arm        │ Generic │ Medium Tablet, 10.05in/25cm (Arm)              │ VIRTUAL │ 2560 x 1600 │ 26,27,28,29,30,31,32,33,34,35 │                        │
-      │ Pixel2.arm              │ Google  │ Pixel 2 (Arm)                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,31,32,33       │                        │
-      │ SmallPhone.arm          │ Generic │ Small Phone, 4.65in/12cm (Arm)                 │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,31,32,33,34,35 │                        │
-      └─────────────────────────┴─────────┴────────────────────────────────────────────────┴─────────┴─────────────┴───────────────────────────────┴────────────────────────┘
+      ┌─────────────────────────┬─────────┬────────────────────────────────────────────────┬─────────┬─────────────┬──────────────────────────────────┬────────────────────────┐
+      │         MODEL_ID        │   MAKE  │                   MODEL_NAME                   │   FORM  │  RESOLUTION │          OS_VERSION_IDS          │          TAGS          │
+      ├─────────────────────────┼─────────┼────────────────────────────────────────────────┼─────────┼─────────────┼──────────────────────────────────┼────────────────────────┤
+      │ AmatiTvEmulator         │ Google  │ Google TV Amati                                │ VIRTUAL │ 1080 x 1920 │ 29                               │ beta=29, deprecated=29 │
+      │ AndroidTablet270dpi.arm │ Generic │ Generic 720x1600 Android tablet @ 270dpi (Arm) │ VIRTUAL │ 1600 x 720  │ 30                               │                        │
+      │ GoogleTv.arm            │ Google  │ Google TV, 1280x720 @ 213dpi (Arm)             │ VIRTUAL │  720 x 1280 │ 31                               │ preview=31             │
+      │ GoogleTvEmulator        │ Google  │ Google TV                                      │ VIRTUAL │  720 x 1280 │ 30                               │ beta=30, deprecated=30 │
+      │ MediumPhone.arm         │ Generic │ Medium Phone, 6.4in/16cm (Arm)                 │ VIRTUAL │ 2400 x 1080 │ 26,27,28,29,30,31,32,33,35,36,34 │                        │
+      │ MediumTablet.arm        │ Generic │ Medium Tablet, 10.05in/25cm (Arm)              │ VIRTUAL │ 2560 x 1600 │ 26,27,28,29,30,31,32,33,34,35    │                        │
+      │ Pixel2.arm              │ Google  │ Pixel 2 (Arm)                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,31,32,33          │                        │
+      │ SmallPhone.arm          │ Generic │ Small Phone, 4.65in/12cm (Arm)                 │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,31,32,33,34,35    │                        │
+      └─────────────────────────┴─────────┴────────────────────────────────────────────────┴─────────┴─────────────┴──────────────────────────────────┴────────────────────────┘
       ```
     summary: |
       Format:
@@ -113,17 +114,18 @@ inputs:
 
       Available devices and its versions:
       ```
-      ┌─────────────────────────┬─────────┬────────────────────────────────────────────────┬─────────┬─────────────┬───────────────────────────────┬────────────────────────┐
-      │         MODEL_ID        │   MAKE  │                   MODEL_NAME                   │   FORM  │  RESOLUTION │         OS_VERSION_IDS        │          TAGS          │
-      ├─────────────────────────┼─────────┼────────────────────────────────────────────────┼─────────┼─────────────┼───────────────────────────────┼────────────────────────┤
-      │ AmatiTvEmulator         │ Google  │ Google TV Amati                                │ VIRTUAL │ 1080 x 1920 │ 29                            │ beta=29, deprecated=29 │
-      │ AndroidTablet270dpi.arm │ Generic │ Generic 720x1600 Android tablet @ 270dpi (Arm) │ VIRTUAL │ 1600 x 720  │ 30                            │                        │
-      │ GoogleTvEmulator        │ Google  │ Google TV                                      │ VIRTUAL │  720 x 1280 │ 30                            │ beta=30, deprecated=30 │
-      │ MediumPhone.arm         │ Generic │ Medium Phone, 6.4in/16cm (Arm)                 │ VIRTUAL │ 2400 x 1080 │ 26,27,28,29,30,31,32,33,35,34 │                        │
-      │ MediumTablet.arm        │ Generic │ Medium Tablet, 10.05in/25cm (Arm)              │ VIRTUAL │ 2560 x 1600 │ 26,27,28,29,30,31,32,33,34,35 │                        │
-      │ Pixel2.arm              │ Google  │ Pixel 2 (Arm)                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,31,32,33       │                        │
-      │ SmallPhone.arm          │ Generic │ Small Phone, 4.65in/12cm (Arm)                 │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,31,32,33,34,35 │                        │
-      └─────────────────────────┴─────────┴────────────────────────────────────────────────┴─────────┴─────────────┴───────────────────────────────┴────────────────────────┘
+      ┌─────────────────────────┬─────────┬────────────────────────────────────────────────┬─────────┬─────────────┬──────────────────────────────────┬────────────────────────┐
+      │         MODEL_ID        │   MAKE  │                   MODEL_NAME                   │   FORM  │  RESOLUTION │          OS_VERSION_IDS          │          TAGS          │
+      ├─────────────────────────┼─────────┼────────────────────────────────────────────────┼─────────┼─────────────┼──────────────────────────────────┼────────────────────────┤
+      │ AmatiTvEmulator         │ Google  │ Google TV Amati                                │ VIRTUAL │ 1080 x 1920 │ 29                               │ beta=29, deprecated=29 │
+      │ AndroidTablet270dpi.arm │ Generic │ Generic 720x1600 Android tablet @ 270dpi (Arm) │ VIRTUAL │ 1600 x 720  │ 30                               │                        │
+      │ GoogleTv.arm            │ Google  │ Google TV, 1280x720 @ 213dpi (Arm)             │ VIRTUAL │  720 x 1280 │ 31                               │ preview=31             │
+      │ GoogleTvEmulator        │ Google  │ Google TV                                      │ VIRTUAL │  720 x 1280 │ 30                               │ beta=30, deprecated=30 │
+      │ MediumPhone.arm         │ Generic │ Medium Phone, 6.4in/16cm (Arm)                 │ VIRTUAL │ 2400 x 1080 │ 26,27,28,29,30,31,32,33,35,36,34 │                        │
+      │ MediumTablet.arm        │ Generic │ Medium Tablet, 10.05in/25cm (Arm)              │ VIRTUAL │ 2560 x 1600 │ 26,27,28,29,30,31,32,33,34,35    │                        │
+      │ Pixel2.arm              │ Google  │ Pixel 2 (Arm)                                  │ VIRTUAL │ 1920 x 1080 │ 26,27,28,29,30,31,32,33          │                        │
+      │ SmallPhone.arm          │ Generic │ Small Phone, 4.65in/12cm (Arm)                 │ VIRTUAL │ 1280 x 720  │ 26,27,28,29,30,31,32,33,34,35    │                        │
+      └─────────────────────────┴─────────┴────────────────────────────────────────────────┴─────────┴─────────────┴──────────────────────────────────┴────────────────────────┘
       ```
     is_required: true
 - test_type: robo
