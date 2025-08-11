@@ -16,8 +16,8 @@ github.com/bitrise-io/go-utils v1.0.13 h1:1QENhTS/JlKH9F7+/nB+TtbTcor6jGrE6cQ4CJ
 github.com/bitrise-io/go-utils v1.0.13/go.mod h1:ZY1DI+fEpZuFpO9szgDeICM4QbqoWVt0RSY3tRI1heY=
 github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.25 h1:ektrSsM00OMKfcyZ+Sn/XWV7YMYuHAsFpELq8dBLKm0=
 github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.25/go.mod h1:3XUplo0dOWc3DqT2XA2SeHToDSg7+j1y1HTHibT2H68=
-github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250807114925-6c2a4946e00c h1:1cdPhvk8eJz6AFGBWyGRVOKIwaXosm1rSvm0YuKzXg4=
-github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250807114925-6c2a4946e00c/go.mod h1:4XGJlV69HdFXvcy11I23Qcog6umvojdrnvzeIg2tT6I=
+github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250811073801-393566b79d9f h1:Z/j06NFfATrSr9Sr1L5LKG16IGa8yhc4G6tUZCfPSBc=
+github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250811073801-393566b79d9f/go.mod h1:4XGJlV69HdFXvcy11I23Qcog6umvojdrnvzeIg2tT6I=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=

@@ -28,7 +28,7 @@ github.com/bitrise-io/go-utils/v2/env
 github.com/bitrise-io/go-utils/v2/log
 github.com/bitrise-io/go-utils/v2/log/colorstring
 github.com/bitrise-io/go-utils/v2/pathutil
-# github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250807114925-6c2a4946e00c
+# github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250811073801-393566b79d9f
 ## explicit; go 1.21
 github.com/bitrise-steplib/steps-virtual-device-testing-for-ios/output
 # github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da

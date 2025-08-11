@@ -10,7 +10,7 @@ require (
 	google.golang.org/api v0.114.0
 )
 
-require github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250807114925-6c2a4946e00c
+require github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250811073801-393566b79d9f
 
 require (
 	cloud.google.com/go/compute v1.19.1 // indirect
