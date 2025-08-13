@@ -8,18 +8,19 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"text/tabwriter"
 	"time"
 
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 
 	"github.com/bitrise-io/go-steputils/stepconf"
-	"github.com/bitrise-io/go-steputils/tools"
 	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
-	"github.com/bitrise-steplib/steps-virtual-device-testing-for-android/resultprocessing"
+	logv2 "github.com/bitrise-io/go-utils/v2/log"
+	"github.com/bitrise-steplib/steps-virtual-device-testing-for-ios/output"
 )
 
 const (
@@ -33,6 +34,9 @@ func failf(f string, v ...interface{}) {
 }
 
 func main() {
+	logger := logv2.NewLogger()
+	outputExporter := output.NewExporter(output.NewOutputExporter(), logger)
+
 	var configs ConfigsModel
 	if err := stepconf.Parse(&configs); err != nil {
 		failf("Invalid input: %s", err)
@@ -49,7 +53,6 @@ func main() {
 	log.SetEnableDebugLog(configs.VerboseLog)
 
 	fmt.Println()
-	successful := true
 
 	log.Infof("Uploading app and test files")
 
@@ -69,9 +72,12 @@ func main() {
 
 	fmt.Println()
 	log.Infof("Waiting for test results")
+
+	dimensionToStatus := map[string]bool{}
 	{
 		finished := false
 		printedLogs := []string{}
+
 		for !finished {
 			url := configs.APIBaseURL + "/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
@@ -137,15 +143,26 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
-				successful, err = resultprocessing.GetSuccessOfExecution(responseModel.Steps)
-				if err != nil {
-					failf("Failed to process results, error: %s", err)
-				}
-
 				for _, step := range responseModel.Steps {
 					dimensions := map[string]string{}
 					for _, dimension := range step.DimensionValue {
 						dimensions[dimension.Key] = dimension.Value
+					}
+
+					dimensionID := fmt.Sprintf("%s.%s.%s.%s", dimensions["Model"], dimensions["Version"], dimensions["Orientation"], dimensions["Locale"])
+					isSuccess := true
+					if step.Outcome.Summary == "failure" || step.Outcome.Summary == "inconclusive" || step.Outcome.Summary == "skipped" {
+						isSuccess = false
+					}
+
+					_, exists := dimensionToStatus[dimensionID]
+					if exists {
+						if isSuccess {
+							// Mark the dimension as successful if at least one step (test run) was successful.
+							dimensionToStatus[dimensionID] = true
+						}
+					} else {
+						dimensionToStatus[dimensionID] = isSuccess
 					}
 
 					outcome := processStepResult(step)
@@ -203,23 +220,43 @@ func main() {
 				failf("Failed to create temp dir, error: %s", err)
 			}
 
+			var mergedTestResultXmlPths []string
 			for fileName, fileURL := range responseModel {
-				err := downloadFile(fileURL, filepath.Join(tempDir, fileName))
+				pth := filepath.Join(tempDir, fileName)
+				err := downloadFile(fileURL, pth)
 				if err != nil {
 					failf("Failed to download file, error: %s", err)
 				}
+
+				// per test run results: MediumPhone.arm-33-en-portrait_test_result_1.xml
+				// merged result: MediumPhone.arm-33-en-portrait_test_results_merged.xml
+				if strings.HasSuffix(fileName, "test_results_merged.xml") {
+					mergedTestResultXmlPths = append(mergedTestResultXmlPths, pth)
+				}
 			}
 
-			log.Donef("=> Assets downloaded")
-			if err := tools.ExportEnvironmentWithEnvman("VDTESTING_DOWNLOADED_FILES_DIR", tempDir); err != nil {
-				log.Warnf("Failed to export environment (VDTESTING_DOWNLOADED_FILES_DIR), error: %s", err)
+			log.Printf("%d merged test results XML(s) found", len(mergedTestResultXmlPths))
+			log.TDonef("=> %d test Assets downloaded", len(responseModel))
+
+			if err := outputExporter.ExportTestResultsDir(tempDir); err != nil {
+				log.Warnf("Failed to export test assets: %s", err)
 			} else {
-				log.Printf("The downloaded test assets path (%s) is exported to the VDTESTING_DOWNLOADED_FILES_DIR environment variable.", tempDir)
+				if err := outputExporter.ExportFlakyTestsEnvVar(mergedTestResultXmlPths); err != nil {
+					log.Warnf("Failed to export flaky tests env var: %s", err)
+				}
 			}
 		}
 	}
 
-	if !successful {
+	var failedTestRuns []string
+	for dimension, isSuccess := range dimensionToStatus {
+		if !isSuccess {
+			failedTestRuns = append(failedTestRuns, dimension)
+		}
+	}
+
+	if len(failedTestRuns) > 0 {
+		log.Errorf("%d test run(s) failed", len(failedTestRuns))
 		os.Exit(1)
 	}
 }

@@ -11,7 +11,6 @@ import (
 	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/pathutil"
-	"github.com/pkg/errors"
 )
 
 func TestDeviceList(t *testing.T) {
@@ -37,7 +36,7 @@ func checkDeviceList() error {
 	cmd := command.New("gcloud", "firebase", "test", "android", "models", "list", "--format", "text", "--filter=VIRTUAL")
 	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
-		return errors.Wrap(err, out)
+		return fmt.Errorf("out: %s, err: %w", out, err)
 	}
 
 	if out == deviceList {
@@ -47,7 +46,7 @@ func checkDeviceList() error {
 	cmd = command.New("gcloud", "firebase", "test", "android", "models", "list", "--filter=VIRTUAL")
 	outFormatted, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
-		return errors.Wrap(err, out)
+		return fmt.Errorf("out: %s, err: %w", out, err)
 	}
 
 	fmt.Println("Fresh devices list to use in this integration test:")
@@ -92,7 +91,11 @@ func signIn() error {
 		"--project", servAcc.ProjectID)
 
 	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
-	return errors.Wrap(err, out)
+	if err != nil {
+		return fmt.Errorf("out: %s, err: %w", out, err)
+	}
+
+	return nil
 }
 
 func checkAccounts() (bool, error) {
@@ -114,6 +117,7 @@ const deviceList = `---
 brand:                  Google
 codename:               AmatiTvEmulator
 form:                   VIRTUAL
+formFactor:             TV
 id:                     AmatiTvEmulator
 manufacturer:           Google
 name:                   Google TV Amati
@@ -139,8 +143,23 @@ supportedAbis[0]:       arm64-v8a
 supportedVersionIds[0]: 30
 ---
 brand:                  Google
+codename:               GoogleTv.arm
+form:                   VIRTUAL
+formFactor:             TV
+id:                     GoogleTv.arm
+manufacturer:           Google
+name:                   Google TV, 1280x720 @ 213dpi (Arm)
+screenDensity:          213
+screenX:                1280
+screenY:                720
+supportedAbis[0]:       arm64-v8a
+supportedVersionIds[0]: 31
+tags[0]:                preview=31
+---
+brand:                  Google
 codename:               GoogleTvEmulator
 form:                   VIRTUAL
+formFactor:             TV
 id:                     GoogleTvEmulator
 manufacturer:           Google
 name:                   Google TV
@@ -152,27 +171,31 @@ supportedVersionIds[0]: 30
 tags[0]:                beta=30
 tags[1]:                deprecated=30
 ---
-brand:                  Generic
-codename:               MediumPhone.arm
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     MediumPhone.arm
-manufacturer:           Generic
-name:                   Medium Phone, 6.4in/16cm (Arm)
-screenDensity:          420
-screenX:                1080
-screenY:                2400
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 26
-supportedVersionIds[1]: 27
-supportedVersionIds[2]: 28
-supportedVersionIds[3]: 29
-supportedVersionIds[4]: 30
-supportedVersionIds[5]: 31
-supportedVersionIds[6]: 32
-supportedVersionIds[7]: 33
-supportedVersionIds[8]: 34
-supportedVersionIds[9]: 35
+brand:                                                           Generic
+codename:                                                        MediumPhone.arm
+form:                                                            VIRTUAL
+formFactor:                                                      PHONE
+id:                                                              MediumPhone.arm
+manufacturer:                                                    Generic
+name:                                                            Medium Phone, 6.4in/16cm (Arm)
+perVersionInfo[0].deviceCapacity:                                DEVICE_CAPACITY_HIGH
+perVersionInfo[0].directAccessVersionInfo.directAccessSupported: True
+perVersionInfo[0].versionId:                                     34
+screenDensity:                                                   420
+screenX:                                                         1080
+screenY:                                                         2400
+supportedAbis[0]:                                                arm64-v8a
+supportedVersionIds[0]:                                          26
+supportedVersionIds[1]:                                          27
+supportedVersionIds[2]:                                          28
+supportedVersionIds[3]:                                          29
+supportedVersionIds[4]:                                          30
+supportedVersionIds[5]:                                          31
+supportedVersionIds[6]:                                          32
+supportedVersionIds[7]:                                          33
+supportedVersionIds[8]:                                          35
+supportedVersionIds[9]:                                          36
+supportedVersionIds[10]:                                         34
 ---
 brand:                  Generic
 codename:               MediumTablet.arm
