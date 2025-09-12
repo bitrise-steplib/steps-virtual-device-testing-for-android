@@ -143,20 +143,6 @@ supportedAbis[0]:       arm64-v8a
 supportedVersionIds[0]: 30
 ---
 brand:                  Google
-codename:               GoogleTv.arm
-form:                   VIRTUAL
-formFactor:             TV
-id:                     GoogleTv.arm
-manufacturer:           Google
-name:                   Google TV, 1280x720 @ 213dpi (Arm)
-screenDensity:          213
-screenX:                1280
-screenY:                720
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 31
-tags[0]:                preview=31
----
-brand:                  Google
 codename:               GoogleTvEmulator
 form:                   VIRTUAL
 formFactor:             TV
