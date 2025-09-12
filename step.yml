@@ -76,6 +76,18 @@ inputs:
       Can specify an APK (`$BITRISE_APK_PATH`) or AAB (Android App Bundle) as input (`$BITRISE_AAB_PATH`).
 
       If nothing is specified then the Step will use a default empty Application APK. This will help the library instrumentation tests as it can be used as a shell where the tests will be running.
+- test_type: robo
+  opts:
+    title: Test type
+    summary: |
+      The type of your test you want to run on the devices. Find more properties below in the selected test type's group.
+    description: |
+      The type of your test you want to run on the devices. Find more properties below in the selected test type's group.
+    is_required: true
+    value_options:
+    - instrumentation
+    - robo
+    - gameloop
 - test_devices: MediumPhone.arm,33,en,portrait
   opts:
     title: Test devices
@@ -128,18 +140,6 @@ inputs:
       └─────────────────────────┴─────────┴────────────────────────────────────────────────┴─────────┴─────────────┴──────────────────────────────────┴────────────────────────┘
       ```
     is_required: true
-- test_type: robo
-  opts:
-    title: Test type
-    summary: |
-      The type of your test you want to run on the devices. Find more properties below in the selected test type's group.
-    description: |
-      The type of your test you want to run on the devices. Find more properties below in the selected test type's group.
-    is_required: true
-    value_options:
-    - instrumentation
-    - robo
-    - gameloop
 - num_flaky_test_attempts: "0"
   opts:
     title: Number of times a test execution is reattempted
