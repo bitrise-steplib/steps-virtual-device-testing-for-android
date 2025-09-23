@@ -419,7 +419,7 @@ inputs:
     summary: A JSON array of quarantined tests.
     description: |-
       A JSON array of quarantined tests.
-      
+
       Quarantining tests is only supported for Android instrumentation tests.
 outputs:
 - VDTESTING_DOWNLOADED_FILES_DIR: ""
