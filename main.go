@@ -261,6 +261,58 @@ func main() {
 	}
 }
 
+/*
+BITRISE_QUARANTINED_TESTS_JSON = "[
+
+	{
+	   testCaseName: 'EnableQuarantiningDisabledByPlan',
+	   testSuiteName: ['UITests', 'CI', 'Settings'],
+	   className: 'BuildSettings'
+	},
+	{
+	   testCaseName: 'EnableQuarantiningDisabledByLDFlag',
+	   testSuiteName: ['UITests', 'CI', 'Settings'],
+	   className: 'BuildSettings'
+	}
+	...
+
+]"
+*/
+type QuarantinedTest struct {
+	TestCaseName  string   `json:"testCaseName"`
+	TestSuiteName []string `json:"testSuiteName"`
+	ClassName     string   `json:"className"`
+}
+
+type QuarantinedTests []QuarantinedTest
+
+/*
+	--test-targets \
+	    "notClass org.gradle.kotlin.dsl.samples.androidstudio.ExampleInstrumentedTest2#useAppContext"
+		"notClass org.gradle.kotlin.dsl.samples.androidstudio.ExampleInstrumentedTest2#useAppContext2"
+*/
+func convertQuarantinedTestsToTestTargets(quarantinedTestsInput string) ([]string, error) {
+	if quarantinedTestsInput == "" {
+		return nil, nil
+	}
+
+	var quarantinedTests QuarantinedTests
+	if err := json.Unmarshal([]byte(quarantinedTestsInput), &quarantinedTests); err != nil {
+		return nil, fmt.Errorf("failed to parse quarantined tests input, error: %s", err)
+	}
+
+	var quarantinedTestsList []string
+	for _, qt := range quarantinedTests {
+		if qt.ClassName == "" || qt.TestCaseName == "" {
+			continue
+		}
+
+		quarantinedTestsList = append(quarantinedTestsList, fmt.Sprintf("notClass %s#%s", qt.ClassName, qt.TestCaseName))
+	}
+
+	return quarantinedTestsList, nil
+}
+
 func downloadFile(url string, localPath string) error {
 	out, err := os.Create(localPath)
 	if err != nil {

@@ -191,6 +191,13 @@ inputs:
     value_options:
     - "false"
     - "true"
+- quarantined_tests: $BITRISE_QUARANTINED_TESTS_JSON
+  opts:
+    category: Instrumentation Test
+    title: Quarantined tests
+    summary: A JSON array of quarantined tests.
+    description: |-
+      A JSON array of quarantined tests.
 - robo_initial_activity:
   opts:
     category: Robo Test

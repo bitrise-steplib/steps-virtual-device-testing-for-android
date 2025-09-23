@@ -57,6 +57,7 @@ type ConfigsModel struct {
 	InstTestRunnerClass string `env:"inst_test_runner_class"`
 	InstTestTargets     string `env:"inst_test_targets"`
 	UseOrchestrator     bool   `env:"inst_use_orchestrator,opt[true,false]"`
+	QuarantinedTests    string `env:"quarantined_tests"`
 
 	// robo
 	RoboInitialActivity string `env:"robo_initial_activity"`
@@ -114,6 +115,7 @@ func (configs *ConfigsModel) print() {
 		log.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
 		log.Printf("- InstTestTargets: %s", configs.InstTestTargets)
 		log.Printf("- UseOrchestrator: %t", configs.UseOrchestrator)
+		log.Printf("- QuarantinedTests: %s", configs.QuarantinedTests)
 	}
 
 	//robo

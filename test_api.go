@@ -209,6 +209,13 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 		} else {
 			testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "DO_NOT_USE_ORCHESTRATOR"
 		}
+		if configs.QuarantinedTests != "" {
+			testTargets, err := convertQuarantinedTestsToTestTargets(configs.QuarantinedTests)
+			if err != nil {
+				return fmt.Errorf("failed to process quarantined tests, error: %s", err)
+			}
+			testModel.TestSpecification.AndroidInstrumentationTest.TestTargets = testTargets
+		}
 		log.Debugf("AndroidInstrumentationTest: %+v", testModel.TestSpecification.AndroidInstrumentationTest)
 	case testTypeRobo:
 		testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
