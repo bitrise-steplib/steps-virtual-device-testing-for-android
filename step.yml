@@ -191,13 +191,6 @@ inputs:
     value_options:
     - "false"
     - "true"
-- quarantined_tests: $BITRISE_QUARANTINED_TESTS_JSON
-  opts:
-    category: Instrumentation Test
-    title: Quarantined tests
-    summary: A JSON array of quarantined tests.
-    description: |-
-      A JSON array of quarantined tests.
 - robo_initial_activity:
   opts:
     category: Robo Test
@@ -419,6 +412,15 @@ inputs:
     is_required: true
     is_dont_change_value: true
     is_sensitive: true
+- quarantined_tests: $BITRISE_QUARANTINED_TESTS_JSON
+  opts:
+    category: Debug
+    title: Quarantined tests
+    summary: A JSON array of quarantined tests.
+    description: |-
+      A JSON array of quarantined tests.
+      
+      Quarantining tests is only supported for Android instrumentation tests.
 outputs:
 - VDTESTING_DOWNLOADED_FILES_DIR: ""
   opts:
