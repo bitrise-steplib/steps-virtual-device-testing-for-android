@@ -9,13 +9,13 @@ cloud.google.com/go/longrunning v0.4.1/go.mod h1:4iWDqhBZ70CvZ6BfETbvam3T8FMvLK+
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/bitrise-io/go-steputils v1.0.6 h1:eBRL70DWwEd7DWYGd5Ds7OSIY5HElzhoDOI6UuITKQg=
 github.com/bitrise-io/go-steputils v1.0.6/go.mod h1:YIUaQnIAyK4pCvQG0hYHVkSzKNT9uL2FWmkFNW4mfNI=
-github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.37 h1:2ovetrqRLDcs/i4PZEVbEkQhV6w/GHWpCXtLVwpAgu8=
-github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.37/go.mod h1:ofknYj6lj4hDtg7lV/veUQ1DJWDEFctjhYoIC8m70Os=
+github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.39.0.20250923143720-ba275d37a404 h1:sLO1o60Z46LbV98U5lZoU8WlI5ChUfsJQDsgOSmtJio=
+github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.39.0.20250923143720-ba275d37a404/go.mod h1:UNKPd7zsUF7gtOpW/G7W7c+T5W7o5kPtAG3/CZPznjw=
 github.com/bitrise-io/go-utils v1.0.1/go.mod h1:ZY1DI+fEpZuFpO9szgDeICM4QbqoWVt0RSY3tRI1heY=
 github.com/bitrise-io/go-utils v1.0.13 h1:1QENhTS/JlKH9F7+/nB+TtbTcor6jGrE6cQ4CJWfp5U=
 github.com/bitrise-io/go-utils v1.0.13/go.mod h1:ZY1DI+fEpZuFpO9szgDeICM4QbqoWVt0RSY3tRI1heY=
-github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.25 h1:ektrSsM00OMKfcyZ+Sn/XWV7YMYuHAsFpELq8dBLKm0=
-github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.25/go.mod h1:3XUplo0dOWc3DqT2XA2SeHToDSg7+j1y1HTHibT2H68=
+github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.26 h1:meDTxqONXlQv2JmOcEbJj5Wx7WcuwpHRsP5MUob1NCQ=
+github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.26/go.mod h1:3XUplo0dOWc3DqT2XA2SeHToDSg7+j1y1HTHibT2H68=
 github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250811073801-393566b79d9f h1:Z/j06NFfATrSr9Sr1L5LKG16IGa8yhc4G6tUZCfPSBc=
 github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-20250811073801-393566b79d9f/go.mod h1:4XGJlV69HdFXvcy11I23Qcog6umvojdrnvzeIg2tT6I=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=

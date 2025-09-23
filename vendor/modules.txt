@@ -7,9 +7,10 @@ cloud.google.com/go/compute/metadata
 # github.com/bitrise-io/go-steputils v1.0.6
 ## explicit; go 1.15
 github.com/bitrise-io/go-steputils/stepconf
-# github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.37
+# github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.39.0.20250923143720-ba275d37a404
 ## explicit; go 1.17
 github.com/bitrise-io/go-steputils/v2/export
+github.com/bitrise-io/go-steputils/v2/testquarantine
 # github.com/bitrise-io/go-utils v1.0.13
 ## explicit; go 1.13
 github.com/bitrise-io/go-utils/colorstring
@@ -21,7 +22,7 @@ github.com/bitrise-io/go-utils/pathutil
 github.com/bitrise-io/go-utils/pointers
 github.com/bitrise-io/go-utils/sliceutil
 github.com/bitrise-io/go-utils/ziputil
-# github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.25
+# github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.26
 ## explicit; go 1.17
 github.com/bitrise-io/go-utils/v2/command
 github.com/bitrise-io/go-utils/v2/env

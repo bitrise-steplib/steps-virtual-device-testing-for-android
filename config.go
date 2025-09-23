@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	_ "embed"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,6 +11,7 @@ import (
 
 	testing "google.golang.org/api/testing/v1"
 
+	"github.com/bitrise-io/go-steputils/v2/testquarantine"
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
@@ -306,17 +306,9 @@ The `notClass` filter is documented on the gcloud CLI reference page:
 https://cloud.google.com/sdk/gcloud/reference/firebase/test/android/run#--test-targets
 */
 func parseQuarantinedTests(quarantinedTestsInput string) ([]string, error) {
-	if quarantinedTestsInput == "" {
-		return nil, nil
-	}
-
-	var quarantinedTests []struct {
-		TestCaseName  string   `json:"testCaseName"`
-		TestSuiteName []string `json:"testSuiteName"`
-		ClassName     string   `json:"className"`
-	}
-	if err := json.Unmarshal([]byte(quarantinedTestsInput), &quarantinedTests); err != nil {
-		return nil, fmt.Errorf("failed to parse quarantined tests input, error: %s", err)
+	quarantinedTests, err := testquarantine.ParseQuarantinedTests(quarantinedTestsInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse quarantined tests input: %w", err)
 	}
 
 	var quarantinedTestsList []string
