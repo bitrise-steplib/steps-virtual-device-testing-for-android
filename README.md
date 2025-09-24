@@ -86,6 +86,7 @@ You can also run this step directly with [Bitrise CLI](https://github.com/bitris
 | `inst_test_package_id` | Deprecated: If not specified will be automatically extracted from the Test App manifest. The Java package name of the instrumentation test.  |  |  |
 | `api_base_url` | The URL where test API is accessible.  | required | `https://vdt.bitrise.io/test` |
 | `api_token` | The token required to authenticate with the API.  | required, sensitive | `$ADDON_VDTESTING_API_TOKEN` |
+| `quarantined_tests` | A JSON array of quarantined tests.  Quarantining tests is only supported for Android instrumentation tests. |  | `$BITRISE_QUARANTINED_TESTS_JSON` |
 </details>
 
 <details>
