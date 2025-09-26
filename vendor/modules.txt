@@ -7,7 +7,7 @@ cloud.google.com/go/compute/metadata
 # github.com/bitrise-io/go-steputils v1.0.6
 ## explicit; go 1.15
 github.com/bitrise-io/go-steputils/stepconf
-# github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.39.0.20250923143720-ba275d37a404
+# github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.40
 ## explicit; go 1.17
 github.com/bitrise-io/go-steputils/v2/export
 github.com/bitrise-io/go-steputils/v2/testquarantine

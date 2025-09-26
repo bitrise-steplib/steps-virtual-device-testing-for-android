@@ -2,6 +2,7 @@ package testquarantine
 
 import "encoding/json"
 
+// QuarantinedTest represents a test case that has been marked as quarantined.
 type QuarantinedTest struct {
 	TestCaseName  string   `json:"testCaseName"`
 	TestSuiteName []string `json:"testSuiteName"`
