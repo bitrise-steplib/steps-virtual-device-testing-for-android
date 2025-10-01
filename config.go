@@ -11,6 +11,7 @@ import (
 
 	testing "google.golang.org/api/testing/v1"
 
+	"github.com/bitrise-io/go-steputils/v2/testquarantine"
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
@@ -53,10 +54,12 @@ type ConfigsModel struct {
 	VerboseLog            bool `env:"use_verbose_log,opt[true,false]"`
 
 	// instrumentation
-	InstTestPackageID   string `env:"inst_test_package_id"`
-	InstTestRunnerClass string `env:"inst_test_runner_class"`
-	InstTestTargets     string `env:"inst_test_targets"`
-	UseOrchestrator     bool   `env:"inst_use_orchestrator,opt[true,false]"`
+	InstTestPackageID      string `env:"inst_test_package_id"`
+	InstTestRunnerClass    string `env:"inst_test_runner_class"`
+	InstTestTargets        string `env:"inst_test_targets"`
+	UseOrchestrator        bool   `env:"inst_use_orchestrator,opt[true,false]"`
+	QuarantinedTests       string `env:"quarantined_tests"`
+	QuarantinedTestTargets []string
 
 	// robo
 	RoboInitialActivity string `env:"robo_initial_activity"`
@@ -114,6 +117,7 @@ func (configs *ConfigsModel) print() {
 		log.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
 		log.Printf("- InstTestTargets: %s", configs.InstTestTargets)
 		log.Printf("- UseOrchestrator: %t", configs.UseOrchestrator)
+		log.Printf("- QuarantinedTests: %s", configs.QuarantinedTests)
 	}
 
 	//robo
@@ -185,6 +189,10 @@ func (configs *ConfigsModel) validate() error {
 
 	configs.DirectoriesToPull = parseDirectoriesToPull(configs.DirectoriesToPullList)
 	configs.EnvironmentVariables = parseTestSetupEnvVars(configs.EnvironmentVariablesList)
+	configs.QuarantinedTestTargets, err = parseQuarantinedTests(configs.QuarantinedTests)
+	if err != nil {
+		return fmt.Errorf("- QuarantinedTests: %s", err)
+	}
 
 	return nil
 }
@@ -286,4 +294,31 @@ func parseTestSetupEnvVars(envVarList string) []*testing.EnvironmentVariable {
 	}
 
 	return envs
+}
+
+/*
+parseQuarantinedTests converts the Bitrise quarantined tests JSON input ($BITRISE_QUARANTINED_TESTS_JSON)
+to Firebase Test Lab Android instrumentation test targets exclude format:
+https://firebase.google.com/docs/test-lab/reference/testing/rest/v1/projects.testMatrices#androidinstrumentationtest
+
+The exclude format uses the `notClass packageName.class_name#methodName` syntax.
+The `notClass` filter is documented on the gcloud CLI reference page:
+https://cloud.google.com/sdk/gcloud/reference/firebase/test/android/run#--test-targets
+*/
+func parseQuarantinedTests(quarantinedTestsInput string) ([]string, error) {
+	quarantinedTests, err := testquarantine.ParseQuarantinedTests(quarantinedTestsInput)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse quarantined tests input: %w", err)
+	}
+
+	var quarantinedTestsList []string
+	for _, qt := range quarantinedTests {
+		if qt.ClassName == "" || qt.TestCaseName == "" {
+			continue
+		}
+
+		quarantinedTestsList = append(quarantinedTestsList, fmt.Sprintf("notClass %s#%s", qt.ClassName, qt.TestCaseName))
+	}
+
+	return quarantinedTestsList, nil
 }

@@ -9,6 +9,31 @@ workflows:
         inputs:
         - test_type: instrumentation
         - download_test_results: "true"
+        - quarantined_tests: |-
+            [
+              {
+                "testCaseName": "autoCompleteTextView_twoSuggestions",
+                "testSuiteName": [
+                  ""
+                ],
+                "className": "com.example.android.testing.espresso.MultiWindowSample.MultiWindowTest"
+              }
+            ]
+    - script:
+        title: Check if skipped tests are really skipped
+        inputs:
+        - content: |
+            test_results_xml_path="$VDTESTING_DOWNLOADED_FILES_DIR/MediumPhone.arm-33-en-portrait_test_result_1.xml"
+            if [ ! -f "$test_results_xml_path" ]; then
+              echo "No test results xml found at: $test_results_xml_path"
+              exit 1
+            fi
+            if grep -q "<testcase name='autoCompleteTextView_twoSuggestions' classname='com.example.android.testing.espresso.MultiWindowSample.MultiWindowTest'" "$test_results_xml_path"; then
+              echo "The skipped test was found in the test results xml."
+              exit 1
+            else
+              echo "The skipped test was NOT found in the test results xml."
+            fi
     - deploy-to-bitrise-io@2:
         inputs:
         - is_compress: "true"

@@ -209,6 +209,9 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 		} else {
 			testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "DO_NOT_USE_ORCHESTRATOR"
 		}
+		if len(configs.QuarantinedTestTargets) > 0 {
+			testModel.TestSpecification.AndroidInstrumentationTest.TestTargets = configs.QuarantinedTestTargets
+		}
 		log.Debugf("AndroidInstrumentationTest: %+v", testModel.TestSpecification.AndroidInstrumentationTest)
 	case testTypeRobo:
 		testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}

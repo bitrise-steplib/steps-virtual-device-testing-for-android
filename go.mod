@@ -4,9 +4,9 @@ go 1.21
 
 require (
 	github.com/bitrise-io/go-steputils v1.0.6
-	github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.37 // indirect
+	github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.40
 	github.com/bitrise-io/go-utils v1.0.13
-	github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.25
+	github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.26
 	google.golang.org/api v0.114.0
 )
 

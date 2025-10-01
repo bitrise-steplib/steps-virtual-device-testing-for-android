@@ -412,6 +412,11 @@ inputs:
     is_required: true
     is_dont_change_value: true
     is_sensitive: true
+- quarantined_tests: $BITRISE_QUARANTINED_TESTS_JSON
+  opts:
+    category: Debug
+    title: Quarantined tests
+    summary: JSON list of tests added to quarantine on Bitrise.io, quarantined tests are excluded from test runs.
 outputs:
 - VDTESTING_DOWNLOADED_FILES_DIR: ""
   opts:
