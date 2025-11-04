@@ -48,7 +48,7 @@ If you get the **Build already exists** error, it is because you have more than 
 
 ## 🧩 Get started
 
-Add this step directly to your workflow in the [Bitrise Workflow Editor](https://devcenter.bitrise.io/steps-and-workflows/steps-and-workflows-index/).
+Add this step directly to your workflow in the [Bitrise Workflow Editor](https://docs.bitrise.io/en/bitrise-ci/workflows-and-pipelines/steps/adding-steps-to-a-workflow.html).
 
 You can also run this step directly with [Bitrise CLI](https://github.com/bitrise-io/bitrise).
 
@@ -67,6 +67,7 @@ You can also run this step directly with [Bitrise CLI](https://github.com/bitris
 | `inst_test_runner_class` | The fully-qualified Java class name of the instrumentation test runner (leave empty to use the last name extracted from the APK manifest). |  |  |
 | `inst_test_targets` | A list of one or more instrumentation test targets to be run (default: all targets). Each target must be fully qualified with the package name or class name, in one of these formats: - `package package_name` - `class package_name.class_name` - `class package_name.class_name#method_name` For example: `class com.my.company.app.MyTargetClass,class com.my.company.app.MyOtherTargetClass`  |  |  |
 | `inst_use_orchestrator` | The option of whether running each test within its own invocation of instrumentation with Android Test Orchestrator or not.  | required | `false` |
+| `inst_uniform_shards` | The number of shards across which to distribute test cases. The shards are run in parallel on separate devices.  A value between 1 and 50. For example, if your test execution contains 20 test cases and you specify four shards, the instrumentation command passes arguments of `-e numShards 4` to `AndroidJUnitRunner` and each shard executes about five test cases. Based on the sharding mechanism `AndroidJUnitRunner` uses, there is no guarantee that test cases will be distributed with perfect uniformity. If zero is specified then no uniform sharding is applied and all test cases run on a single device.  |  |  |
 | `robo_initial_activity` | The initial activity used to start the app during a robo test. (leave empty to get it extracted from the APK manifest) |  |  |
 | `robo_max_depth` | The maximum depth of the traversal stack a robo test can explore. Needs to be at least 2 to make Robo explore the app beyond the first activity(leave empty to use the default value: `50`)  |  |  |
 | `robo_max_steps` | The maximum number of steps/actions a robo test can execute(leave empty to use the default value: `no limit`).  |  |  |
@@ -102,9 +103,8 @@ You can also run this step directly with [Bitrise CLI](https://github.com/bitris
 
 We welcome [pull requests](https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android/pulls) and [issues](https://github.com/bitrise-steplib/steps-virtual-device-testing-for-android/issues) against this repository.
 
-For pull requests, work on your changes in a forked repository and use the Bitrise CLI to [run step tests locally](https://devcenter.bitrise.io/bitrise-cli/run-your-first-build/).
+For pull requests, work on your changes in a forked repository and use the Bitrise CLI to [run step tests locally](https://docs.bitrise.io/en/bitrise-ci/bitrise-cli/running-your-first-local-build-with-the-cli.html).
 
 Learn more about developing steps:
 
-- [Create your own step](https://devcenter.bitrise.io/contributors/create-your-own-step/)
-- [Testing your Step](https://devcenter.bitrise.io/contributors/testing-and-versioning-your-steps/)
+- [Create your own step](https://docs.bitrise.io/en/bitrise-ci/workflows-and-pipelines/developing-your-own-bitrise-step/developing-a-new-step.html)
