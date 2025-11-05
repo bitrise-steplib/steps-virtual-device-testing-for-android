@@ -46,9 +46,10 @@ support_url: https://github.com/bitrise-steplib/steps-virtual-device-testing-for
 project_type_tags:
 - android
 - cordova
-- ionic
-- react-native
 - flutter
+- ionic
+- kotlin-multiplatform
+- react-native
 type_tags:
 - test
 
