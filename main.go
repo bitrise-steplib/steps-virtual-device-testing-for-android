@@ -167,8 +167,7 @@ func main() {
 						dimensionToStatus[dimensionID] = isSuccess
 					}
 
-					failureDetail := step.Outcome.FailureDetail
-					if failureDetail != nil && failureDetail.Crashed {
+					if step.Outcome != nil && step.Outcome.FailureDetail != nil && step.Outcome.FailureDetail.Crashed {
 						crashed = true
 					}
 
