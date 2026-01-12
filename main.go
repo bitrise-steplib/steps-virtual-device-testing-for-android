@@ -143,6 +143,8 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
+				crashed := false
+
 				for _, step := range responseModel.Steps {
 					dimensions := map[string]string{}
 					for _, dimension := range step.DimensionValue {
@@ -165,6 +167,11 @@ func main() {
 						dimensionToStatus[dimensionID] = isSuccess
 					}
 
+					failureDetail := step.Outcome.FailureDetail
+					if failureDetail != nil && failureDetail.Crashed {
+						crashed = true
+					}
+
 					outcome := processStepResult(step)
 
 					if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome); err != nil {
@@ -174,6 +181,13 @@ func main() {
 
 				if err := w.Flush(); err != nil {
 					log.Errorf("Failed to flush writer, error: %s", err)
+				}
+
+				if crashed {
+					fmt.Println()
+					log.Warnf("Firebase detected an app crash during one of the runs.")
+					log.Warnf("Note: If the crash occurred outside active test execution (e.g., during cleanup or background processes), individual test results will still appear successful.")
+					fmt.Println()
 				}
 			}
 			if !finished {
