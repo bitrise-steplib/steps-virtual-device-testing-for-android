@@ -143,6 +143,8 @@ func main() {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
 
+				anyDeviceRunCrashed := false
+
 				for _, step := range responseModel.Steps {
 					dimensions := map[string]string{}
 					for _, dimension := range step.DimensionValue {
@@ -165,7 +167,8 @@ func main() {
 						dimensionToStatus[dimensionID] = isSuccess
 					}
 
-					outcome := processStepResult(step)
+					outcome, crashed := processStepResult(step)
+					anyDeviceRunCrashed = anyDeviceRunCrashed || crashed
 
 					if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome); err != nil {
 						failf("Failed to write in tabwriter, error: %s", err)
@@ -174,6 +177,13 @@ func main() {
 
 				if err := w.Flush(); err != nil {
 					log.Errorf("Failed to flush writer, error: %s", err)
+				}
+
+				if anyDeviceRunCrashed {
+					fmt.Println()
+					log.Warnf("Firebase detected an app crash during one of the runs.")
+					log.Warnf("Note: If the crash occurred outside active test execution (e.g., during cleanup or background processes), individual test results will still appear successful.")
+					fmt.Println()
 				}
 			}
 			if !finished {
@@ -346,8 +356,9 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 	return nil
 }
 
-func processStepResult(step *toolresults.Step) string {
+func processStepResult(step *toolresults.Step) (string, bool) {
 	outcome := step.Outcome.Summary
+	crashed := false
 
 	switch outcome {
 	case "success":
@@ -356,6 +367,7 @@ func processStepResult(step *toolresults.Step) string {
 		if step.Outcome.FailureDetail != nil {
 			if step.Outcome.FailureDetail.Crashed {
 				outcome += "(Crashed)"
+				crashed = true
 			}
 			if step.Outcome.FailureDetail.NotInstalled {
 				outcome += "(NotInstalled)"
@@ -395,5 +407,5 @@ func processStepResult(step *toolresults.Step) string {
 		}
 		outcome = colorstring.Blue(outcome)
 	}
-	return outcome
+	return outcome, crashed
 }
