@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -18,7 +19,6 @@ import (
 	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
-	"github.com/bitrise-io/go-utils/sliceutil"
 	logv2 "github.com/bitrise-io/go-utils/v2/log"
 	"github.com/bitrise-steplib/steps-virtual-device-testing-for-ios/output"
 )
@@ -128,7 +128,7 @@ func main() {
 				msg = fmt.Sprintf("- (%d/%d) running", testsRunning, len(responseModel.Steps))
 			}
 
-			if !sliceutil.IsStringInSlice(msg, printedLogs) {
+			if !slices.Contains(printedLogs, msg) {
 				log.Printf(msg)
 				printedLogs = append(printedLogs, msg)
 			}
