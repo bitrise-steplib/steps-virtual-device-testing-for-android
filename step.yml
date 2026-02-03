@@ -192,6 +192,16 @@ inputs:
     value_options:
     - "false"
     - "true"
+- inst_uniform_shards:
+  opts:
+    title: Number of shards
+    summary: |
+      The number of shards across which to distribute test cases. The shards are run in parallel on separate devices.
+    description: |
+      The number of shards across which to distribute test cases. The shards are run in parallel on separate devices.
+
+      A value between 1 and 50. For example, if your test execution contains 20 test cases and you specify four shards, the instrumentation command passes arguments of `-e numShards 4` to `AndroidJUnitRunner` and each shard executes about five test cases. Based on the sharding mechanism `AndroidJUnitRunner` uses, there is no guarantee that test cases will be distributed with perfect uniformity.
+      If zero is specified then no uniform sharding is applied and all test cases run on a single device.
 - robo_initial_activity:
   opts:
     category: Robo Test

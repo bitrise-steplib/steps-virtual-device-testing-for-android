@@ -58,6 +58,7 @@ type ConfigsModel struct {
 	InstTestRunnerClass    string `env:"inst_test_runner_class"`
 	InstTestTargets        string `env:"inst_test_targets"`
 	UseOrchestrator        bool   `env:"inst_use_orchestrator,opt[true,false]"`
+	NumberOfUniformShards  int    `env:"inst_num_uniform_shards,range[0..50]"`
 	QuarantinedTests       string `env:"quarantined_tests"`
 	QuarantinedTestTargets []string
 
@@ -117,6 +118,7 @@ func (configs *ConfigsModel) print() {
 		log.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
 		log.Printf("- InstTestTargets: %s", configs.InstTestTargets)
 		log.Printf("- UseOrchestrator: %t", configs.UseOrchestrator)
+		log.Printf("- NumberOfUniformShards: %d", configs.NumberOfUniformShards)
 		log.Printf("- QuarantinedTests: %s", configs.QuarantinedTests)
 	}
 
