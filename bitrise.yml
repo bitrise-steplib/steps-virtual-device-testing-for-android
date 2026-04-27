@@ -9,7 +9,7 @@ workflows:
         inputs:
         - test_type: instrumentation
         - download_test_results: "true"
-        - inst_test_targets: package com.example.android.testing.espresso.MultiWindowSample.MultiWindowTest
+        - inst_test_targets: package com.example.android.testing.espresso.MultiWindowSample
         - quarantined_tests: |-
             [
               {
@@ -20,6 +20,7 @@ workflows:
                 "className": "com.example.android.testing.espresso.MultiWindowSample.MultiWindowTest"
               }
             ]
+        - use_verbose_log: "true"
     - script:
         title: Check if skipped tests are really skipped
         inputs:
