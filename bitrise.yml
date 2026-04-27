@@ -9,6 +9,7 @@ workflows:
         inputs:
         - test_type: instrumentation
         - download_test_results: "true"
+        - inst_test_targets: package com.example.android.testing.espresso.MultiWindowSample.MultiWindowTest
         - quarantined_tests: |-
             [
               {
