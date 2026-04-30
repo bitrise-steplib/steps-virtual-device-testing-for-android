@@ -27,9 +27,9 @@ func TestParseQuarantinedTests(t *testing.T) {
 			want:  []string{"notClass pkg.Cls#foo"},
 		},
 		{
-			name:  "JUnit5 named parameter suffix (SSW-2961 reproducer)",
-			input: `[{"className":"com.syscocorp.mss.products.ProductDetailsFragmentTest","testCaseName":"test_show_product_specialOffer_banner_when_offer_available[1: TestData(unified=false)]"}]`,
-			want:  []string{"notClass com.syscocorp.mss.products.ProductDetailsFragmentTest#test_show_product_specialOffer_banner_when_offer_available"},
+			name:  "JUnit5 named parameter suffix",
+			input: `[{"className":"pkg.Cls","testCaseName":"foo[1: TestData(unified=false)]"}]`,
+			want:  []string{"notClass pkg.Cls#foo"},
 		},
 		{
 			name:  "whitespace before parameter suffix",
@@ -58,6 +58,16 @@ func TestParseQuarantinedTests(t *testing.T) {
 				"notClass pkg.A#foo",
 				"notClass pkg.B#bar",
 			},
+		},
+		{
+			name:  "duplicate parameter instances dedupe to one entry",
+			input: `[{"className":"pkg.Cls","testCaseName":"foo[0]"},{"className":"pkg.Cls","testCaseName":"foo[1: TestData(unified=false)]"}]`,
+			want:  []string{"notClass pkg.Cls#foo"},
+		},
+		{
+			name:  "duplicate plain entries dedupe to one entry",
+			input: `[{"className":"pkg.Cls","testCaseName":"foo"},{"className":"pkg.Cls","testCaseName":"foo"}]`,
+			want:  []string{"notClass pkg.Cls#foo"},
 		},
 	}
 

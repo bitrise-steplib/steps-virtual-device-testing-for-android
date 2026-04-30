@@ -312,6 +312,7 @@ func parseQuarantinedTests(quarantinedTestsInput string) ([]string, error) {
 	}
 
 	var quarantinedTestsList []string
+	seen := map[string]struct{}{}
 	for _, qt := range quarantinedTests {
 		// JUnit parametrized tests carry a "[index: param]" suffix that Firebase's
 		// TestTarget API rejects; strip it so the whole method is excluded.
@@ -323,7 +324,12 @@ func parseQuarantinedTests(quarantinedTestsInput string) ([]string, error) {
 			continue
 		}
 
-		quarantinedTestsList = append(quarantinedTestsList, fmt.Sprintf("notClass %s#%s", qt.ClassName, testCaseName))
+		target := fmt.Sprintf("notClass %s#%s", qt.ClassName, testCaseName)
+		if _, ok := seen[target]; ok {
+			continue
+		}
+		seen[target] = struct{}{}
+		quarantinedTestsList = append(quarantinedTestsList, target)
 	}
 
 	return quarantinedTestsList, nil
