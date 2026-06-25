@@ -141,6 +141,7 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 	url := configs.APIBaseURL + "/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
+	log.Donef("URL: %s", url)
 	testModel := &testing.TestMatrix{}
 	testModel.EnvironmentMatrix = &testing.EnvironmentMatrix{AndroidDeviceList: &testing.AndroidDeviceList{}}
 
