@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -142,6 +143,7 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 	url := configs.APIBaseURL + "/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
 	log.Donef("URL: %s", url)
+	log.Donef("URL (base64): %s", base64.StdEncoding.EncodeToString([]byte(url)))
 	testModel := &testing.TestMatrix{}
 	testModel.EnvironmentMatrix = &testing.EnvironmentMatrix{AndroidDeviceList: &testing.AndroidDeviceList{}}
 
