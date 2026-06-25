@@ -21,6 +21,7 @@ You can read [our detailed guide about using the Step](https://devcenter.bitrise
    You need to set the device ID, the version, the orientation, and the language. Read the input description for more information and available devices.
 1. Choose a test type.
 
+
    The available options are:
    - instrumentation
    - robo
