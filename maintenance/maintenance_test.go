@@ -1,3 +1,9 @@
+//go:build maintenance
+
+// This test calls the live Firebase Test Lab catalog, so it needs the gcloud CLI and
+// credentials. The build tag keeps it out of `go test ./...` in the check workflow; the
+// e2e `test_device_catalog_up_to_date` workflow runs it with `-tags maintenance`.
+
 package maintenance
 
 import (
