@@ -144,14 +144,20 @@ workflows:
               exit 1
             fi
 
-            if grep -q "name='$QUARANTINED_TEST_CASE' classname='$QUARANTINED_TEST_CLASS'" "$test_results_xml_path"; then
+            # -F: the names are literal. Unquoted, the dots in a class name match any character,
+            # and a parameterized test's `[0: 4]` suffix reads as a bracket expression — which
+            # would make the check below miss a test that is present and report a pass.
+            # Quarantining a parameterized test needs more than -F: the results XML keeps the
+            # suffix that the Step strips when it builds the exclusion, so the name would not
+            # match as written.
+            if grep -qF "name='$QUARANTINED_TEST_CASE' classname='$QUARANTINED_TEST_CLASS'" "$test_results_xml_path"; then
               echo "The quarantined test was found in the test results xml."
               exit 1
             fi
             echo "The quarantined test was NOT found in the test results xml."
 
             # The same method in the other class must still have run.
-            if ! grep -q "name='$QUARANTINED_TEST_CASE' classname='$SIBLING_TEST_CLASS'" "$test_results_xml_path"; then
+            if ! grep -qF "name='$QUARANTINED_TEST_CASE' classname='$SIBLING_TEST_CLASS'" "$test_results_xml_path"; then
               echo "$SIBLING_TEST_CLASS#$QUARANTINED_TEST_CASE is missing, the exclusion was too broad."
               exit 1
             fi
