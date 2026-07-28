@@ -43,8 +43,17 @@ func checkDeviceList() error {
 		return nil
 	}
 
-	cmd = command.New("gcloud", "firebase", "test", "android", "models", "list", "--filter=VIRTUAL")
-	outFormatted, err := cmd.RunAndReturnTrimmedCombinedOutput()
+	cmd = command.New("gcloud", "firebase", "test", "android", "models", "list",
+		"--filter=VIRTUAL",
+		// Generally available models first, then newest OS first within each group, so the
+		// models worth picking are at the top. Untagged means GA, and an empty tags[0]
+		// sorts before "beta=*" and "preview=*". supportedVersionIds is ascending, so [-1]
+		// is the newest OS. name breaks remaining ties, otherwise the row order is
+		// arbitrary and the table churns between runs.
+		"--sort-by", "tags[0],~supportedVersionIds[-1],name",
+		"--format", deviceTableFormat)
+
+	deviceTable, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return fmt.Errorf("out: %s, err: %w", out, err)
 	}
@@ -52,8 +61,8 @@ func checkDeviceList() error {
 	fmt.Println("Fresh devices list to use in this integration test:")
 	fmt.Println(out)
 	fmt.Println()
-	fmt.Println("Fresh device list to use in the step's descriptor:")
-	fmt.Println(outFormatted)
+	fmt.Println("Fresh device table to use in the step's descriptor:")
+	fmt.Println(deviceTable)
 
 	return fmt.Errorf("device list has changed, update the corresponding step descriptor blocks")
 }
@@ -113,6 +122,20 @@ func checkAccounts() (bool, error) {
 	return len(accounts) > 0, nil
 }
 
+// deviceTableFormat renders the catalog as a single box table, matching the table in the
+// test_devices input of step.yml. It differs from the default `models list` format only in
+// column order: what a user configuring the input needs first comes first. `form.color()`
+// clears the default blue on the FORM value, otherwise the output carries ANSI escapes that
+// would end up pasted into step.yml.
+const deviceTableFormat = `table[box](
+	name:label=MODEL_NAME,
+	id:label=MODEL_ID,
+	supportedVersionIds.list(undefined="none"):label=OS_VERSION_IDS,
+	tags.list(separator=", "):label=TAGS,
+	manufacturer:label=MAKE,
+	format("{0:>4} x {1:<4}", screenY, screenX):label=RESOLUTION,
+	form.color():label=FORM)`
+
 const deviceList = `---
 brand:                  Google
 codename:               AmatiTvEmulator
@@ -167,6 +190,12 @@ name:                                                            Medium Phone, 6
 perVersionInfo[0].deviceCapacity:                                DEVICE_CAPACITY_HIGH
 perVersionInfo[0].directAccessVersionInfo.directAccessSupported: True
 perVersionInfo[0].versionId:                                     34
+perVersionInfo[1].deviceCapacity:                                DEVICE_CAPACITY_HIGH
+perVersionInfo[1].directAccessVersionInfo.directAccessSupported: True
+perVersionInfo[1].versionId:                                     35
+perVersionInfo[2].deviceCapacity:                                DEVICE_CAPACITY_HIGH
+perVersionInfo[2].directAccessVersionInfo.directAccessSupported: True
+perVersionInfo[2].versionId:                                     36
 screenDensity:                                                   420
 screenX:                                                         1080
 screenY:                                                         2400
@@ -179,9 +208,39 @@ supportedVersionIds[4]:                                          30
 supportedVersionIds[5]:                                          31
 supportedVersionIds[6]:                                          32
 supportedVersionIds[7]:                                          33
-supportedVersionIds[8]:                                          35
-supportedVersionIds[9]:                                          36
-supportedVersionIds[10]:                                         34
+supportedVersionIds[8]:                                          34
+supportedVersionIds[9]:                                          35
+supportedVersionIds[10]:                                         36
+---
+brand:                  Google
+codename:               MediumPhone_ps16k.arm
+form:                   VIRTUAL
+formFactor:             PHONE
+id:                     MediumPhone_ps16k.arm
+manufacturer:           Generic
+name:                   Medium Phone (16K page size), 6.4in/16cm (Arm)
+screenDensity:          420
+screenX:                1080
+screenY:                2400
+supportedAbis[0]:       arm64-v8a
+supportedVersionIds[0]: 36
+supportedVersionIds[1]: 37
+tags[0]:                preview=36
+tags[1]:                preview=37
+---
+brand:                  Google
+codename:               MediumPhone_ps16k_backcompat.arm
+form:                   VIRTUAL
+formFactor:             PHONE
+id:                     MediumPhone_ps16k_backcompat.arm
+manufacturer:           Generic
+name:                   Medium Phone (16K page size), 6.4in/16cm (Arm)
+screenDensity:          420
+screenX:                1080
+screenY:                2400
+supportedAbis[0]:       arm64-v8a
+supportedVersionIds[0]: 36
+tags[0]:                preview=36
 ---
 brand:                  Generic
 codename:               MediumTablet.arm
