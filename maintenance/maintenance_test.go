@@ -215,6 +215,48 @@ func replaceTableBlock(description, deviceTable string) (string, error) {
 	return strings.Join(updated, "\n"), nil
 }
 
+// blockScalarRange returns the half-open line range of a block scalar's content and the
+// indentation its lines carry. keyLine is the 1-based line of the `key: |` indicator, so the
+// content starts at that index into lines.
+//
+// The indentation comes from the first non-blank content line, and an empty one is an error:
+// every line matches the prefix "", which would run the range to the end of the file.
+// Trailing blank lines are left out, they belong to whatever follows the block.
+func blockScalarRange(lines []string, keyLine int) (first, last int, indent string, err error) {
+	first = keyLine
+	if first >= len(lines) {
+		return 0, 0, "", fmt.Errorf("block scalar on line %d has no content", keyLine)
+	}
+
+	indent = ""
+	for _, line := range lines[first:] {
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		indent = line[:len(line)-len(strings.TrimLeft(line, " \t"))]
+		break
+	}
+	if indent == "" {
+		return 0, 0, "", fmt.Errorf("block scalar on line %d has no indented content", keyLine)
+	}
+
+	lastContent := first - 1
+	for i := first; i < len(lines); i++ {
+		if strings.TrimSpace(lines[i]) == "" {
+			continue // A blank line inside the block; only a non-blank one can end it.
+		}
+		if !strings.HasPrefix(lines[i], indent) {
+			break
+		}
+		lastContent = i
+	}
+	if lastContent < first {
+		return 0, 0, "", fmt.Errorf("block scalar on line %d has no indented content", keyLine)
+	}
+
+	return first, lastContent + 1, indent, nil
+}
+
 // updateStepYML rewrites the device table in the test_devices input description. The description
 // is located by parsing step.yml, but only its lines are rewritten: re-encoding the whole
 // document would reformat every other block in the file.
@@ -224,17 +266,9 @@ func updateStepYML(deviceTable string) error {
 		return fmt.Errorf("read %s: %w", stepYMLPath, err)
 	}
 
-	var doc yaml.Node
-	if err := yaml.Unmarshal(content, &doc); err != nil {
-		return fmt.Errorf("parse %s: %w", stepYMLPath, err)
-	}
-
-	description, err := testDevicesDescription(&doc)
+	description, err := parseTestDevicesDescription(content)
 	if err != nil {
-		return fmt.Errorf("parse %s: %w", stepYMLPath, err)
-	}
-	if description.Style != yaml.LiteralStyle {
-		return fmt.Errorf("%s: expected the %s description to be a literal block scalar", stepYMLPath, testDevicesInput)
+		return err
 	}
 
 	updated, err := replaceTableBlock(description.Value, deviceTable)
@@ -242,17 +276,10 @@ func updateStepYML(deviceTable string) error {
 		return fmt.Errorf("%s: %w", stepYMLPath, err)
 	}
 
-	// Node.Line points at the `description: |` line, so the block scalar's content starts on
-	// the next one and runs while lines are blank or indented at least as far as the first.
 	lines := strings.Split(string(content), "\n")
-	first := description.Line
-	if first >= len(lines) {
-		return fmt.Errorf("%s: description has no content", stepYMLPath)
-	}
-	indent := lines[first][:len(lines[first])-len(strings.TrimLeft(lines[first], " "))]
-	last := first
-	for last < len(lines) && (strings.TrimSpace(lines[last]) == "" || strings.HasPrefix(lines[last], indent)) {
-		last++
+	first, last, indent, err := blockScalarRange(lines, description.Line)
+	if err != nil {
+		return fmt.Errorf("%s: %w", stepYMLPath, err)
 	}
 
 	rewritten := append([]string{}, lines[:first]...)
@@ -265,11 +292,44 @@ func updateStepYML(deviceTable string) error {
 	}
 	rewritten = append(rewritten, lines[last:]...)
 
-	if err := os.WriteFile(stepYMLPath, []byte(strings.Join(rewritten, "\n")), 0600); err != nil {
+	if err := os.WriteFile(stepYMLPath, []byte(strings.Join(rewritten, "\n")), 0644); err != nil { //nolint:gosec // step.yml is a tracked, non-secret descriptor.
 		return fmt.Errorf("write %s: %w", stepYMLPath, err)
 	}
 
+	// A bad splice must not survive: read the file back and confirm the description now holds
+	// what we meant to write. Nothing downstream should commit a step.yml we cannot re-parse.
+	written, err := os.ReadFile(stepYMLPath)
+	if err != nil {
+		return fmt.Errorf("read back %s: %w", stepYMLPath, err)
+	}
+	reparsed, err := parseTestDevicesDescription(written)
+	if err != nil {
+		return fmt.Errorf("read back %s: %w", stepYMLPath, err)
+	}
+	if strings.TrimRight(reparsed.Value, "\n") != strings.TrimRight(updated, "\n") {
+		return fmt.Errorf("%s: the rewritten description does not match what was intended, the file is left modified and must not be committed", stepYMLPath)
+	}
+
 	return nil
+}
+
+// parseTestDevicesDescription parses step.yml and returns the test_devices input's description,
+// which must be a literal block scalar for the line-based rewrite to be valid.
+func parseTestDevicesDescription(content []byte) (*yaml.Node, error) {
+	var doc yaml.Node
+	if err := yaml.Unmarshal(content, &doc); err != nil {
+		return nil, fmt.Errorf("parse %s: %w", stepYMLPath, err)
+	}
+
+	description, err := testDevicesDescription(&doc)
+	if err != nil {
+		return nil, fmt.Errorf("parse %s: %w", stepYMLPath, err)
+	}
+	if description.Style != yaml.LiteralStyle {
+		return nil, fmt.Errorf("%s: expected the %s description to be a literal block scalar", stepYMLPath, testDevicesInput)
+	}
+
+	return description, nil
 }
 
 func signIn() error {
