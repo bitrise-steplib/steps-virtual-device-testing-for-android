@@ -14,11 +14,8 @@ app:
 workflows:
   # `test_` prefix is used by unified CI to filter tests to run
 
-  # The test runs on Firebase Test Lab's virtual devices, so its result does not depend on the
-  # stack the build happens to be on. Running it on every stack would only spend device minutes
-  # on the same assertions, so on CI it is limited to the latest Ubuntu stack, which is also the
-  # only one where building the Android sample app is cheap. Locally
-  # (`bitrise run --config ./e2e/bitrise.yml test_flaky_and_quarantined_tests`) it always runs.
+  # The devices are Firebase Test Lab's, so the result does not depend on the stack. Limited to
+  # the latest Ubuntu stack on CI, which is also the cheapest place to build an Android app.
   test_flaky_and_quarantined_tests:
     steps:
     - bitrise-run:
@@ -28,31 +25,31 @@ workflows:
         - workflow_id: utility_test_flaky_and_quarantined_tests
         - bitrise_config_path: ./e2e/bitrise.yml
 
-  # Checks the device table in step.yml against the live Firebase Test Lab catalog. Needs no
-  # devices and no app build, only a service account for the catalog lookup, so it runs on
-  # every stack.
+  # The catalog is the same everywhere, so one stack is enough. Running it on all of them also
+  # meant 17 gcloud sign-ins per build, any one of which failing takes the whole build down.
   test_device_catalog_up_to_date:
     envs:
-    # maintenance/maintenance_test.go signs in to gcloud with this.
+    # maintenance_test.go signs in to gcloud with this.
     - SERVICE_ACCOUNT_JSON: $GCP_SERVICE_ACCOUNT_JSON_VDT_DEVICE_FETCHER
     steps:
     - script:
         title: Compare step.yml's device table with the live catalog
+        run_if: |-
+          {{ or (enveq "IS_LATEST_STACK_UBUNTU" "true") (not .IsCI) }}
         inputs:
         - content: |-
             #!/bin/env bash
             set -eo pipefail
-            # The go-test Step cannot pass build tags, and the test is behind the
-            # `maintenance` tag to keep it out of `go test ./...` in the check workflow.
-            go test -v -tags maintenance ./maintenance
+            # Its own module, so the Step's `go test ./...` in check does not run it.
+            cd maintenance
+            go test -v ./...
 
   utility_test_flaky_and_quarantined_tests:
     envs:
     - TEST_DEVICES: MediumPhone.arm,33,en,portrait
     - NUM_FLAKY_TEST_ATTEMPTS: 2
     - TEST_PACKAGE: sample.results.test.multiple.bitrise.com.multipletestresultssample
-    # The sample app has two test classes with identical method names, so quarantining one
-    # class' method also proves the exclusion is not applied to the other class.
+    # Two test classes share method names, so this also proves the exclusion is not too broad.
     - QUARANTINED_TEST_CLASS: $TEST_PACKAGE.InstrumentedTest0
     - SIBLING_TEST_CLASS: $TEST_PACKAGE.InstrumentedTest1
     - QUARANTINED_TEST_CASE: correctUITestCase0
@@ -95,8 +92,7 @@ workflows:
         run_if: .IsCI
         inputs:
         - gradlew_path: ./_tmp/gradlew
-    # Exports $BITRISE_APK_PATH and $BITRISE_TEST_APK_PATH, the defaults of the Step's
-    # `app_path` and `test_apk_path` inputs.
+    # Exports $BITRISE_APK_PATH and $BITRISE_TEST_APK_PATH, the Step's input defaults.
     - android-build-for-ui-testing:
         inputs:
         - project_location: ./_tmp
@@ -137,8 +133,7 @@ workflows:
         - content: |-
             #!/bin/env bash
             set -e
-            # The Step names result files after the device config, with `,` replaced by `-`.
-            # Deriving it here keeps the assertion in sync with TEST_DEVICES automatically.
+            # Result files are named after the device config, `,` replaced by `-`.
             device_slug="$(echo "$TEST_DEVICES" | tr ',' '-')"
             test_results_xml_path="$VDTESTING_DOWNLOADED_FILES_DIR/${device_slug}_test_result_1.xml"
 
@@ -155,8 +150,7 @@ workflows:
             fi
             echo "The quarantined test was NOT found in the test results xml."
 
-            # The same method name in another class must still have run, otherwise an
-            # over-broad exclusion would look like a pass above.
+            # The same method in the other class must still have run.
             if ! grep -q "name='$QUARANTINED_TEST_CASE' classname='$SIBLING_TEST_CLASS'" "$test_results_xml_path"; then
               echo "$SIBLING_TEST_CLASS#$QUARANTINED_TEST_CASE is missing, the exclusion was too broad."
               exit 1

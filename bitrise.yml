@@ -46,17 +46,21 @@ workflows:
         - test_devices: $TEST_DEVICES
         - download_test_results: "true"
 
+  # Rewrites step.yml's device table and the golden list from the live catalog, then regenerates
+  # the README. Leaves the changes in the working tree to review and commit.
   maintenance:
     steps:
     - script:
-        title: Compare step.yml's device table with the live catalog
+        title: Update step.yml's device table from the live catalog
         inputs:
         - content: |-
             #!/bin/env bash
             set -eo pipefail
             # Needs the gcloud CLI, and either an already signed in account or
-            # $SERVICE_ACCOUNT_JSON. The tag keeps it out of `go test ./...` in check.
-            go test -v -tags maintenance ./maintenance
+            # $SERVICE_ACCOUNT_JSON. Without -update the test only reports the drift.
+            cd maintenance
+            go test -v ./... -update
+    - git::https://github.com/bitrise-steplib/steps-readme-generator.git@main: {}
 
   generate_readme:
     steps:
