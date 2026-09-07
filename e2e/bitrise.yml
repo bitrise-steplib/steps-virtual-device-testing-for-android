@@ -29,8 +29,9 @@ workflows:
         - workflow_id: utility_test_flaky_and_quarantined_tests
         - bitrise_config_path: ./e2e/bitrise.yml
 
-  # Checks the device table in step.yml against the live Firebase Test Lab catalog. The catalog
-  # is the same everywhere, so one stack is enough.
+  # Checks the device table in step.yml against the live Firebase Test Lab catalog. Needs no
+  # devices and no app build, only a service account for the catalog lookup, so it runs on
+  # every stack.
   test_device_catalog_up_to_date:
     envs:
     # maintenance/maintenance_test.go signs in to gcloud with this.
@@ -38,11 +39,6 @@ workflows:
     steps:
     - script:
         title: Compare step.yml's device table with the live catalog
-        # Needs no devices and no app build, so this was initially left ungated. That was
-        # wrong: it made one gcloud sign-in per stack per build, and a single worker failing
-        # to reach oauth2.googleapis.com took the whole build down.
-        run_if: |-
-          {{ or (enveq "IS_LATEST_STACK_UBUNTU" "true") (not .IsCI) }}
         inputs:
         - content: |-
             #!/bin/env bash
