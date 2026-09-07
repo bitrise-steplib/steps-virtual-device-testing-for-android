@@ -7,6 +7,7 @@
 package maintenance
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -18,6 +19,11 @@ import (
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/pathutil"
 )
+
+// deviceListPath holds the catalog this Step's device table was generated from. It is a file
+// rather than a const in this test so that applying an update is a file write, not a test
+// rewriting its own source.
+const deviceListPath = "testdata/device_list.txt"
 
 func TestDeviceList(t *testing.T) {
 	signedIn, err := checkAccounts()
@@ -39,17 +45,61 @@ func TestDeviceList(t *testing.T) {
 }
 
 func checkDeviceList() error {
-	cmd := command.New("gcloud", "firebase", "test", "android", "models", "list", "--format", "text", "--filter=VIRTUAL")
-	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
+	deviceList, err := fetchDeviceList()
 	if err != nil {
-		return fmt.Errorf("out: %s, err: %w", out, err)
+		return err
 	}
 
-	if out == deviceList {
+	expected, err := os.ReadFile(deviceListPath)
+	if err != nil {
+		return fmt.Errorf("read %s: %w", deviceListPath, err)
+	}
+
+	if deviceList == strings.TrimRight(string(expected), "\n") {
 		return nil
 	}
 
-	cmd = command.New("gcloud", "firebase", "test", "android", "models", "list",
+	deviceTable, err := fetchDeviceTable()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Fresh device list to write to %s:\n", deviceListPath)
+	fmt.Println(deviceList)
+	fmt.Println()
+	fmt.Println("Fresh device table to use in the step's descriptor:")
+	fmt.Println(deviceTable)
+
+	return fmt.Errorf("device list has changed, update %s and the step's device table",
+		deviceListPath)
+}
+
+// gcloudStdout runs gcloud and returns its trimmed stdout.
+//
+// Only stdout, because this output is golden data: it is compared against deviceListPath, and
+// the table is meant to be pasted into step.yml. gcloud writes component update notices and
+// credential warnings to stderr, and combined output would mix them into both. stderr is still
+// read, it carries gcloud's diagnostics when the call fails.
+func gcloudStdout(args ...string) (string, error) {
+	var stdout, stderr bytes.Buffer
+
+	cmd := command.New("gcloud", args...).SetStdout(&stdout).SetStderr(&stderr)
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("%s: %w, stderr: %s",
+			cmd.PrintableCommandArgs(), err, strings.TrimSpace(stderr.String()))
+	}
+
+	return strings.TrimSpace(stdout.String()), nil
+}
+
+func fetchDeviceList() (string, error) {
+	return gcloudStdout("firebase", "test", "android", "models", "list",
+		"--filter=VIRTUAL",
+		"--format", "text")
+}
+
+func fetchDeviceTable() (string, error) {
+	return gcloudStdout("firebase", "test", "android", "models", "list",
 		"--filter=VIRTUAL",
 		// Generally available models first, then newest OS first within each group, so the
 		// models worth picking are at the top. Untagged means GA, and an empty tags[0]
@@ -58,19 +108,6 @@ func checkDeviceList() error {
 		// arbitrary and the table churns between runs.
 		"--sort-by", "tags[0],~supportedVersionIds[-1],name",
 		"--format", deviceTableFormat)
-
-	deviceTable, err := cmd.RunAndReturnTrimmedCombinedOutput()
-	if err != nil {
-		return fmt.Errorf("out: %s, err: %w", out, err)
-	}
-
-	fmt.Println("Fresh devices list to use in this integration test:")
-	fmt.Println(out)
-	fmt.Println()
-	fmt.Println("Fresh device table to use in the step's descriptor:")
-	fmt.Println(deviceTable)
-
-	return fmt.Errorf("device list has changed, update the corresponding step descriptor blocks")
 }
 
 func signIn() error {
@@ -141,173 +178,3 @@ const deviceTableFormat = `table[box](
 	manufacturer:label=MAKE,
 	format("{0:>4} x {1:<4}", screenY, screenX):label=RESOLUTION,
 	form.color():label=FORM)`
-
-const deviceList = `---
-brand:                  Google
-codename:               AmatiTvEmulator
-form:                   VIRTUAL
-formFactor:             TV
-id:                     AmatiTvEmulator
-manufacturer:           Google
-name:                   Google TV Amati
-screenDensity:          320
-screenX:                1920
-screenY:                1080
-supportedAbis[0]:       x86
-supportedVersionIds[0]: 29
-tags[0]:                beta=29
-tags[1]:                deprecated=29
----
-brand:                  Generic
-codename:               AndroidTablet270dpi.arm
-form:                   VIRTUAL
-formFactor:             TABLET
-id:                     AndroidTablet270dpi.arm
-manufacturer:           Generic
-name:                   Generic 720x1600 Android tablet @ 270dpi (Arm)
-screenDensity:          270
-screenX:                720
-screenY:                1600
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 30
----
-brand:                  Google
-codename:               GoogleTvEmulator
-form:                   VIRTUAL
-formFactor:             TV
-id:                     GoogleTvEmulator
-manufacturer:           Google
-name:                   Google TV
-screenDensity:          213
-screenX:                1280
-screenY:                720
-supportedAbis[0]:       x86
-supportedVersionIds[0]: 30
-tags[0]:                beta=30
-tags[1]:                deprecated=30
----
-brand:                                                           Generic
-codename:                                                        MediumPhone.arm
-form:                                                            VIRTUAL
-formFactor:                                                      PHONE
-id:                                                              MediumPhone.arm
-manufacturer:                                                    Generic
-name:                                                            Medium Phone, 6.4in/16cm (Arm)
-perVersionInfo[0].deviceCapacity:                                DEVICE_CAPACITY_HIGH
-perVersionInfo[0].directAccessVersionInfo.directAccessSupported: True
-perVersionInfo[0].versionId:                                     34
-perVersionInfo[1].deviceCapacity:                                DEVICE_CAPACITY_HIGH
-perVersionInfo[1].directAccessVersionInfo.directAccessSupported: True
-perVersionInfo[1].versionId:                                     35
-perVersionInfo[2].deviceCapacity:                                DEVICE_CAPACITY_HIGH
-perVersionInfo[2].directAccessVersionInfo.directAccessSupported: True
-perVersionInfo[2].versionId:                                     36
-screenDensity:                                                   420
-screenX:                                                         1080
-screenY:                                                         2400
-supportedAbis[0]:                                                arm64-v8a
-supportedVersionIds[0]:                                          26
-supportedVersionIds[1]:                                          27
-supportedVersionIds[2]:                                          28
-supportedVersionIds[3]:                                          29
-supportedVersionIds[4]:                                          30
-supportedVersionIds[5]:                                          31
-supportedVersionIds[6]:                                          32
-supportedVersionIds[7]:                                          33
-supportedVersionIds[8]:                                          34
-supportedVersionIds[9]:                                          35
-supportedVersionIds[10]:                                         36
----
-brand:                  Google
-codename:               MediumPhone_ps16k.arm
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     MediumPhone_ps16k.arm
-manufacturer:           Generic
-name:                   Medium Phone (16K page size), 6.4in/16cm (Arm)
-screenDensity:          420
-screenX:                1080
-screenY:                2400
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 36
-supportedVersionIds[1]: 37
-tags[0]:                preview=36
-tags[1]:                preview=37
----
-brand:                  Google
-codename:               MediumPhone_ps16k_backcompat.arm
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     MediumPhone_ps16k_backcompat.arm
-manufacturer:           Generic
-name:                   Medium Phone (16K page size), 6.4in/16cm (Arm)
-screenDensity:          420
-screenX:                1080
-screenY:                2400
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 36
-tags[0]:                preview=36
----
-brand:                  Generic
-codename:               MediumTablet.arm
-form:                   VIRTUAL
-formFactor:             TABLET
-id:                     MediumTablet.arm
-manufacturer:           Generic
-name:                   Medium Tablet, 10.05in/25cm (Arm)
-screenDensity:          320
-screenX:                1600
-screenY:                2560
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 26
-supportedVersionIds[1]: 27
-supportedVersionIds[2]: 28
-supportedVersionIds[3]: 29
-supportedVersionIds[4]: 30
-supportedVersionIds[5]: 31
-supportedVersionIds[6]: 32
-supportedVersionIds[7]: 33
-supportedVersionIds[8]: 34
-supportedVersionIds[9]: 35
----
-brand:                  Google
-codename:               Pixel2.arm
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     Pixel2.arm
-manufacturer:           Google
-name:                   Pixel 2 (Arm)
-screenDensity:          420
-screenX:                1080
-screenY:                1920
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 26
-supportedVersionIds[1]: 27
-supportedVersionIds[2]: 28
-supportedVersionIds[3]: 29
-supportedVersionIds[4]: 30
-supportedVersionIds[5]: 31
-supportedVersionIds[6]: 32
-supportedVersionIds[7]: 33
----
-brand:                  Generic
-codename:               SmallPhone.arm
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     SmallPhone.arm
-manufacturer:           Generic
-name:                   Small Phone, 4.65in/12cm (Arm)
-screenDensity:          320
-screenX:                720
-screenY:                1280
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 26
-supportedVersionIds[1]: 27
-supportedVersionIds[2]: 28
-supportedVersionIds[3]: 29
-supportedVersionIds[4]: 30
-supportedVersionIds[5]: 31
-supportedVersionIds[6]: 32
-supportedVersionIds[7]: 33
-supportedVersionIds[8]: 34
-supportedVersionIds[9]: 35`
