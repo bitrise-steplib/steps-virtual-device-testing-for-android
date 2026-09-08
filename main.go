@@ -274,7 +274,7 @@ func main() {
 func downloadFile(url string, localPath string) error {
 	out, err := os.Create(localPath)
 	if err != nil {
-		return fmt.Errorf("Failed to open the local cache file for write: %s", err)
+		return fmt.Errorf("failed to open the local cache file for write: %s", err)
 	}
 	defer func() {
 		if err := out.Close(); err != nil {
@@ -284,7 +284,7 @@ func downloadFile(url string, localPath string) error {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return fmt.Errorf("Failed to create cache download request: %s", err)
+		return fmt.Errorf("failed to create cache download request: %s", err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
@@ -293,12 +293,12 @@ func downloadFile(url string, localPath string) error {
 	}()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to download archive - non success response code: %d", resp.StatusCode)
+		return fmt.Errorf("failed to download archive - non success response code: %d", resp.StatusCode)
 	}
 
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		return fmt.Errorf("Failed to save cache content into file: %s", err)
+		return fmt.Errorf("failed to save cache content into file: %s", err)
 	}
 
 	return nil
@@ -307,7 +307,7 @@ func downloadFile(url string, localPath string) error {
 func uploadFile(uploadURL string, archiveFilePath string) error {
 	archFile, err := os.Open(archiveFilePath)
 	if err != nil {
-		return fmt.Errorf("Failed to open archive file for upload (%s): %s", archiveFilePath, err)
+		return fmt.Errorf("failed to open archive file for upload (%s): %s", archiveFilePath, err)
 	}
 	isFileCloseRequired := true
 	defer func() {
@@ -321,13 +321,13 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 
 	fileInfo, err := archFile.Stat()
 	if err != nil {
-		return fmt.Errorf("Failed to get File Stats of the Archive file (%s): %s", archiveFilePath, err)
+		return fmt.Errorf("failed to get File Stats of the Archive file (%s): %s", archiveFilePath, err)
 	}
 	fileSize := fileInfo.Size()
 
 	req, err := http.NewRequest("PUT", uploadURL, archFile)
 	if err != nil {
-		return fmt.Errorf("Failed to create upload request: %s", err)
+		return fmt.Errorf("failed to create upload request: %s", err)
 	}
 
 	req.Header.Add("Content-Length", strconv.FormatInt(fileSize, 10))
@@ -335,7 +335,7 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("Failed to upload: %s", err)
+		return fmt.Errorf("failed to upload: %s", err)
 	}
 	isFileCloseRequired = false
 	defer func() {
@@ -346,11 +346,11 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Failed to read response: %s", err)
+		return fmt.Errorf("failed to read response: %s", err)
 	}
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to upload file, response code was: %d", resp.StatusCode)
+		return fmt.Errorf("failed to upload file, response code was: %d", resp.StatusCode)
 	}
 
 	return nil

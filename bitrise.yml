@@ -1,52 +1,63 @@
-format_version: 3
+format_version: "11"
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
+include:
+- repository: steps-check
+  branch: master
+  path: steps.bitrise.yml
+
 workflows:
-  test:
+  # check: included from steps-check/steps.bitrise.yml
+
+  e2e:
     steps:
-    - git::https://github.com/bitrise-steplib/steps-check.git: { }
+    - git::https://github.com/bitrise-steplib/steps-check.git:
+        inputs:
+        - workflow: e2e
+
+  sample:
+    envs:
+    - TEST_APP_URL: https://github.com/bitrise-io/android-multiple-test-results-sample.git
+    - TEST_APP_BRANCH: maintenance
+    - TEST_APP_MODULE: app
+    - TEST_APP_VARIANT: DemoDebug
+    - TEST_DEVICES: MediumPhone.arm,33,en,portrait
+    steps:
+    - script:
+        title: Clean _tmp dir
+        inputs:
+        - content: |-
+            #!/bin/env bash
+            set -ex
+            rm -rf ./_tmp
+    - git::https://github.com/bitrise-steplib/bitrise-step-simple-git-clone.git:
+        inputs:
+        - repository_url: $TEST_APP_URL
+        - branch: $TEST_APP_BRANCH
+        - clone_into_dir: ./_tmp
+    - android-build-for-ui-testing:
+        inputs:
+        - project_location: ./_tmp
+        - module: $TEST_APP_MODULE
+        - variant: $TEST_APP_VARIANT
     - path::./:
         inputs:
         - test_type: instrumentation
+        - test_devices: $TEST_DEVICES
         - download_test_results: "true"
-        - inst_test_targets: package com.example.android.testing.espresso.MultiWindowSample
-        - quarantined_tests: |-
-            [
-              {
-                "testCaseName": "autoCompleteTextView_twoSuggestions",
-                "testSuiteName": [
-                  ""
-                ],
-                "className": "com.example.android.testing.espresso.MultiWindowSample.MultiWindowTest"
-              }
-            ]
-        - use_verbose_log: "true"
-    - script:
-        title: Check if skipped tests are really skipped
-        inputs:
-        - content: |
-            test_results_xml_path="$VDTESTING_DOWNLOADED_FILES_DIR/MediumPhone.arm-33-en-portrait_test_result_1.xml"
-            if [ ! -f "$test_results_xml_path" ]; then
-              echo "No test results xml found at: $test_results_xml_path"
-              exit 1
-            fi
-            if grep -q "<testcase name='autoCompleteTextView_twoSuggestions' classname='com.example.android.testing.espresso.MultiWindowSample.MultiWindowTest'" "$test_results_xml_path"; then
-              echo "The skipped test was found in the test results xml."
-              exit 1
-            else
-              echo "The skipped test was NOT found in the test results xml."
-            fi
-    - deploy-to-bitrise-io@2:
-        inputs:
-        - is_compress: "true"
-        - deploy_path: $VDTESTING_DOWNLOADED_FILES_DIR
 
   maintenance:
     steps:
-    - go-test:
+    - script:
+        title: Compare step.yml's device table with the live catalog
         inputs:
-        - packages: ./maintenance
+        - content: |-
+            #!/bin/env bash
+            set -eo pipefail
+            # Needs the gcloud CLI, and either an already signed in account or
+            # $SERVICE_ACCOUNT_JSON. The tag keeps it out of `go test ./...` in check.
+            go test -v -tags maintenance ./maintenance
 
   generate_readme:
     steps:
-    - git::https://github.com/bitrise-steplib/steps-readme-generator.git@main: { }
+    - git::https://github.com/bitrise-steplib/steps-readme-generator.git@main: {}
