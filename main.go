@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -18,7 +19,6 @@ import (
 	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
-	"github.com/bitrise-io/go-utils/sliceutil"
 	logv2 "github.com/bitrise-io/go-utils/v2/log"
 	"github.com/bitrise-steplib/steps-virtual-device-testing-for-ios/output"
 )
@@ -128,7 +128,7 @@ func main() {
 				msg = fmt.Sprintf("- (%d/%d) running", testsRunning, len(responseModel.Steps))
 			}
 
-			if !sliceutil.IsStringInSlice(msg, printedLogs) {
+			if !slices.Contains(printedLogs, msg) {
 				log.Printf(msg)
 				printedLogs = append(printedLogs, msg)
 			}
@@ -142,6 +142,8 @@ func main() {
 				if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\tOutcome\t"); err != nil {
 					failf("Failed to write in tabwriter, error: %s", err)
 				}
+
+				anyDeviceRunCrashed := false
 
 				for _, step := range responseModel.Steps {
 					dimensions := map[string]string{}
@@ -165,7 +167,8 @@ func main() {
 						dimensionToStatus[dimensionID] = isSuccess
 					}
 
-					outcome := processStepResult(step)
+					outcome, crashed := processStepResult(step)
+					anyDeviceRunCrashed = anyDeviceRunCrashed || crashed
 
 					if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome); err != nil {
 						failf("Failed to write in tabwriter, error: %s", err)
@@ -174,6 +177,13 @@ func main() {
 
 				if err := w.Flush(); err != nil {
 					log.Errorf("Failed to flush writer, error: %s", err)
+				}
+
+				if anyDeviceRunCrashed {
+					fmt.Println()
+					log.Warnf("Firebase detected an app crash during one of the runs.")
+					log.Warnf("Note: If the crash occurred outside active test execution (e.g., during cleanup or background processes), individual test results will still appear successful.")
+					fmt.Println()
 				}
 			}
 			if !finished {
@@ -264,7 +274,7 @@ func main() {
 func downloadFile(url string, localPath string) error {
 	out, err := os.Create(localPath)
 	if err != nil {
-		return fmt.Errorf("Failed to open the local cache file for write: %s", err)
+		return fmt.Errorf("failed to open the local cache file for write: %s", err)
 	}
 	defer func() {
 		if err := out.Close(); err != nil {
@@ -274,7 +284,7 @@ func downloadFile(url string, localPath string) error {
 
 	resp, err := http.Get(url)
 	if err != nil {
-		return fmt.Errorf("Failed to create cache download request: %s", err)
+		return fmt.Errorf("failed to create cache download request: %s", err)
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
@@ -283,12 +293,12 @@ func downloadFile(url string, localPath string) error {
 	}()
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to download archive - non success response code: %d", resp.StatusCode)
+		return fmt.Errorf("failed to download archive - non success response code: %d", resp.StatusCode)
 	}
 
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		return fmt.Errorf("Failed to save cache content into file: %s", err)
+		return fmt.Errorf("failed to save cache content into file: %s", err)
 	}
 
 	return nil
@@ -297,7 +307,7 @@ func downloadFile(url string, localPath string) error {
 func uploadFile(uploadURL string, archiveFilePath string) error {
 	archFile, err := os.Open(archiveFilePath)
 	if err != nil {
-		return fmt.Errorf("Failed to open archive file for upload (%s): %s", archiveFilePath, err)
+		return fmt.Errorf("failed to open archive file for upload (%s): %s", archiveFilePath, err)
 	}
 	isFileCloseRequired := true
 	defer func() {
@@ -311,13 +321,13 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 
 	fileInfo, err := archFile.Stat()
 	if err != nil {
-		return fmt.Errorf("Failed to get File Stats of the Archive file (%s): %s", archiveFilePath, err)
+		return fmt.Errorf("failed to get File Stats of the Archive file (%s): %s", archiveFilePath, err)
 	}
 	fileSize := fileInfo.Size()
 
 	req, err := http.NewRequest("PUT", uploadURL, archFile)
 	if err != nil {
-		return fmt.Errorf("Failed to create upload request: %s", err)
+		return fmt.Errorf("failed to create upload request: %s", err)
 	}
 
 	req.Header.Add("Content-Length", strconv.FormatInt(fileSize, 10))
@@ -325,7 +335,7 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("Failed to upload: %s", err)
+		return fmt.Errorf("failed to upload: %s", err)
 	}
 	isFileCloseRequired = false
 	defer func() {
@@ -336,18 +346,19 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 
 	_, err = io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("Failed to read response: %s", err)
+		return fmt.Errorf("failed to read response: %s", err)
 	}
 
 	if resp.StatusCode != 200 {
-		return fmt.Errorf("Failed to upload file, response code was: %d", resp.StatusCode)
+		return fmt.Errorf("failed to upload file, response code was: %d", resp.StatusCode)
 	}
 
 	return nil
 }
 
-func processStepResult(step *toolresults.Step) string {
+func processStepResult(step *toolresults.Step) (string, bool) {
 	outcome := step.Outcome.Summary
+	crashed := false
 
 	switch outcome {
 	case "success":
@@ -356,6 +367,7 @@ func processStepResult(step *toolresults.Step) string {
 		if step.Outcome.FailureDetail != nil {
 			if step.Outcome.FailureDetail.Crashed {
 				outcome += "(Crashed)"
+				crashed = true
 			}
 			if step.Outcome.FailureDetail.NotInstalled {
 				outcome += "(NotInstalled)"
@@ -395,5 +407,5 @@ func processStepResult(step *toolresults.Step) string {
 		}
 		outcome = colorstring.Blue(outcome)
 	}
-	return outcome
+	return outcome, crashed
 }

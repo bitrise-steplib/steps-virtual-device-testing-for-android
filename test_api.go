@@ -200,10 +200,9 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 		if configs.InstTestRunnerClass != "" {
 			testModel.TestSpecification.AndroidInstrumentationTest.TestRunnerClass = configs.InstTestRunnerClass
 		}
-		if configs.InstTestTargets != "" {
-			targets := strings.Split(strings.TrimSpace(configs.InstTestTargets), ",")
-			testModel.TestSpecification.AndroidInstrumentationTest.TestTargets = targets
-		}
+		targets := strings.Split(strings.TrimSpace(configs.InstTestTargets), ",")
+		targets = append(targets, configs.QuarantinedTestTargets...)
+		testModel.TestSpecification.AndroidInstrumentationTest.TestTargets = targets
 		if configs.UseOrchestrator {
 			testModel.TestSpecification.AndroidInstrumentationTest.OrchestratorOption = "USE_ORCHESTRATOR"
 		} else {
