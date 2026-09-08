@@ -12,8 +12,6 @@ app:
   - GCP_SERVICE_ACCOUNT_JSON_VDT_DEVICE_FETCHER: $GCP_SERVICE_ACCOUNT_JSON_VDT_DEVICE_FETCHER
 
 workflows:
-  # `test_` prefix is used by unified CI to filter tests to run
-
   test_flaky_and_quarantined_tests:
     steps:
     - bitrise-run:
