@@ -3,10 +3,8 @@ module github.com/bitrise-steplib/steps-virtual-device-testing-for-android
 go 1.21
 
 require (
-	github.com/bitrise-io/go-steputils v1.0.6
 	github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.40
-	github.com/bitrise-io/go-utils v1.0.13
-	github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.26
+	github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.39
 	google.golang.org/api v0.114.0
 )
 
@@ -15,6 +13,7 @@ require github.com/bitrise-steplib/steps-virtual-device-testing-for-ios v0.0.0-2
 require (
 	cloud.google.com/go/compute v1.19.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	github.com/bitrise-io/go-utils v1.0.13 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
