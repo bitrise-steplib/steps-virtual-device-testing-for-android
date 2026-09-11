@@ -15,9 +15,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bitrise-io/go-utils/command"
-	"github.com/bitrise-io/go-utils/fileutil"
-	"github.com/bitrise-io/go-utils/pathutil"
+	"github.com/bitrise-io/go-utils/v2/command"
+	"github.com/bitrise-io/go-utils/v2/env"
+	"github.com/bitrise-io/go-utils/v2/fileutil"
+	"github.com/bitrise-io/go-utils/v2/pathutil"
 )
 
 // deviceListPath holds the catalog this Step's device table was generated from. It is a file
@@ -26,26 +27,28 @@ import (
 const deviceListPath = "testdata/device_list.txt"
 
 func TestDeviceList(t *testing.T) {
-	signedIn, err := checkAccounts()
+	cmdFactory := command.NewFactory(env.NewRepository())
+
+	signedIn, err := checkAccounts(cmdFactory)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 
 	if !signedIn {
-		if err := signIn(); err != nil {
+		if err := signIn(cmdFactory); err != nil {
 			t.Error(err)
 			t.FailNow()
 		}
 	}
 
-	if err := checkDeviceList(); err != nil {
+	if err := checkDeviceList(cmdFactory); err != nil {
 		t.Error(err)
 	}
 }
 
-func checkDeviceList() error {
-	deviceList, err := fetchDeviceList()
+func checkDeviceList(cmdFactory command.Factory) error {
+	deviceList, err := fetchDeviceList(cmdFactory)
 	if err != nil {
 		return err
 	}
@@ -59,7 +62,7 @@ func checkDeviceList() error {
 		return nil
 	}
 
-	deviceTable, err := fetchDeviceTable()
+	deviceTable, err := fetchDeviceTable(cmdFactory)
 	if err != nil {
 		return err
 	}
@@ -80,10 +83,10 @@ func checkDeviceList() error {
 // the table is meant to be pasted into step.yml. gcloud writes component update notices and
 // credential warnings to stderr, and combined output would mix them into both. stderr is still
 // read, it carries gcloud's diagnostics when the call fails.
-func gcloudStdout(args ...string) (string, error) {
+func gcloudStdout(cmdFactory command.Factory, args ...string) (string, error) {
 	var stdout, stderr bytes.Buffer
 
-	cmd := command.New("gcloud", args...).SetStdout(&stdout).SetStderr(&stderr)
+	cmd := cmdFactory.Create("gcloud", args, &command.Opts{Stdout: &stdout, Stderr: &stderr})
 	if err := cmd.Run(); err != nil {
 		return "", fmt.Errorf("%s: %w, stderr: %s",
 			cmd.PrintableCommandArgs(), err, strings.TrimSpace(stderr.String()))
@@ -92,14 +95,14 @@ func gcloudStdout(args ...string) (string, error) {
 	return strings.TrimSpace(stdout.String()), nil
 }
 
-func fetchDeviceList() (string, error) {
-	return gcloudStdout("firebase", "test", "android", "models", "list",
+func fetchDeviceList(cmdFactory command.Factory) (string, error) {
+	return gcloudStdout(cmdFactory, "firebase", "test", "android", "models", "list",
 		"--filter=VIRTUAL",
 		"--format", "text")
 }
 
-func fetchDeviceTable() (string, error) {
-	return gcloudStdout("firebase", "test", "android", "models", "list",
+func fetchDeviceTable(cmdFactory command.Factory) (string, error) {
+	return gcloudStdout(cmdFactory, "firebase", "test", "android", "models", "list",
 		"--filter=VIRTUAL",
 		// Generally available models first, then newest OS first within each group, so the
 		// models worth picking are at the top. Untagged means GA, and an empty tags[0]
@@ -110,8 +113,8 @@ func fetchDeviceTable() (string, error) {
 		"--format", deviceTableFormat)
 }
 
-func signIn() error {
-	tmpDir, err := pathutil.NormalizedOSTempDirPath("_serv_acc_")
+func signIn(cmdFactory command.Factory) error {
+	tmpDir, err := pathutil.NewPathProvider().CreateTempDir("_serv_acc_")
 	if err != nil {
 		return err
 	}
@@ -122,7 +125,7 @@ func signIn() error {
 	}
 
 	servAccFilePAth := filepath.Join(tmpDir, "serv-acc.json")
-	if err := fileutil.WriteStringToFile(servAccFilePAth, servAccFileContent); err != nil {
+	if err := fileutil.NewFileManager().Write(servAccFilePAth, servAccFileContent, 0600); err != nil {
 		return err
 	}
 
@@ -136,11 +139,12 @@ func signIn() error {
 		return fmt.Errorf("invalid service account json, no project_id found")
 	}
 
-	cmd := command.New("gcloud",
+	cmd := cmdFactory.Create("gcloud", []string{
 		"auth",
 		"activate-service-account",
 		fmt.Sprintf("--key-file=%s", servAccFilePAth),
-		"--project", servAcc.ProjectID)
+		"--project", servAcc.ProjectID,
+	}, nil)
 
 	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
@@ -150,8 +154,8 @@ func signIn() error {
 	return nil
 }
 
-func checkAccounts() (bool, error) {
-	cmd := command.New("gcloud", "auth", "list", "--format", "json")
+func checkAccounts(cmdFactory command.Factory) (bool, error) {
+	cmd := cmdFactory.Create("gcloud", []string{"auth", "list", "--format", "json"}, nil)
 	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return false, err

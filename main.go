@@ -15,11 +15,12 @@ import (
 
 	toolresults "google.golang.org/api/toolresults/v1beta3"
 
-	"github.com/bitrise-io/go-steputils/stepconf"
-	"github.com/bitrise-io/go-utils/colorstring"
-	"github.com/bitrise-io/go-utils/log"
-	"github.com/bitrise-io/go-utils/pathutil"
-	logv2 "github.com/bitrise-io/go-utils/v2/log"
+	"github.com/bitrise-io/go-steputils/v2/stepconf"
+	"github.com/bitrise-io/go-utils/v2/env"
+	"github.com/bitrise-io/go-utils/v2/fileutil"
+	"github.com/bitrise-io/go-utils/v2/log"
+	"github.com/bitrise-io/go-utils/v2/log/colorstring"
+	"github.com/bitrise-io/go-utils/v2/pathutil"
 	"github.com/bitrise-steplib/steps-virtual-device-testing-for-ios/output"
 )
 
@@ -28,50 +29,54 @@ const (
 	testTypeRobo            = "robo"
 )
 
-func failf(f string, v ...interface{}) {
-	log.Errorf(f, v...)
+func failf(logger log.Logger, f string, v ...interface{}) {
+	logger.Errorf(f, v...)
 	os.Exit(1)
 }
 
 func main() {
-	logger := logv2.NewLogger()
+	logger := log.NewLogger()
+	envRepo := env.NewRepository()
+	pathProvider := pathutil.NewPathProvider()
+	fileManager := fileutil.NewFileManager()
+
 	outputExporter := output.NewExporter(output.NewOutputExporter(), logger)
 
 	var configs ConfigsModel
-	if err := stepconf.Parse(&configs); err != nil {
-		failf("Invalid input: %s", err)
+	if err := stepconf.NewInputParser(envRepo).Parse(&configs); err != nil {
+		failf(logger, "Invalid input: %s", err)
 	}
 
-	if err := configs.validate(); err != nil {
-		log.Errorf("Failed to parse config:")
-		failf("%s", err)
+	if err := configs.validate(logger, pathProvider, fileManager); err != nil {
+		logger.Errorf("Failed to parse config:")
+		failf(logger, "%s", err)
 	}
 
 	fmt.Println()
-	configs.print()
+	configs.print(logger)
 
-	log.SetEnableDebugLog(configs.VerboseLog)
+	logger.EnableDebugLog(configs.VerboseLog)
 
 	fmt.Println()
 
-	log.Infof("Uploading app and test files")
+	logger.Infof("Uploading app and test files")
 
-	testAssets, err := uploadTestAssets(configs)
+	testAssets, err := uploadTestAssets(configs, logger)
 	if err != nil {
-		failf("Failed to upload test assets, error: %s", err)
+		failf(logger, "Failed to upload test assets, error: %s", err)
 	}
-	log.Donef("=> Files uploaded")
+	logger.Donef("=> Files uploaded")
 
 	fmt.Println()
-	log.Infof("Starting test")
+	logger.Infof("Starting test")
 
-	if err = startTestRun(configs, testAssets); err != nil {
-		failf("Starting test run failed, error: %s", err)
+	if err = startTestRun(configs, testAssets, logger); err != nil {
+		failf(logger, "Starting test run failed, error: %s", err)
 	}
-	log.Donef("=> Test started")
+	logger.Donef("=> Test started")
 
 	fmt.Println()
-	log.Infof("Waiting for test results")
+	logger.Infof("Waiting for test results")
 
 	dimensionToStatus := map[string]bool{}
 	{
@@ -83,7 +88,7 @@ func main() {
 
 			req, err := http.NewRequest("GET", url, nil)
 			if err != nil {
-				failf("Failed to create http request, error: %s", err)
+				failf(logger, "Failed to create http request, error: %s", err)
 			}
 
 			client := &http.Client{}
@@ -91,24 +96,24 @@ func main() {
 			if err != nil || resp.StatusCode != http.StatusOK {
 				resp, err = client.Do(req)
 				if err != nil {
-					failf("Failed to get http response, error: %s", err)
+					failf(logger, "Failed to get http response, error: %s", err)
 				}
 			}
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
-				failf("Failed to read response body, error: %s", err)
+				failf(logger, "Failed to read response body, error: %s", err)
 			}
 
 			if resp.StatusCode != http.StatusOK {
-				failf("Failed to get test status, error: %s", string(body))
+				failf(logger, "Failed to get test status, error: %s", string(body))
 			}
 
 			responseModel := &toolresults.ListStepsResponse{}
 
 			err = json.Unmarshal(body, responseModel)
 			if err != nil {
-				failf("Failed to unmarshal response body, error: %s, body: %s", err, string(body))
+				failf(logger, "Failed to unmarshal response body, error: %s, body: %s", err, string(body))
 			}
 
 			finished = true
@@ -129,18 +134,18 @@ func main() {
 			}
 
 			if !slices.Contains(printedLogs, msg) {
-				log.Printf(msg)
+				logger.Printf(msg)
 				printedLogs = append(printedLogs, msg)
 			}
 
 			if finished {
-				log.Donef("=> Test finished")
+				logger.Donef("=> Test finished")
 				fmt.Println()
 
-				log.Infof("Test results:")
+				logger.Infof("Test results:")
 				w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 				if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\tOutcome\t"); err != nil {
-					failf("Failed to write in tabwriter, error: %s", err)
+					failf(logger, "Failed to write in tabwriter, error: %s", err)
 				}
 
 				anyDeviceRunCrashed := false
@@ -171,18 +176,18 @@ func main() {
 					anyDeviceRunCrashed = anyDeviceRunCrashed || crashed
 
 					if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", dimensions["Model"], dimensions["Version"], dimensions["Locale"], dimensions["Orientation"], outcome); err != nil {
-						failf("Failed to write in tabwriter, error: %s", err)
+						failf(logger, "Failed to write in tabwriter, error: %s", err)
 					}
 				}
 
 				if err := w.Flush(); err != nil {
-					log.Errorf("Failed to flush writer, error: %s", err)
+					logger.Errorf("Failed to flush writer, error: %s", err)
 				}
 
 				if anyDeviceRunCrashed {
 					fmt.Println()
-					log.Warnf("Firebase detected an app crash during one of the runs.")
-					log.Warnf("Note: If the crash occurred outside active test execution (e.g., during cleanup or background processes), individual test results will still appear successful.")
+					logger.Warnf("Firebase detected an app crash during one of the runs.")
+					logger.Warnf("Note: If the crash occurred outside active test execution (e.g., during cleanup or background processes), individual test results will still appear successful.")
 					fmt.Println()
 				}
 			}
@@ -194,48 +199,48 @@ func main() {
 
 	if configs.DownloadTestResults {
 		fmt.Println()
-		log.Infof("Downloading test assets")
+		logger.Infof("Downloading test assets")
 		{
 			url := configs.APIBaseURL + "/assets/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
 			req, err := http.NewRequest("GET", url, nil)
 			if err != nil {
-				failf("Failed to create http request, error: %s", err)
+				failf(logger, "Failed to create http request, error: %s", err)
 			}
 
 			client := &http.Client{}
 			resp, err := client.Do(req)
 			if err != nil {
-				failf("Failed to get http response, error: %s", err)
+				failf(logger, "Failed to get http response, error: %s", err)
 			}
 
 			if resp.StatusCode != http.StatusOK {
-				failf("Failed to get http response, status code: %d", resp.StatusCode)
+				failf(logger, "Failed to get http response, status code: %d", resp.StatusCode)
 			}
 
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
-				failf("Failed to read response body, error: %s", err)
+				failf(logger, "Failed to read response body, error: %s", err)
 			}
 
 			responseModel := map[string]string{}
 
 			err = json.Unmarshal(body, &responseModel)
 			if err != nil {
-				failf("Failed to unmarshal response body, error: %s", err)
+				failf(logger, "Failed to unmarshal response body, error: %s", err)
 			}
 
-			tempDir, err := pathutil.NormalizedOSTempDirPath("vdtesting_test_assets")
+			tempDir, err := pathProvider.CreateTempDir("vdtesting_test_assets")
 			if err != nil {
-				failf("Failed to create temp dir, error: %s", err)
+				failf(logger, "Failed to create temp dir, error: %s", err)
 			}
 
 			var mergedTestResultXmlPths []string
 			for fileName, fileURL := range responseModel {
 				pth := filepath.Join(tempDir, fileName)
-				err := downloadFile(fileURL, pth)
+				err := downloadFile(fileURL, pth, logger)
 				if err != nil {
-					failf("Failed to download file, error: %s", err)
+					failf(logger, "Failed to download file, error: %s", err)
 				}
 
 				// per test run results: MediumPhone.arm-33-en-portrait_test_result_1.xml
@@ -245,14 +250,14 @@ func main() {
 				}
 			}
 
-			log.Printf("%d merged test results XML(s) found", len(mergedTestResultXmlPths))
-			log.TDonef("=> %d test Assets downloaded", len(responseModel))
+			logger.Printf("%d merged test results XML(s) found", len(mergedTestResultXmlPths))
+			logger.TDonef("=> %d test Assets downloaded", len(responseModel))
 
 			if err := outputExporter.ExportTestResultsDir(tempDir); err != nil {
-				log.Warnf("Failed to export test assets: %s", err)
+				logger.Warnf("Failed to export test assets: %s", err)
 			} else {
 				if err := outputExporter.ExportFlakyTestsEnvVar(mergedTestResultXmlPths); err != nil {
-					log.Warnf("Failed to export flaky tests env var: %s", err)
+					logger.Warnf("Failed to export flaky tests env var: %s", err)
 				}
 			}
 		}
@@ -266,19 +271,19 @@ func main() {
 	}
 
 	if len(failedTestRuns) > 0 {
-		log.Errorf("%d test run(s) failed", len(failedTestRuns))
+		logger.Errorf("%d test run(s) failed", len(failedTestRuns))
 		os.Exit(1)
 	}
 }
 
-func downloadFile(url string, localPath string) error {
+func downloadFile(url string, localPath string, logger log.Logger) error {
 	out, err := os.Create(localPath)
 	if err != nil {
 		return fmt.Errorf("failed to open the local cache file for write: %s", err)
 	}
 	defer func() {
 		if err := out.Close(); err != nil {
-			log.Printf("Failed to close Archive download file (%s): %s", localPath, err)
+			logger.Printf("Failed to close Archive download file (%s): %s", localPath, err)
 		}
 	}()
 
@@ -288,7 +293,7 @@ func downloadFile(url string, localPath string) error {
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Printf("Failed to close Archive download response body: %s", err)
+			logger.Printf("Failed to close Archive download response body: %s", err)
 		}
 	}()
 
@@ -304,7 +309,7 @@ func downloadFile(url string, localPath string) error {
 	return nil
 }
 
-func uploadFile(uploadURL string, archiveFilePath string) error {
+func uploadFile(uploadURL string, archiveFilePath string, logger log.Logger) error {
 	archFile, err := os.Open(archiveFilePath)
 	if err != nil {
 		return fmt.Errorf("failed to open archive file for upload (%s): %s", archiveFilePath, err)
@@ -315,7 +320,7 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 			return
 		}
 		if err := archFile.Close(); err != nil {
-			log.Printf(" (!) Failed to close archive file (%s): %s", archiveFilePath, err)
+			logger.Printf(" (!) Failed to close archive file (%s): %s", archiveFilePath, err)
 		}
 	}()
 
@@ -340,7 +345,7 @@ func uploadFile(uploadURL string, archiveFilePath string) error {
 	isFileCloseRequired = false
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
-			log.Printf(" [!] Failed to close response body: %s", err)
+			logger.Printf(" [!] Failed to close response body: %s", err)
 		}
 	}()
 
