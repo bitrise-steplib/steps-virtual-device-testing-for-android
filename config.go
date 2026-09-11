@@ -77,78 +77,78 @@ type ConfigsModel struct {
 	ApkPath string `env:"apk_path"`
 }
 
-func (configs *ConfigsModel) print(logger log.Logger) {
-	logger.Infof("Configs:")
-	logger.Printf("- AppPath: %s", configs.AppPath)
+func (configs *ConfigsModel) print(log log.Logger) {
+	log.Infof("Configs:")
+	log.Printf("- AppPath: %s", configs.AppPath)
 	if configs.ApkPath != "" {
-		logger.Printf("- ApkPath: %s", configs.ApkPath)
+		log.Printf("- ApkPath: %s", configs.ApkPath)
 	}
 	if configs.AppPackageID != "" {
-		logger.Printf("- AppPackageID: %s", configs.AppPackageID)
+		log.Printf("- AppPackageID: %s", configs.AppPackageID)
 	}
-	logger.Printf("- TestTimeout: %f", configs.TestTimeout)
-	logger.Printf("- FlakyTestAttempts: %d", configs.FlakyTestAttempts)
-	logger.Printf("- DownloadTestResults: %t", configs.DownloadTestResults)
-	logger.Printf("- DirectoriesToPull: %s", configs.DirectoriesToPullList)
-	logger.Printf("- AutoGoogleLogin: %t", configs.AutoGoogleLogin)
-	logger.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariablesList)
-	logger.Printf("- ObbFilesList: %s", configs.ObbFilesList)
+	log.Printf("- TestTimeout: %f", configs.TestTimeout)
+	log.Printf("- FlakyTestAttempts: %d", configs.FlakyTestAttempts)
+	log.Printf("- DownloadTestResults: %t", configs.DownloadTestResults)
+	log.Printf("- DirectoriesToPull: %s", configs.DirectoriesToPullList)
+	log.Printf("- AutoGoogleLogin: %t", configs.AutoGoogleLogin)
+	log.Printf("- EnvironmentVariables: %s", configs.EnvironmentVariablesList)
+	log.Printf("- ObbFilesList: %s", configs.ObbFilesList)
 
-	logger.Printf("- TestDevices:\n---")
+	log.Printf("- TestDevices:\n---")
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', 0)
 	if _, err := fmt.Fprintln(w, "Model\tAPI Level\tLocale\tOrientation\t"); err != nil {
-		failf(logger, "Failed to write in tabwriter, error: %s", err)
+		failf(log, "Failed to write in tabwriter, error: %s", err)
 	}
 	for _, testDevice := range configs.TestDevices {
 		if _, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t\n", testDevice.AndroidModelId, testDevice.AndroidVersionId, testDevice.Locale, testDevice.Orientation); err != nil {
-			failf(logger, "Failed to write in tabwriter, error: %s", err)
+			failf(log, "Failed to write in tabwriter, error: %s", err)
 		}
 	}
 	if err := w.Flush(); err != nil {
-		logger.Errorf("Failed to flush writer, error: %s", err)
+		log.Errorf("Failed to flush writer, error: %s", err)
 	}
-	logger.Printf("---")
+	log.Printf("---")
 
-	logger.Printf("- TestType: %s", configs.TestType)
+	log.Printf("- TestType: %s", configs.TestType)
 	// instruments
 	if configs.TestType == testTypeInstrumentation {
-		logger.Printf("- TestApkPath: %s", configs.TestApkPath)
-		logger.Printf("- InstTestPackageID: %s", configs.InstTestPackageID)
-		logger.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
-		logger.Printf("- InstTestTargets: %s", configs.InstTestTargets)
-		logger.Printf("- UseOrchestrator: %t", configs.UseOrchestrator)
-		logger.Printf("- QuarantinedTests: %s", configs.QuarantinedTests)
+		log.Printf("- TestApkPath: %s", configs.TestApkPath)
+		log.Printf("- InstTestPackageID: %s", configs.InstTestPackageID)
+		log.Printf("- InstTestRunnerClass: %s", configs.InstTestRunnerClass)
+		log.Printf("- InstTestTargets: %s", configs.InstTestTargets)
+		log.Printf("- UseOrchestrator: %t", configs.UseOrchestrator)
+		log.Printf("- QuarantinedTests: %s", configs.QuarantinedTests)
 	}
 
 	//robo
 	if configs.TestType == testTypeRobo {
-		logger.Printf("- RoboInitialActivity: %s", configs.RoboInitialActivity)
-		logger.Printf("- RoboScenarioFile: %s", configs.RoboScenarioFile)
-		logger.Printf("- RoboDirectives: %s", configs.RoboDirectives)
-		logger.Printf("- RoboMaxDepth: %s", configs.RoboMaxDepth)
-		logger.Printf("- RoboMaxSteps: %s", configs.RoboMaxSteps)
+		log.Printf("- RoboInitialActivity: %s", configs.RoboInitialActivity)
+		log.Printf("- RoboScenarioFile: %s", configs.RoboScenarioFile)
+		log.Printf("- RoboDirectives: %s", configs.RoboDirectives)
+		log.Printf("- RoboMaxDepth: %s", configs.RoboMaxDepth)
+		log.Printf("- RoboMaxSteps: %s", configs.RoboMaxSteps)
 	}
 
 	// loop
 	if configs.TestType == "gameloop" {
-		logger.Printf("- LoopScenarios: %s", configs.LoopScenarios)
-		logger.Printf("- LoopScenarioLabels: %s", configs.LoopScenarioLabels)
-		logger.Printf("- LoopScenarioNumbers: %s", configs.LoopScenarioNumbers)
+		log.Printf("- LoopScenarios: %s", configs.LoopScenarios)
+		log.Printf("- LoopScenarioLabels: %s", configs.LoopScenarioLabels)
+		log.Printf("- LoopScenarioNumbers: %s", configs.LoopScenarioNumbers)
 	}
 }
 
-func (configs *ConfigsModel) validate(logger log.Logger, pathProvider pathutil.PathProvider, fileManager fileutil.FileManager) error {
-	configs.migrate(logger)
+func (configs *ConfigsModel) validate(log log.Logger, pathProvider pathutil.PathProvider, fileManager fileutil.FileManager) error {
+	configs.migrate(log)
 
 	if strings.TrimSpace(configs.APIBaseURL) == "" {
 		if _, set := os.LookupEnv("BITRISE_IO"); !set {
-			logger.Warnf("Warning: please make sure that Virtual Device Testing add-on is turned on under your app's settings tab.")
+			log.Warnf("Warning: please make sure that Virtual Device Testing add-on is turned on under your app's settings tab.")
 		}
 		return fmt.Errorf("- APIBaseURL: required variable is not present")
 	}
 
 	if strings.TrimSpace(configs.AppPath) == "" {
-		logger.Warnf("Warning: Using embedded Android application as AppPath value is empty")
+		log.Warnf("Warning: Using embedded Android application as AppPath value is empty")
 
 		path, err := pathProvider.CreateTempDir("")
 		if err != nil {
@@ -197,17 +197,17 @@ func (configs *ConfigsModel) validate(logger log.Logger, pathProvider pathutil.P
 	return nil
 }
 
-func (configs *ConfigsModel) migrate(logger log.Logger) {
+func (configs *ConfigsModel) migrate(log log.Logger) {
 	if configs.ApkPath != "" {
-		logger.Warnf("'Apk path' (apk_path) input is deprected, use 'App path' (app_path) instead.")
-		logger.Warnf("'Apk path' (%s) is specified, overrides App path (%s)", configs.ApkPath, configs.AppPath)
+		log.Warnf("'Apk path' (apk_path) input is deprected, use 'App path' (app_path) instead.")
+		log.Warnf("'Apk path' (%s) is specified, overrides App path (%s)", configs.ApkPath, configs.AppPath)
 		configs.AppPath = configs.ApkPath
 	}
 	if configs.AppPackageID != "" {
-		logger.Warnf("'App package ID' (app_package_id) input is deprecated. Leave empty to automatically extract it from the App manifest")
+		log.Warnf("'App package ID' (app_package_id) input is deprecated. Leave empty to automatically extract it from the App manifest")
 	}
 	if configs.InstTestPackageID != "" {
-		logger.Warnf("'Test package ID' (inst_test_package_id) input is deprecatad. Leave empty to automatically extract it from the App manifest")
+		log.Warnf("'Test package ID' (inst_test_package_id) input is deprecatad. Leave empty to automatically extract it from the App manifest")
 	}
 }
 
