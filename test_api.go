@@ -13,7 +13,7 @@ import (
 
 	testing "google.golang.org/api/testing/v1"
 
-	"github.com/bitrise-io/go-utils/log"
+	"github.com/bitrise-io/go-utils/v2/log"
 )
 
 // TestAsset describes a requested test asset
@@ -34,7 +34,7 @@ type TestAssetsAndroid struct {
 	ObbFiles   []TestAsset `json:"obbFiles,omitempty"`
 }
 
-func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
+func uploadTestAssets(configs ConfigsModel, logger log.Logger) (TestAssetsAndroid, error) {
 	var testAssets TestAssetsAndroid
 
 	url := configs.APIBaseURL + "/assets/android/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
@@ -42,7 +42,7 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 	if strings.ToLower(filepath.Ext(configs.AppPath)) == ".aab" {
 		testAssets.isBundle = true
 	}
-	log.Debugf("App path (%s), is bundle: %t", configs.AppPath, testAssets.isBundle)
+	logger.Debugf("App path (%s), is bundle: %t", configs.AppPath, testAssets.isBundle)
 
 	var requestedAssets TestAssetsAndroid
 	if testAssets.isBundle {
@@ -70,7 +70,7 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 		})
 	}
 
-	log.Debugf("Assets requested: %+v", requestedAssets)
+	logger.Debugf("Assets requested: %+v", requestedAssets)
 
 	data, err := json.Marshal(requestedAssets)
 	if err != nil {
@@ -107,21 +107,21 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 	} else {
 		testAssets.testApp = &testAssets.Apk
 	}
-	log.Debugf("Uploading file(%s) to (%s)", configs.AppPath, testAssets.testApp.GcsPath)
+	logger.Debugf("Uploading file(%s) to (%s)", configs.AppPath, testAssets.testApp.GcsPath)
 
-	err = uploadFile(testAssets.testApp.UploadURL, configs.AppPath)
+	err = uploadFile(testAssets.testApp.UploadURL, configs.AppPath, logger)
 	if err != nil {
 		return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.AppPath, testAssets.testApp.UploadURL, err)
 	}
 
 	if configs.TestType == testTypeInstrumentation {
-		if err := uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath); err != nil {
+		if err := uploadFile(testAssets.TestApk.UploadURL, configs.TestApkPath, logger); err != nil {
 			return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.TestApkPath, testAssets.TestApk.UploadURL, err)
 		}
 	}
 
 	if configs.TestType == testTypeRobo && configs.RoboScenarioFile != "" {
-		if err := uploadFile(testAssets.RoboScript.UploadURL, configs.RoboScenarioFile); err != nil {
+		if err := uploadFile(testAssets.RoboScript.UploadURL, configs.RoboScenarioFile, logger); err != nil {
 			return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.RoboScenarioFile, testAssets.RoboScript.UploadURL, err)
 		}
 	}
@@ -130,7 +130,7 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 		return TestAssetsAndroid{}, fmt.Errorf("invalid length of obb file upload URLs in response: %+v", testAssets)
 	}
 	for i, obbFile := range configs.ObbFiles {
-		if err := uploadFile(testAssets.ObbFiles[i].UploadURL, obbFile); err != nil {
+		if err := uploadFile(testAssets.ObbFiles[i].UploadURL, obbFile, logger); err != nil {
 			return TestAssetsAndroid{}, fmt.Errorf("failed to upload obb file (%s) to (%s), error: %s", obbFile, testAssets.ObbFiles[i].UploadURL, err)
 		}
 	}
@@ -138,7 +138,7 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 	return testAssets, nil
 }
 
-func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
+func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid, logger log.Logger) error {
 	url := configs.APIBaseURL + "/" + configs.AppSlug + "/" + configs.BuildSlug + "/" + configs.APIToken
 
 	testModel := &testing.TestMatrix{}
@@ -218,7 +218,7 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 		if len(configs.QuarantinedTestTargets) > 0 {
 			testModel.TestSpecification.AndroidInstrumentationTest.TestTargets = configs.QuarantinedTestTargets
 		}
-		log.Debugf("AndroidInstrumentationTest: %+v", testModel.TestSpecification.AndroidInstrumentationTest)
+		logger.Debugf("AndroidInstrumentationTest: %+v", testModel.TestSpecification.AndroidInstrumentationTest)
 	case testTypeRobo:
 		testModel.TestSpecification.AndroidRoboTest = &testing.AndroidRoboTest{}
 
@@ -269,7 +269,7 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 			testModel.TestSpecification.AndroidRoboTest.RoboDirectives = roboDirectives
 		}
 		if configs.RoboScenarioFile != "" {
-			log.Debugf("Robo scenario file: %s", testAssets.RoboScript.GcsPath)
+			logger.Debugf("Robo scenario file: %s", testAssets.RoboScript.GcsPath)
 			testModel.TestSpecification.AndroidRoboTest.RoboScript = &testing.FileReference{
 				GcsPath: testAssets.RoboScript.GcsPath,
 			}
