@@ -8,8 +8,19 @@ app:
   - TEST_APP_MODULE: app
   - TEST_APP_VARIANT: DemoDebug
   - JDK_VERSION: 17
-  # Secret env vars have matching key and value
-  - GCP_SERVICE_ACCOUNT_JSON_VDT_DEVICE_FETCHER: $GCP_SERVICE_ACCOUNT_JSON_VDT_DEVICE_FETCHER
+  # GCP sign-in without a stored key: the build's Bitrise OIDC token is exchanged through the
+  # `bitrise` Workload Identity pool of steps-dev-308611 for the vdt-device-fetcher service
+  # account. The pool only trusts the unified CI app's `worker` workflow.
+  - GCP_OIDC_AUDIENCE: https://iam.googleapis.com/projects/1086499775844/locations/global/workloadIdentityPools/bitrise/providers/bitrise
+  - GCP_OIDC_CLIENT_CONFIG: |-
+      {
+        "universe_domain": "googleapis.com",
+        "type": "external_account",
+        "audience": "//iam.googleapis.com/projects/1086499775844/locations/global/workloadIdentityPools/bitrise/providers/bitrise",
+        "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+        "token_url": "https://sts.googleapis.com/v1/token",
+        "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/vdt-device-fetcher@steps-dev-308611.iam.gserviceaccount.com:generateAccessToken"
+      }
 
 workflows:
   test_flaky_and_quarantined_tests:
@@ -29,12 +40,14 @@ workflows:
 
   # Checks the device table in step.yml against the live Firebase Test Lab catalog. Needs no
   # devices and no app build, only a service account for the catalog lookup, so it runs on
-  # every stack.
+  # every stack. Once gcloud has an active account, maintenance/maintenance_test.go skips its
+  # own (key based) sign-in.
   test_device_catalog_up_to_date:
-    envs:
-    # maintenance/maintenance_test.go signs in to gcloud with this.
-    - SERVICE_ACCOUNT_JSON: $GCP_SERVICE_ACCOUNT_JSON_VDT_DEVICE_FETCHER
     steps:
+    - authenticate-with-gcp@0:
+        inputs:
+        - audience: $GCP_OIDC_AUDIENCE
+        - client_config: $GCP_OIDC_CLIENT_CONFIG
     - script:
         title: Compare step.yml's device table with the live catalog
         inputs:
