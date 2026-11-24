@@ -8,7 +8,6 @@ app:
   - TEST_APP_MODULE: app
   - TEST_APP_VARIANT: DemoDebug
   - JDK_VERSION: 17
-  # Secret env vars have matching key and value
 
 workflows:
   test_flaky_and_quarantined_tests:
