@@ -126,26 +126,6 @@ supportedVersionIds[7]: 33
 supportedVersionIds[8]: 34
 supportedVersionIds[9]: 35
 ---
-brand:                  Google
-codename:               Pixel2.arm
-form:                   VIRTUAL
-formFactor:             PHONE
-id:                     Pixel2.arm
-manufacturer:           Google
-name:                   Pixel 2 (Arm)
-screenDensity:          420
-screenX:                1080
-screenY:                1920
-supportedAbis[0]:       arm64-v8a
-supportedVersionIds[0]: 26
-supportedVersionIds[1]: 27
-supportedVersionIds[2]: 28
-supportedVersionIds[3]: 29
-supportedVersionIds[4]: 30
-supportedVersionIds[5]: 31
-supportedVersionIds[6]: 32
-supportedVersionIds[7]: 33
----
 brand:                  Generic
 codename:               SmallPhone.arm
 form:                   VIRTUAL

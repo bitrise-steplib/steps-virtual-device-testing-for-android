@@ -102,7 +102,7 @@ inputs:
       MediumTablet.arm,30,en,landscape
       ```
 
-      Available devices and their OS versions, generally available models first, newest OS first (generated on 2026-07-28):
+      Available devices and their OS versions, generally available models first, newest OS first (generated on 2026-11-24):
       ```
       ┌────────────────────────────────────────────────┬──────────────────────────────────┬──────────────────────────────────┬────────────────────────┬─────────┬─────────────┬─────────┐
       │                   MODEL_NAME                   │             MODEL_ID             │          OS_VERSION_IDS          │          TAGS          │   MAKE  │  RESOLUTION │   FORM  │
@@ -110,7 +110,6 @@ inputs:
       │ Medium Phone, 6.4in/16cm (Arm)                 │ MediumPhone.arm                  │ 26,27,28,29,30,31,32,33,34,35,36 │                        │ Generic │ 2400 x 1080 │ VIRTUAL │
       │ Medium Tablet, 10.05in/25cm (Arm)              │ MediumTablet.arm                 │ 26,27,28,29,30,31,32,33,34,35    │                        │ Generic │ 2560 x 1600 │ VIRTUAL │
       │ Small Phone, 4.65in/12cm (Arm)                 │ SmallPhone.arm                   │ 26,27,28,29,30,31,32,33,34,35    │                        │ Generic │ 1280 x 720  │ VIRTUAL │
-      │ Pixel 2 (Arm)                                  │ Pixel2.arm                       │ 26,27,28,29,30,31,32,33          │                        │ Google  │ 1920 x 1080 │ VIRTUAL │
       │ Generic 720x1600 Android tablet @ 270dpi (Arm) │ AndroidTablet270dpi.arm          │ 30                               │                        │ Generic │ 1600 x 720  │ VIRTUAL │
       │ Google TV Amati                                │ AmatiTvEmulator                  │ 29                               │ beta=29, deprecated=29 │ Google  │ 1080 x 1920 │ VIRTUAL │
       │ Google TV                                      │ GoogleTvEmulator                 │ 30                               │ beta=30, deprecated=30 │ Google  │  720 x 1280 │ VIRTUAL │
